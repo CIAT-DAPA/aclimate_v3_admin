@@ -20,6 +20,23 @@
     />
   </head>
   <body>
+    <style>
+        .alert {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+    </style>
     <!-- Navbar -->
     {% if current_user.is_authenticated %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
@@ -51,6 +68,21 @@
       </div>
     </nav>
     {% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for message in messages %}
+        <!-- {{ message }} -->
+        <div
+          class="alert {% if 'error' in message %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show position-fixed bottom-0 end-0 p-3 auto-dismiss-alert"
+          role="alert" style="max-width: 300px;">
+          <div class="pe-4" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+            {{ message }} <!-- Imprime el mensaje -->
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
     <!-- Main Content -->
     <main class="">{% block content %}{% endblock %}</main>
 
@@ -59,6 +91,19 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
+
+     <script>
+        // Selecciona todas las alertas con la clase "auto-dismiss-alert"
+        var autoDismissAlerts = document.querySelectorAll('.auto-dismiss-alert');
+
+        // Itera a través de las alertas y cierra cada una después de 2 segundos
+        autoDismissAlerts.forEach(function (alert) {
+            setTimeout(function () {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000); // 2000 milisegundos = 2 segundos
+        });
+    </script>
     {% block scripts %}{% endblock %}
   </body>
 </html>
