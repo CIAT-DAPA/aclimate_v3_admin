@@ -24,7 +24,6 @@ def list_country():
 
     countries = country_service.get_all()
     return render_template('country/list.html', countries=countries, form=form)
-    return render_template('country/list.html', countries=countries)
 
 # Ruta: Agregar país
 @bp.route('/country/add', methods=['GET', 'POST'])
@@ -56,17 +55,13 @@ def edit_country(id):
 
     form = CountryForm(obj=existing)
 
-    print(existing)
-
     if form.validate_on_submit():
         update = CountryUpdate(
             name=form.name.data,
             iso2=form.iso2.data.upper(),
             enable=form.enable.data
         )
-        cualquiervariable = country_service.update(id=id, obj_in=update)
-        print(cualquiervariable)
-        print(update)
+
         flash('País actualizado correctamente.', 'success')
         return redirect(url_for('country.list_country'))
 
@@ -87,7 +82,6 @@ def delete_country(id):
 @login_required
 def reset_country(id):
     existing = country_service.get_by_id(id)
-    print(existing)
     if not existing:
         flash('País no encontrado.', 'danger')
         return redirect(url_for('country.list_country'))
