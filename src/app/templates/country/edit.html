@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Editar País{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>Editar país</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.name.label(class="form-label") }}
+      {{ form.name(class="form-control") }}
+      {% for error in form.name.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.iso2.label(class="form-label") }}
+      {{ form.iso2(class="form-control") }}
+      {% for error in form.iso2.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="form-check mb-3">
+      {{ form.enable(class="form-check-input") }}
+      {{ form.enable.label(class="form-check-label") }}
+    </div>
+
+    {{ form.submit(class="btn btn-success") }}
+    <a href="{{ url_for('country.list_country') }}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

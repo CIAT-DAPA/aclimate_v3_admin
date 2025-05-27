@@ -21,7 +21,9 @@ def create_app():
     
     # Registrar rutas
     from app.routes.main_routes import bp as main_bp
+    from app.routes.country_routes import bp as country_bp
     
     app.register_blueprint(main_bp)
+    app.register_blueprint(country_bp)
     
     return app
