@@ -13,7 +13,7 @@ adm1_service = MngAdmin1Service()
 @login_required
 def list_adm2():
     form = Adm2Form()
-    form.admin_1_id.choices = [(a.id, a.name) for a in adm1_service.get_all(filters={"enable": True})]
+    form.admin_1_id.choices = [(a.id, a.name) for a in adm1_service.get_all()]
 
     if form.validate_on_submit():
         new_adm2 = Admin2Create(
