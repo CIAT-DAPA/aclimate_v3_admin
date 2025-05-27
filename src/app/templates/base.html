@@ -20,30 +20,32 @@
     />
   </head>
   <body>
-    <style>
-        .alert {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-        .alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-    </style>
-    <!-- Navbar -->
     {% if current_user.is_authenticated %}
+    <!-- Navbar superior -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
       <div class="container-fluid">
+        <!-- Botón para toggle sidebar en móviles -->
+        <button
+          class="btn btn-outline-light sidebar-toggle me-2"
+          type="button"
+          id="sidebarToggle"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+
         <a class="navbar-brand fw-bold" href="{{ url_for('main.home') }}">
-          <i class="fas fa-cogs me-2"></i>Admin Panel
+          <i class="fas fa-cogs me-2"></i>AClimate Admin
         </a>
+
+        <!-- Botón para colapsar sidebar en desktop -->
+        <button
+          class="btn btn-outline-light d-none d-md-block me-auto ms-2"
+          type="button"
+          id="sidebarCollapseBtn"
+        >
+          <i class="fas fa-angle-double-left" id="collapseIcon"></i>
+        </button>
+
         <button
           class="navbar-toggler"
           type="button"
@@ -67,24 +69,107 @@
         </div>
       </div>
     </nav>
-    {% endif %}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for message in messages %}
-        <!-- {{ message }} -->
-        <div
-          class="alert {% if 'error' in message %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show position-fixed bottom-0 end-0 p-3 auto-dismiss-alert"
-          role="alert" style="max-width: 300px;">
-          <div class="pe-4" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-            {{ message }} <!-- Imprime el mensaje -->
-          </div>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-section">Geográfico</div>
+      <nav class="nav flex-column">
+        <a class="nav-link" href="{{ url_for('country.list_country') }}">
+          <i class="fas fa-globe"></i>
+          <span>Countries</span>
+        </a>
+        <a class="nav-link" href="{{ url_for('adm1.list_adm1') }}">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Adm 1</span>
+        </a>
+        <a class="nav-link" href="{{ url_for('adm2.list_adm2') }}">
+          <i class="fas fa-map-pin"></i>
+          <span>Adm 2</span>
+        </a>
+        <a class="nav-link" href="#">
+          <i class="fas fa-location-arrow"></i>
+          <span>Locations</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-section">Cultivos</div>
+      <nav class="nav flex-column">
+        <a class="nav-link" href="#">
+          <i class="fas fa-seedling"></i>
+          <span>Crops</span>
+        </a>
+        <a class="nav-link" href="#">
+          <i class="fas fa-chart-line"></i>
+          <span>Simulations</span>
+        </a>
+        <a class="nav-link" href="#">
+          <i class="fas fa-sliders-h"></i>
+          <span>Parameters</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-section">Clima</div>
+      <nav class="nav flex-column">
+        <a class="nav-link" href="#">
+          <i class="fas fa-cloud-sun"></i>
+          <span>Weather</span>
+        </a>
+        <a class="nav-link" href="#">
+          <i class="fas fa-thermometer-half"></i>
+          <span>Parameters</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-section">Usuarios</div>
+      <nav class="nav flex-column">
+        <a class="nav-link" href="#">
+          <i class="fas fa-users"></i>
+          <span>Users</span>
+        </a>
+        <a class="nav-link" href="#">
+          <i class="fas fa-user-shield"></i>
+          <span>Roles</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content" id="mainContent">
       {% endif %}
-    {% endwith %}
-    <!-- Main Content -->
-    <main class="">{% block content %}{% endblock %}</main>
+
+      <!-- Mensajes flash -->
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for message in messages %}
+      <div
+        class="alert {% if 'error' in message %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show position-fixed bottom-0 end-0 p-3 auto-dismiss-alert"
+        role="alert"
+        style="max-width: 300px; z-index: 1050"
+      >
+        <div
+          class="pe-4"
+          style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+        >
+          {{ message }}
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <!-- Main Content -->
+      <main
+        class="{% if not current_user.is_authenticated %}pt-0{% else %}p-4{% endif %}"
+      >
+        {% block content %}{% endblock %}
+      </main>
+
+      {% if current_user.is_authenticated %}
+    </div>
+    {% endif %}
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
@@ -92,17 +177,76 @@
       crossorigin="anonymous"
     ></script>
 
-     <script>
-        // Selecciona todas las alertas con la clase "auto-dismiss-alert"
-        var autoDismissAlerts = document.querySelectorAll('.auto-dismiss-alert');
+    <script>
+      // Auto-dismiss alerts
+      var autoDismissAlerts = document.querySelectorAll(".auto-dismiss-alert");
+      autoDismissAlerts.forEach(function (alert) {
+        setTimeout(function () {
+          var bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        }, 5000);
+      });
 
-        // Itera a través de las alertas y cierra cada una después de 2 segundos
-        autoDismissAlerts.forEach(function (alert) {
-            setTimeout(function () {
-                var bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            }, 5000); // 2000 milisegundos = 2 segundos
+      // Sidebar functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.getElementById("sidebar");
+        const mainContent = document.getElementById("mainContent");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+        const sidebarCollapseBtn =
+          document.getElementById("sidebarCollapseBtn");
+        const collapseIcon = document.getElementById("collapseIcon");
+
+        // Toggle sidebar en móviles
+        if (sidebarToggle) {
+          sidebarToggle.addEventListener("click", function () {
+            sidebar.classList.toggle("show");
+          });
+        }
+
+        // Colapsar sidebar en desktop
+        if (sidebarCollapseBtn) {
+          sidebarCollapseBtn.addEventListener("click", function () {
+            sidebar.classList.toggle("collapsed");
+            mainContent.classList.toggle("expanded");
+
+            // Cambiar icono
+            if (sidebar.classList.contains("collapsed")) {
+              collapseIcon.classList.remove("fa-angle-double-left");
+              collapseIcon.classList.add("fa-angle-double-right");
+            } else {
+              collapseIcon.classList.remove("fa-angle-double-right");
+              collapseIcon.classList.add("fa-angle-double-left");
+            }
+          });
+        }
+
+        // Cerrar sidebar en móviles al hacer click fuera
+        document.addEventListener("click", function (event) {
+          if (window.innerWidth <= 768) {
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isClickOnToggle =
+              sidebarToggle && sidebarToggle.contains(event.target);
+
+            if (
+              !isClickInsideSidebar &&
+              !isClickOnToggle &&
+              sidebar.classList.contains("show")
+            ) {
+              sidebar.classList.remove("show");
+            }
+          }
         });
+
+        // Highlight active nav link
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll(".sidebar .nav-link");
+
+        navLinks.forEach(function (link) {
+          if (link.getAttribute("href") === currentPath) {
+            link.classList.add("active");
+          }
+        });
+      });
     </script>
     {% block scripts %}{% endblock %}
   </body>

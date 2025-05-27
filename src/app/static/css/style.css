@@ -1,0 +1,132 @@
+.alert {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+.alert-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+/* Estilos para el sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  padding-top: 76px; /* Altura del navbar superior */
+  z-index: 1000;
+  transition: all 0.3s;
+  overflow-y: auto;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.sidebar .nav-link {
+  color: #495057;
+  padding: 12px 20px;
+  border-radius: 0;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #e9ecef;
+  color: #007bff;
+}
+
+.sidebar .nav-link.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.sidebar .nav-link i {
+  width: 20px;
+  margin-right: 10px;
+  text-align: center;
+}
+
+.sidebar.collapsed .nav-link span {
+  display: none;
+}
+
+.sidebar.collapsed .nav-link {
+  justify-content: center;
+  padding: 12px 10px;
+}
+
+.sidebar.collapsed .nav-link i {
+  margin-right: 0;
+}
+
+/* Ajustar el contenido principal */
+.main-content {
+  margin-left: 250px;
+  padding-top: 76px;
+  min-height: 100vh;
+  transition: all 0.3s;
+}
+
+.main-content.expanded {
+  margin-left: 80px;
+}
+
+/* Navbar superior ajustado */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+}
+
+.navbar .sidebar-toggle {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 250px;
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .navbar .sidebar-toggle {
+    display: block;
+  }
+}
+
+/* Sección del sidebar */
+.sidebar-section {
+  padding: 15px 20px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6c757d;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 5px;
+}
+
+.sidebar.collapsed .sidebar-section {
+  display: none;
+}
