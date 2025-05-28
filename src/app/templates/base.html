@@ -14,6 +14,20 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       rel="stylesheet"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bs-primary: #bc6c25;
+        --bs-dark: #283618;
+        --bs-dark-rgb: 40, 54, 24;
+        --bs-font-sans-serif: "Montserrat", sans-serif;
+      }
+    </style>
     <link
       href="{{ url_for('static', filename='css/style.css') }}"
       rel="stylesheet"
@@ -39,8 +53,16 @@
           <i class="fas fa-bars"></i>
         </button>
 
-        <a class="navbar-brand fw-bold" href="{{ url_for('main.home') }}">
-          <i class="fas fa-cogs me-2"></i>AClimate Admin
+        <a
+          class="navbar-brand d-flex align-items-center"
+          href="{{ url_for('main.home') }}"
+        >
+          <img
+            src="{{ url_for('static', filename='img/logo.png') }}"
+            class="img-fluid me-2"
+            alt="AClimate Logo"
+            style="max-height: 35px"
+          />AClimate Admin
         </a>
 
         <button
