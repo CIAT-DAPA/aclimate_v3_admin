@@ -22,14 +22,17 @@
   <body>
     {% if current_user.is_authenticated %}
     <!-- Área de trigger para hover -->
-    <div class="sidebar-trigger" id="sidebarTrigger"></div>
+    <div
+      class="sidebar-trigger position-fixed top-0 start-0 h-100"
+      id="sidebarTrigger"
+    ></div>
 
     <!-- Navbar superior -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow fixed-top">
       <div class="container-fluid">
         <!-- Botón para toggle sidebar en móviles -->
         <button
-          class="btn btn-outline-light sidebar-toggle me-2"
+          class="btn btn-outline-light d-md-none me-2"
           type="button"
           id="sidebarToggle"
         >
@@ -65,31 +68,46 @@
     </nav>
 
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+    <div
+      class="sidebar position-fixed top-0 start-0 h-100 bg-light border-end overflow-auto"
+      style="z-index: 1000"
+      id="sidebar"
+    >
       <!-- Sección Geográfico -->
-      <div class="sidebar-section-collapsible">
+      <div class="sidebar-section-collapsible mb-1">
         <div
-          class="sidebar-section-header"
+          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
           data-bs-toggle="collapse"
           data-bs-target="#geograficoSection"
           aria-expanded="true"
         >
-          <i class="fas fa-globe section-icon"></i>
-          <span class="section-title">Geográfico</span>
-          <i class="fas fa-chevron-down collapse-icon"></i>
+          <i class="fas fa-globe section-icon me-2 text-center"></i>
+          <span class="section-title fw-semibold text-uppercase flex-grow-1"
+            >Geográfico</span
+          >
+          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
         <div class="collapse show" id="geograficoSection">
           <nav class="nav flex-column">
-            <a class="nav-link" href="{{ url_for('country.list_country') }}">
+            <a
+              class="nav-link d-flex align-items-center text-dark"
+              href="{{ url_for('country.list_country') }}"
+            >
               <span>Countries</span>
             </a>
-            <a class="nav-link" href="{{ url_for('adm1.list_adm1') }}">
+            <a
+              class="nav-link d-flex align-items-center text-dark"
+              href="{{ url_for('adm1.list_adm1') }}"
+            >
               <span>Adm 1</span>
             </a>
-            <a class="nav-link" href="{{ url_for('adm2.list_adm2') }}">
+            <a
+              class="nav-link d-flex align-items-center text-dark"
+              href="{{ url_for('adm2.list_adm2') }}"
+            >
               <span>Adm 2</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
               <span>Locations</span>
             </a>
           </nav>
@@ -97,26 +115,28 @@
       </div>
 
       <!-- Sección Cultivos -->
-      <div class="sidebar-section-collapsible">
+      <div class="sidebar-section-collapsible mb-1">
         <div
-          class="sidebar-section-header"
+          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
           data-bs-toggle="collapse"
           data-bs-target="#cultivosSection"
           aria-expanded="false"
         >
-          <i class="fas fa-seedling section-icon"></i>
-          <span class="section-title">Cultivos</span>
-          <i class="fas fa-chevron-down collapse-icon"></i>
+          <i class="fas fa-seedling section-icon me-2 text-center"></i>
+          <span class="section-title fw-semibold text-uppercase flex-grow-1"
+            >Cultivos</span
+          >
+          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
         <div class="collapse" id="cultivosSection">
           <nav class="nav flex-column">
-            <a class="nav-link" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
               <span>Crops</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
               <span>Simulations</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
               <span>Parameters</span>
             </a>
           </nav>
@@ -124,23 +144,25 @@
       </div>
 
       <!-- Sección Clima -->
-      <div class="sidebar-section-collapsible">
+      <div class="sidebar-section-collapsible mb-1">
         <div
-          class="sidebar-section-header"
+          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
           data-bs-toggle="collapse"
           data-bs-target="#climaSection"
           aria-expanded="false"
         >
-          <i class="fas fa-cloud-sun section-icon"></i>
-          <span class="section-title">Clima</span>
-          <i class="fas fa-chevron-down collapse-icon"></i>
+          <i class="fas fa-cloud-sun section-icon me-2 text-center"></i>
+          <span class="section-title fw-semibold text-uppercase flex-grow-1"
+            >Clima</span
+          >
+          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
         <div class="collapse" id="climaSection">
           <nav class="nav flex-column">
-            <a class="nav-link" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
               <span>Weather</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
               <span>Parameters</span>
             </a>
           </nav>
@@ -148,23 +170,25 @@
       </div>
 
       <!-- Sección Usuarios -->
-      <div class="sidebar-section-collapsible">
+      <div class="sidebar-section-collapsible mb-1">
         <div
-          class="sidebar-section-header"
+          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
           data-bs-toggle="collapse"
           data-bs-target="#usuariosSection"
           aria-expanded="false"
         >
-          <i class="fas fa-users section-icon"></i>
-          <span class="section-title">Usuarios</span>
-          <i class="fas fa-chevron-down collapse-icon"></i>
+          <i class="fas fa-users section-icon me-2 text-center"></i>
+          <span class="section-title fw-semibold text-uppercase flex-grow-1"
+            >Usuarios</span
+          >
+          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
         <div class="collapse" id="usuariosSection">
           <nav class="nav flex-column">
-            <a class="nav-link" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
               <span>Users</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
               <span>Roles</span>
             </a>
           </nav>
@@ -216,116 +240,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <script>
-      // Auto-dismiss alerts
-      var autoDismissAlerts = document.querySelectorAll(".auto-dismiss-alert");
-      autoDismissAlerts.forEach(function (alert) {
-        setTimeout(function () {
-          var bsAlert = new bootstrap.Alert(alert);
-          bsAlert.close();
-        }, 5000);
-      });
-
-      // Sidebar functionality
-      document.addEventListener("DOMContentLoaded", function () {
-        const sidebar = document.getElementById("sidebar");
-        const sidebarTrigger = document.getElementById("sidebarTrigger");
-        const sidebarToggle = document.getElementById("sidebarToggle");
-
-        // Función para manejar el hover del sidebar
-        function handleSidebarHover() {
-          if (window.innerWidth <= 1200 && window.innerWidth > 768) {
-            // Hover sobre el área de trigger
-            sidebarTrigger.addEventListener("mouseenter", function () {
-              sidebar.classList.add("hover-active");
-            });
-
-            // Hover sobre el sidebar mismo
-            sidebar.addEventListener("mouseenter", function () {
-              sidebar.classList.add("hover-active");
-            });
-
-            // Mouse leave del sidebar
-            sidebar.addEventListener("mouseleave", function () {
-              sidebar.classList.remove("hover-active");
-            });
-
-            // Mouse leave del trigger
-            sidebarTrigger.addEventListener("mouseleave", function () {
-              setTimeout(() => {
-                if (!sidebar.matches(":hover")) {
-                  sidebar.classList.remove("hover-active");
-                }
-              }, 100);
-            });
-          }
-        }
-
-        // Toggle sidebar en móviles
-        if (sidebarToggle) {
-          sidebarToggle.addEventListener("click", function () {
-            sidebar.classList.toggle("hover-active");
-          });
-        }
-
-        // Cerrar sidebar en móviles al hacer click fuera
-        document.addEventListener("click", function (event) {
-          if (window.innerWidth <= 768) {
-            const isClickInsideSidebar = sidebar.contains(event.target);
-            const isClickOnToggle =
-              sidebarToggle && sidebarToggle.contains(event.target);
-
-            if (
-              !isClickInsideSidebar &&
-              !isClickOnToggle &&
-              sidebar.classList.contains("hover-active")
-            ) {
-              sidebar.classList.remove("hover-active");
-            }
-          }
-        });
-
-        // Highlight active nav link
-        const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll(".sidebar .nav-link");
-
-        navLinks.forEach(function (link) {
-          if (link.getAttribute("href") === currentPath) {
-            link.classList.add("active");
-          }
-        });
-
-        // Manejar rotación de íconos de colapso
-        const collapseElements = document.querySelectorAll(".collapse");
-        collapseElements.forEach(function (collapseEl) {
-          collapseEl.addEventListener("show.bs.collapse", function () {
-            const header = document.querySelector(
-              `[data-bs-target="#${this.id}"]`
-            );
-            const icon = header.querySelector(".collapse-icon");
-            icon.style.transform = "rotate(180deg)";
-          });
-
-          collapseEl.addEventListener("hide.bs.collapse", function () {
-            const header = document.querySelector(
-              `[data-bs-target="#${this.id}"]`
-            );
-            const icon = header.querySelector(".collapse-icon");
-            icon.style.transform = "rotate(0deg)";
-          });
-        });
-
-        // Inicializar hover functionality
-        handleSidebarHover();
-
-        // Re-inicializar en resize
-        window.addEventListener("resize", function () {
-          // Limpiar clases de hover al cambiar tamaño
-          sidebar.classList.remove("hover-active");
-          handleSidebarHover();
-        });
-      });
-    </script>
+    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
     {% block scripts %}{% endblock %}
   </body>
 </html>
