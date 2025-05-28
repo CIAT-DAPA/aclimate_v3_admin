@@ -33,18 +33,82 @@
   width: 80px;
 }
 
+/* Estilos para secciones colapsables */
+.sidebar-section-collapsible {
+  margin-bottom: 5px;
+}
+
+.sidebar-section-header {
+  padding: 15px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background-color: #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.3s;
+  user-select: none;
+}
+
+.sidebar-section-header:hover {
+  background-color: #dee2e6;
+}
+
+.sidebar-section-header .section-icon {
+  width: 20px;
+  margin-right: 10px;
+  text-align: center;
+  color: #495057;
+}
+
+.sidebar-section-header .section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #495057;
+  flex-grow: 1;
+}
+
+.sidebar-section-header .collapse-icon {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.3s;
+  color: #6c757d;
+}
+
+/* Estilos para sidebar colapsado */
+.sidebar.collapsed .sidebar-section-header {
+  justify-content: center;
+  padding: 15px 10px;
+}
+
+.sidebar.collapsed .sidebar-section-header .section-title,
+.sidebar.collapsed .sidebar-section-header .collapse-icon {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-section-header .section-icon {
+  margin-right: 0;
+}
+
+.sidebar.collapsed .sidebar-section-collapsible .collapse {
+  display: none !important;
+}
+
+/* Estilos para los links del sidebar */
 .sidebar .nav-link {
   color: #495057;
-  padding: 12px 20px;
+  padding: 8px 20px 8px 40px;
   border-radius: 0;
   transition: all 0.3s;
   display: flex;
   align-items: center;
+  font-size: 0.9rem;
 }
 
 .sidebar .nav-link:hover {
   background-color: #e9ecef;
   color: #007bff;
+  text-decoration: none;
 }
 
 .sidebar .nav-link.active {
@@ -52,23 +116,12 @@
   color: white;
 }
 
-.sidebar .nav-link i {
-  width: 20px;
-  margin-right: 10px;
-  text-align: center;
-}
-
-.sidebar.collapsed .nav-link span {
-  display: none;
+.sidebar .nav-link span {
+  margin-left: 0;
 }
 
 .sidebar.collapsed .nav-link {
-  justify-content: center;
-  padding: 12px 10px;
-}
-
-.sidebar.collapsed .nav-link i {
-  margin-right: 0;
+  display: none;
 }
 
 /* Ajustar el contenido principal */
@@ -114,19 +167,4 @@
   .navbar .sidebar-toggle {
     display: block;
   }
-}
-
-/* Sección del sidebar */
-.sidebar-section {
-  padding: 15px 20px 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: #6c757d;
-  border-bottom: 1px solid #dee2e6;
-  margin-bottom: 5px;
-}
-
-.sidebar.collapsed .sidebar-section {
-  display: none;
 }

@@ -72,65 +72,110 @@
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-      <div class="sidebar-section">Geográfico</div>
-      <nav class="nav flex-column">
-        <a class="nav-link" href="{{ url_for('country.list_country') }}">
-          <i class="fas fa-globe"></i>
-          <span>Countries</span>
-        </a>
-        <a class="nav-link" href="{{ url_for('adm1.list_adm1') }}">
-          <i class="fas fa-map-marker-alt"></i>
-          <span>Adm 1</span>
-        </a>
-        <a class="nav-link" href="{{ url_for('adm2.list_adm2') }}">
-          <i class="fas fa-map-pin"></i>
-          <span>Adm 2</span>
-        </a>
-        <a class="nav-link" href="#">
-          <i class="fas fa-location-arrow"></i>
-          <span>Locations</span>
-        </a>
-      </nav>
+      <!-- Sección Geográfico -->
+      <div class="sidebar-section-collapsible">
+        <div
+          class="sidebar-section-header"
+          data-bs-toggle="collapse"
+          data-bs-target="#geograficoSection"
+          aria-expanded="true"
+        >
+          <i class="fas fa-globe section-icon"></i>
+          <span class="section-title">Geográfico</span>
+          <i class="fas fa-chevron-down collapse-icon"></i>
+        </div>
+        <div class="collapse show" id="geograficoSection">
+          <nav class="nav flex-column">
+            <a class="nav-link" href="{{ url_for('country.list_country') }}">
+              <span>Countries</span>
+            </a>
+            <a class="nav-link" href="{{ url_for('adm1.list_adm1') }}">
+              <span>Adm 1</span>
+            </a>
+            <a class="nav-link" href="{{ url_for('adm2.list_adm2') }}">
+              <span>Adm 2</span>
+            </a>
+            <a class="nav-link" href="#">
+              <span>Locations</span>
+            </a>
+          </nav>
+        </div>
+      </div>
 
-      <div class="sidebar-section">Cultivos</div>
-      <nav class="nav flex-column">
-        <a class="nav-link" href="#">
-          <i class="fas fa-seedling"></i>
-          <span>Crops</span>
-        </a>
-        <a class="nav-link" href="#">
-          <i class="fas fa-chart-line"></i>
-          <span>Simulations</span>
-        </a>
-        <a class="nav-link" href="#">
-          <i class="fas fa-sliders-h"></i>
-          <span>Parameters</span>
-        </a>
-      </nav>
+      <!-- Sección Cultivos -->
+      <div class="sidebar-section-collapsible">
+        <div
+          class="sidebar-section-header"
+          data-bs-toggle="collapse"
+          data-bs-target="#cultivosSection"
+          aria-expanded="false"
+        >
+          <i class="fas fa-seedling section-icon"></i>
+          <span class="section-title">Cultivos</span>
+          <i class="fas fa-chevron-down collapse-icon"></i>
+        </div>
+        <div class="collapse" id="cultivosSection">
+          <nav class="nav flex-column">
+            <a class="nav-link" href="#">
+              <span>Crops</span>
+            </a>
+            <a class="nav-link" href="#">
+              <span>Simulations</span>
+            </a>
+            <a class="nav-link" href="#">
+              <span>Parameters</span>
+            </a>
+          </nav>
+        </div>
+      </div>
 
-      <div class="sidebar-section">Clima</div>
-      <nav class="nav flex-column">
-        <a class="nav-link" href="#">
-          <i class="fas fa-cloud-sun"></i>
-          <span>Weather</span>
-        </a>
-        <a class="nav-link" href="#">
-          <i class="fas fa-thermometer-half"></i>
-          <span>Parameters</span>
-        </a>
-      </nav>
+      <!-- Sección Clima -->
+      <div class="sidebar-section-collapsible">
+        <div
+          class="sidebar-section-header"
+          data-bs-toggle="collapse"
+          data-bs-target="#climaSection"
+          aria-expanded="false"
+        >
+          <i class="fas fa-cloud-sun section-icon"></i>
+          <span class="section-title">Clima</span>
+          <i class="fas fa-chevron-down collapse-icon"></i>
+        </div>
+        <div class="collapse" id="climaSection">
+          <nav class="nav flex-column">
+            <a class="nav-link" href="#">
+              <span>Weather</span>
+            </a>
+            <a class="nav-link" href="#">
+              <span>Parameters</span>
+            </a>
+          </nav>
+        </div>
+      </div>
 
-      <div class="sidebar-section">Usuarios</div>
-      <nav class="nav flex-column">
-        <a class="nav-link" href="#">
-          <i class="fas fa-users"></i>
-          <span>Users</span>
-        </a>
-        <a class="nav-link" href="#">
-          <i class="fas fa-user-shield"></i>
-          <span>Roles</span>
-        </a>
-      </nav>
+      <!-- Sección Usuarios -->
+      <div class="sidebar-section-collapsible">
+        <div
+          class="sidebar-section-header"
+          data-bs-toggle="collapse"
+          data-bs-target="#usuariosSection"
+          aria-expanded="false"
+        >
+          <i class="fas fa-users section-icon"></i>
+          <span class="section-title">Usuarios</span>
+          <i class="fas fa-chevron-down collapse-icon"></i>
+        </div>
+        <div class="collapse" id="usuariosSection">
+          <nav class="nav flex-column">
+            <a class="nav-link" href="#">
+              <span>Users</span>
+            </a>
+            <a class="nav-link" href="#">
+              <span>Roles</span>
+            </a>
+          </nav>
+        </div>
+      </div>
     </div>
 
     <!-- Contenido principal -->
@@ -245,6 +290,26 @@
           if (link.getAttribute("href") === currentPath) {
             link.classList.add("active");
           }
+        });
+
+        // Manejar rotación de íconos de colapso
+        const collapseElements = document.querySelectorAll(".collapse");
+        collapseElements.forEach(function (collapseEl) {
+          collapseEl.addEventListener("show.bs.collapse", function () {
+            const header = document.querySelector(
+              `[data-bs-target="#${this.id}"]`
+            );
+            const icon = header.querySelector(".collapse-icon");
+            icon.style.transform = "rotate(180deg)";
+          });
+
+          collapseEl.addEventListener("hide.bs.collapse", function () {
+            const header = document.querySelector(
+              `[data-bs-target="#${this.id}"]`
+            );
+            const icon = header.querySelector(".collapse-icon");
+            icon.style.transform = "rotate(0deg)";
+          });
         });
       });
     </script>
