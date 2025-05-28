@@ -1,63 +1,73 @@
 {% extends "base.html" %} {% block title %}Iniciar Sesión - AClimate Admin{%
 endblock %} {% block content %}
-<div
-  class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light"
->
-  <div class="row w-100">
-    <!-- Ilustración -->
+<div class="container-fluid p-0">
+  <div class="row g-0 min-vh-100">
+    <!-- Lado izquierdo con fondo animado -->
     <div
-      class="col-md-6 d-none d-md-flex align-items-center justify-content-center"
+      class="col-md-8 bg-dark text-white position-relative d-flex flex-column"
+      id="box"
     >
-      <div class="text-center">
+      <div class="p-4 position-relative" style="z-index: 2">
         <img
-          src="{{ url_for('static', filename='img/login_bg.jpg') }}"
-          class="img-fluid mb-4"
-          alt="Office Illustration"
-          style="max-width: 400px"
+          src="{{ url_for('static', filename='img/logo.png') }}"
+          class="img-fluid"
+          alt="AClimate Logo"
+          style="max-width: 60px"
         />
-        <h5 class="text-primary">
-          Manage all the geographic<br />information from AClimate
-        </h5>
+      </div>
+
+      <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+        <div class="text-center p-4 position-relative" style="z-index: 2">
+          <h1 class="display-5 fw-normal mb-2">Bienvenido a</h1>
+          <h2 class="display-4 fw-bold mb-4">AClimate Admin</h2>
+          <p
+            class="fs-6 mx-auto"
+            style="max-width: 500px; text-wrap: pretty"
+          >
+            Sistema de administración para la gestión de los datos de AClimate.
+          </p>
+        </div>
       </div>
     </div>
 
-    <!-- Login -->
-    <div class="col-md-6 d-flex align-items-center justify-content-center">
-      <div
-        class="card shadow rounded-4 p-4"
-        style="min-width: 300px; max-width: 400px; width: 100%"
-      >
+    <!-- Lado derecho con formulario -->
+    <div
+      class="col-md-4 bg-light d-flex align-items-center justify-content-center"
+    >
+      <div class="w-100 px-3" style="min-width: 250px">
         <div class="text-center mb-4">
           <img
             src="{{ url_for('static', filename='img/logo.png') }}"
-            class="img-fluid mb-1"
+            class="img-fluid mb-3"
             alt="AClimate Logo"
             style="max-width: 90px"
           />
           <h4 class="fw-bold">AClimate Admin</h4>
+          <p>Accede al panel de administración</p>
         </div>
+
         <form method="POST" action="">
           {{ form.hidden_tag() }}
 
           <!-- Email -->
           <div class="mb-3">
-            <label for="email" class="form-label"
-              ><i class="fas fa-user me-2"></i>Mail</label
-            >
+            <label for="email" class="form-label">
+              <i class="fas fa-user me-2"></i>Mail
+            </label>
             {{ form.email(class="form-control", id="email") }}
           </div>
 
           <!-- Password -->
           <div class="mb-3">
-            <label for="password" class="form-label"
-              ><i class="fas fa-lock me-2"></i>Password</label
-            >
+            <label for="password" class="form-label">
+              <i class="fas fa-lock me-2"></i>Password
+            </label>
             {{ form.password(class="form-control", id="password") }}
           </div>
 
           <!-- Forgot password -->
           <div class="mb-3 text-end">
-            <a href="#" class="small text-decoration-none"
+            <a href="#" class="text-decoration-none"
               >Forgot your password?</a
             >
           </div>

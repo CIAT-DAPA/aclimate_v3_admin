@@ -20,29 +20,18 @@
       href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
-    <style>
-      :root {
-        --bs-primary: #bc6c25;
-        --bs-primary-rgb: 188, 108, 37;
-        --bs-dark-rgb: 40, 54, 24;
-        --bs-font-sans-serif: "Montserrat", sans-serif;
-      }
-
-      .btn-primary {
-        background-color: var(--bs-primary) !important;
-        border-color: var(--bs-primary) !important;
-        color: var(--bs-btn-color) !important; /* suele ser blanco */
-      }
-      .btn-primary:hover,
-      .btn-primary:focus {
-        background-color: rgba(var(--bs-primary-rgb), 0.85) !important;
-        border-color: rgba(var(--bs-primary-rgb), 0.85) !important;
-      }
-    </style>
+    <link
+      href="{{ url_for('static', filename='css/custom.css') }}"
+      rel="stylesheet"
+    />
     <link
       href="{{ url_for('static', filename='css/style.css') }}"
       rel="stylesheet"
     />
+
+    <!-- <script src="{{ url_for('static', filename='js/GridArrayBg.min.js')}}"></script> -->
+    <!-- <script src="{{ url_for('static', filename='js/TrianglesMosaicBg.min.js')}}"></script> -->
+    <script src="{{ url_for('static', filename='js/WaterDrop.js')}}"></script>
   </head>
   <body>
     {% if current_user.is_authenticated %}
@@ -274,6 +263,48 @@
     ></script>
 
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    <!-- <script>
+      let colorbg = new Color4Bg.GridArrayBg({
+        dom: "box",
+        colors: [
+          "#283618",
+          "#6c3909",
+          "#583a1d",
+          "#bc6c25",
+          "#34530e",
+          "#517722",
+        ],
+        loop: true,
+      });
+    </script> -->
+    <!-- <script>
+      let colorbg = new Color4Bg.TrianglesMosaicBg({
+        dom: "box",
+        colors: [
+          "#283618",
+          "#0b1207",
+          "#18352a",
+          "#283618",
+          "#0f2912",
+          "#18352a",
+        ],
+        loop: true,
+      });
+    </script> -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let colorbg = new Color4Bg.WaterDropsBg({
+          dom: "box",
+          colors: ["#ffffff"], // Solo un color para evitar el efecto "luces navideñas"
+          loop: true,
+          speed: 8, // Velocidad moderada
+          density: 3, // Densidad ajustada
+          minSize: 0.5, // Tamaño mínimo muy pequeño
+          maxSize: 2, // Tamaño máximo pequeño
+          rippleEffect: true, // Efecto de ondas cuando tocan el suelo
+        });
+      });
+    </script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

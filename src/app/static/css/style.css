@@ -1,3 +1,28 @@
+#box {
+  position: relative;
+  background-color: #283618; /* Mantiene bg-dark */
+  background-image: radial-gradient(
+    circle at 3px 3px,
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 0
+  );
+  background-size: 15px 15px;
+}
+
+#box canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+.left-content {
+  z-index: 2;
+}
+
 .sidebar {
   width: 250px;
   padding-top: 60px;
