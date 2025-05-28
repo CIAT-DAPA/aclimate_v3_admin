@@ -21,6 +21,9 @@
   </head>
   <body>
     {% if current_user.is_authenticated %}
+    <!-- Área de trigger para hover -->
+    <div class="sidebar-trigger" id="sidebarTrigger"></div>
+
     <!-- Navbar superior -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
       <div class="container-fluid">
@@ -36,15 +39,6 @@
         <a class="navbar-brand fw-bold" href="{{ url_for('main.home') }}">
           <i class="fas fa-cogs me-2"></i>AClimate Admin
         </a>
-
-        <!-- Botón para colapsar sidebar en desktop -->
-        <button
-          class="btn btn-outline-light d-none d-md-block me-auto ms-2"
-          type="button"
-          id="sidebarCollapseBtn"
-        >
-          <i class="fas fa-angle-double-left" id="collapseIcon"></i>
-        </button>
 
         <button
           class="navbar-toggler"
@@ -235,33 +229,42 @@
       // Sidebar functionality
       document.addEventListener("DOMContentLoaded", function () {
         const sidebar = document.getElementById("sidebar");
-        const mainContent = document.getElementById("mainContent");
+        const sidebarTrigger = document.getElementById("sidebarTrigger");
         const sidebarToggle = document.getElementById("sidebarToggle");
-        const sidebarCollapseBtn =
-          document.getElementById("sidebarCollapseBtn");
-        const collapseIcon = document.getElementById("collapseIcon");
+
+        // Función para manejar el hover del sidebar
+        function handleSidebarHover() {
+          if (window.innerWidth <= 1200 && window.innerWidth > 768) {
+            // Hover sobre el área de trigger
+            sidebarTrigger.addEventListener("mouseenter", function () {
+              sidebar.classList.add("hover-active");
+            });
+
+            // Hover sobre el sidebar mismo
+            sidebar.addEventListener("mouseenter", function () {
+              sidebar.classList.add("hover-active");
+            });
+
+            // Mouse leave del sidebar
+            sidebar.addEventListener("mouseleave", function () {
+              sidebar.classList.remove("hover-active");
+            });
+
+            // Mouse leave del trigger
+            sidebarTrigger.addEventListener("mouseleave", function () {
+              setTimeout(() => {
+                if (!sidebar.matches(":hover")) {
+                  sidebar.classList.remove("hover-active");
+                }
+              }, 100);
+            });
+          }
+        }
 
         // Toggle sidebar en móviles
         if (sidebarToggle) {
           sidebarToggle.addEventListener("click", function () {
-            sidebar.classList.toggle("show");
-          });
-        }
-
-        // Colapsar sidebar en desktop
-        if (sidebarCollapseBtn) {
-          sidebarCollapseBtn.addEventListener("click", function () {
-            sidebar.classList.toggle("collapsed");
-            mainContent.classList.toggle("expanded");
-
-            // Cambiar icono
-            if (sidebar.classList.contains("collapsed")) {
-              collapseIcon.classList.remove("fa-angle-double-left");
-              collapseIcon.classList.add("fa-angle-double-right");
-            } else {
-              collapseIcon.classList.remove("fa-angle-double-right");
-              collapseIcon.classList.add("fa-angle-double-left");
-            }
+            sidebar.classList.toggle("hover-active");
           });
         }
 
@@ -275,9 +278,9 @@
             if (
               !isClickInsideSidebar &&
               !isClickOnToggle &&
-              sidebar.classList.contains("show")
+              sidebar.classList.contains("hover-active")
             ) {
-              sidebar.classList.remove("show");
+              sidebar.classList.remove("hover-active");
             }
           }
         });
@@ -310,6 +313,16 @@
             const icon = header.querySelector(".collapse-icon");
             icon.style.transform = "rotate(0deg)";
           });
+        });
+
+        // Inicializar hover functionality
+        handleSidebarHover();
+
+        // Re-inicializar en resize
+        window.addEventListener("resize", function () {
+          // Limpiar clases de hover al cambiar tamaño
+          sidebar.classList.remove("hover-active");
+          handleSidebarHover();
         });
       });
     </script>
