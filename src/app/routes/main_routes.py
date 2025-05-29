@@ -25,14 +25,35 @@ def login():
         return redirect(url_for('main.home'))
     
     form = LoginForm()
-    if form.validate_on_submit():
-        user = User.get(form.email.data)
-        if user and user.check_password(form.password.data):
-            login_user(user)
-            flash('Inicio de sesión exitoso!', 'success')
-            return redirect(url_for('main.home'))
+    if request.method == 'POST':
+        email = form.email.data.strip() if form.email.data else ''
+        password = form.password.data if form.password.data else ''
+        
+        # Validación manual en el servidor
+        errors = {}
+        if not email:
+            errors['email'] = 'El email es requerido'
+        elif '@' not in email or '.' not in email.split('@')[-1]:
+            errors['email'] = 'Ingresa un email válido'
+        
+        if not password:
+            errors['password'] = 'La contraseña es requerida'
+        
+        # Si no hay errores de validación, verificar credenciales
+        if not errors:
+            user = User.get(email)
+            if user and user.check_password(password):
+                login_user(user)
+                flash('Inicio de sesión exitoso!', 'success')
+                return redirect(url_for('main.home'))
+            else:
+                flash('Correo y/o contraseña inválidas', 'error')
         else:
-            flash('Email o contraseña incorrectos', 'danger')
+            # Agregar errores al formulario para mostrar en el template
+            if 'email' in errors:
+                form.email.errors = [errors['email']]
+            if 'password' in errors:
+                form.password.errors = [errors['password']]
     
     return render_template('login.html', form=form)
 
