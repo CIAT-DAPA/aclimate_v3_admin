@@ -6,6 +6,3 @@ class Config:
     # Configuración de PostgreSQL (para más adelante)
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///app.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    # Configuración de sesiones
-    PERMANENT_SESSION_LIFETIME = 3600  # 1 hora
