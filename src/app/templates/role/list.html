@@ -1,0 +1,225 @@
+{% extends 'base.html' %} {% block title %}Roles{% endblock %} {% block content
+%}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Roles</h2>
+
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addRoleModal"
+    >
+      <i class="fas fa-plus"></i> Agregar
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda y filtros -->
+  <div class="d-flex align-items-center mb-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      placeholder="Buscar rol..."
+      style="max-width: 300px"
+      disabled
+    />
+    <button class="btn btn-secondary" disabled>
+      <i class="fas fa-filter"></i> Filtros
+    </button>
+  </div>
+
+  {% if roles %}
+  <table class="table table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th style="width: 5%"><input type="checkbox" disabled /></th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Módulos</th>
+        <th>Estado</th>
+        <th class="text-end">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for role in roles %}
+      <tr class="{{ 'table-secondary' if not role.get('enable', True) }}">
+        <td><input type="checkbox" disabled /></td>
+        <td>
+          <strong>{{ role.name }}</strong>
+        </td>
+        <td>
+          <small class="text-muted"
+            >{{ role.description or 'Sin descripción' }}</small
+          >
+        </td>
+        <td>
+          {% if role.modules %} {% for module, access in role.modules.items() %}
+          {% if access %}
+          <span class="badge bg-success me-1 mb-1">
+            {% if module == 'geographic' %}
+            <i class="fas fa-globe"></i> Geográfico {% elif module == 'crops' %}
+            <i class="fas fa-seedling"></i> Cultivos {% elif module == 'weather'
+            %} <i class="fas fa-cloud-sun"></i> Clima {% elif module == 'users'
+            %} <i class="fas fa-users"></i> Usuarios {% elif module == 'api' %}
+            <i class="fas fa-code"></i> API {% else %} {{ module.title() }} {%
+            endif %}
+          </span>
+          {% endif %} {% endfor %} {% if not role.modules.values() | select %}
+          <span class="text-muted"><i>Sin módulos asignados</i></span>
+          {% endif %} {% else %}
+          <span class="text-muted"><i>Sin módulos</i></span>
+          {% endif %}
+        </td>
+        <td>
+          {% if role.get('enable', True) %}
+          <span class="badge bg-success">
+            <i class="fas fa-check-circle"></i> Activo
+          </span>
+          {% else %}
+          <span class="badge bg-danger">
+            <i class="fas fa-times-circle"></i> Inactivo
+          </span>
+          {% endif %}
+        </td>
+        <td class="text-end">
+          <a
+            href="{{ url_for('role.edit_role', id=role.id) }}"
+            class="btn btn-warning btn-sm me-1"
+            title="Editar"
+          >
+            <i class="fas fa-pen"></i>
+          </a>
+          {% if role.get('enable', True) %} {% if role.name.lower() not in
+          ['admin', 'administrador'] %}
+          <a
+            href="{{ url_for('role.delete_role', id=role.id) }}"
+            class="btn btn-danger btn-sm"
+            title="Deshabilitar"
+            onclick="return confirm('¿Está seguro de deshabilitar este rol?')"
+          >
+            <i class="fas fa-ban"></i>
+          </a>
+          {% else %}
+          <button
+            class="btn btn-secondary btn-sm"
+            disabled
+            title="No se puede deshabilitar rol administrador"
+          >
+            <i class="fas fa-shield-alt"></i>
+          </button>
+          {% endif %} {% else %}
+          <a
+            href="{{ url_for('role.restore_role', id=role.id) }}"
+            class="btn btn-success btn-sm"
+            title="Restaurar"
+            onclick="return confirm('¿Está seguro de restaurar este rol?')"
+          >
+            <i class="fas fa-undo"></i>
+          </a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    <i class="fas fa-info-circle"></i>
+    No hay roles registrados.
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar rol -->
+<div
+  class="modal fade"
+  id="addRoleModal"
+  tabindex="-1"
+  aria-labelledby="addRoleLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addRoleLabel">
+          <i class="fas fa-user-tag"></i> Agregar Rol
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              {{ form.name.label(class="form-label") }} {{
+              form.name(class="form-control") }} {% for error in
+              form.name.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check mt-4">
+              {{ form.enable(class="form-check-input") }} {{
+              form.enable.label(class="form-check-label") }}
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }} {{
+          form.description(class="form-control") }} {% for error in
+          form.description.errors %}
+          <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.modules.label(class="form-label") }}
+          <div class="row">
+            {% for subfield in form.modules %}
+            <div class="col-md-6 mb-2">
+              <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                <label class="form-check-label" for="{{ subfield.id }}">
+                  {% if subfield.data == 'geographic' %}
+                  <i class="fas fa-map-marker-alt text-primary"></i> {{
+                  subfield.label.text }} {% elif subfield.data == 'crops' %}
+                  <i class="fas fa-seedling text-success"></i> {{
+                  subfield.label.text }} {% elif subfield.data == 'weather' %}
+                  <i class="fas fa-cloud-sun text-info"></i> {{
+                  subfield.label.text }} {% elif subfield.data == 'users' %}
+                  <i class="fas fa-users text-warning"></i> {{
+                  subfield.label.text }} {% elif subfield.data == 'api' %}
+                  <i class="fas fa-code text-secondary"></i> {{
+                  subfield.label.text }} {% else %} {{ subfield.label.text }} {%
+                  endif %}
+                </label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% for error in form.modules.errors %}
+          <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Guardar Rol
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JavaScript para manejar interacciones -->
+<script src="{{ url_for('static', filename='js/roles/list.js') }}"></script>
+{% endblock %}

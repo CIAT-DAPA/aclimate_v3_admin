@@ -24,10 +24,12 @@ def create_app():
     from app.routes.country_routes import bp as country_bp
     from app.routes.adm1_routes import bp as adm1_bp
     from app.routes.adm2_routes import bp as adm2_bp
+    from app.routes.role_routes import bp as role_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(country_bp)
     app.register_blueprint(adm1_bp)
     app.register_blueprint(adm2_bp)
+    app.register_blueprint(role_bp)
     
     return app
