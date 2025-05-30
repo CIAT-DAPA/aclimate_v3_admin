@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ get_locale() }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Admin Panel{% endblock %}</title>
+    <title>{% block title %}{{ _('Admin Panel') }}{% endblock %}</title>
     <link
       rel="icon"
       href="{{ url_for('static', filename='favicon.ico') }}"
@@ -34,8 +34,6 @@
       rel="stylesheet"
     />
 
-    <!-- <script src="{{ url_for('static', filename='js/GridArrayBg.min.js')}}"></script> -->
-    <!-- <script src="{{ url_for('static', filename='js/TrianglesMosaicBg.min.js')}}"></script> -->
     <script src="{{ url_for('static', filename='js/WaterDrop.js')}}"></script>
   </head>
   <body>
@@ -67,7 +65,7 @@
             class="img-fluid me-2"
             alt="AClimate Logo"
             style="max-height: 35px"
-          />AClimate Admin
+          />{{ _('AClimate Admin') }}
         </a>
 
         <button
@@ -80,6 +78,33 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <div class="navbar-nav ms-auto">
+            <!-- Selector de idioma -->
+            <div class="nav-item dropdown me-3">
+              <a
+                class="nav-link dropdown-toggle d-flex align-items-center"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-globe me-2"></i>
+                {% set current_lang = get_locale() %} {{
+                config.LANGUAGES[current_lang]['name'] }}
+              </a>
+              <ul class="dropdown-menu">
+                {% for lang_code, lang_info in config.LANGUAGES.items() %}
+                <li>
+                  <a
+                    class="dropdown-item {% if get_locale() == lang_code %}active{% endif %}"
+                    href="{{ url_for('language.set_language', language=lang_code) }}"
+                  >
+                    <i class="fas fa-flag me-2"></i>{{ lang_info.name }}
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+
             <span class="navbar-text me-3 d-flex align-items-center">
               <i class="fas fa-user-circle me-2"></i>{{ current_user.email }}
             </span>
@@ -87,7 +112,7 @@
               class="nav-link btn btn-sm px-3"
               href="{{ url_for('main.logout') }}"
             >
-              <i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
+              <i class="fas fa-sign-out-alt me-1"></i>{{ _('Cerrar Sesión') }}
             </a>
           </div>
         </div>
@@ -110,7 +135,7 @@
         >
           <i class="fas fa-globe section-icon me-2 text-center"></i>
           <span class="section-title fw-semibold text-uppercase flex-grow-1"
-            >Geográfico</span
+            >{{ _('Geográfico') }}</span
           >
           <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
@@ -120,22 +145,22 @@
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('country.list_country') }}"
             >
-              <span>Countries</span>
+              <span>{{ _('Countries') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('adm1.list_adm1') }}"
             >
-              <span>Adm 1</span>
+              <span>{{ _('Adm 1') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('adm2.list_adm2') }}"
             >
-              <span>Adm 2</span>
+              <span>{{ _('Adm 2') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>Locations</span>
+              <span>{{ _('Locations') }}</span>
             </a>
           </nav>
         </div>
@@ -151,20 +176,20 @@
         >
           <i class="fas fa-seedling section-icon me-2 text-center"></i>
           <span class="section-title fw-semibold text-uppercase flex-grow-1"
-            >Cultivos</span
+            >{{ _('Cultivos') }}</span
           >
           <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
         <div class="collapse" id="cultivosSection">
           <nav class="nav flex-column">
             <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>Crops</span>
+              <span>{{ _('Crops') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>Simulations</span>
+              <span>{{ _('Simulations') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>Parameters</span>
+              <span>{{ _('Parameters') }}</span>
             </a>
           </nav>
         </div>
@@ -180,17 +205,17 @@
         >
           <i class="fas fa-cloud-sun section-icon me-2 text-center"></i>
           <span class="section-title fw-semibold text-uppercase flex-grow-1"
-            >Clima</span
+            >{{ _('Clima') }}</span
           >
           <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
         <div class="collapse" id="climaSection">
           <nav class="nav flex-column">
             <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>Weather</span>
+              <span>{{ _('Weather') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>Parameters</span>
+              <span>{{ _('Parameters') }}</span>
             </a>
           </nav>
         </div>
@@ -206,20 +231,20 @@
         >
           <i class="fas fa-users section-icon me-2 text-center"></i>
           <span class="section-title fw-semibold text-uppercase flex-grow-1"
-            >Usuarios</span
+            >{{ _('Usuarios') }}</span
           >
           <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
         <div class="collapse" id="usuariosSection">
           <nav class="nav flex-column">
             <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>Users</span>
+              <span>{{ _('Users') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('role.list_role') }}"
             >
-              <span>Roles</span>
+              <span>{{ _('Roles') }}</span>
             </a>
           </nav>
         </div>
@@ -261,7 +286,7 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="alert"
-          aria-label="Close"
+          aria-label="{{ _('Close') }}"
         ></button>
       </div>
       {% endfor %} {% endif %} {% endwith %}
@@ -284,45 +309,17 @@
     ></script>
 
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
-    <!-- <script>
-      let colorbg = new Color4Bg.GridArrayBg({
-        dom: "box",
-        colors: [
-          "#283618",
-          "#6c3909",
-          "#583a1d",
-          "#bc6c25",
-          "#34530e",
-          "#517722",
-        ],
-        loop: true,
-      });
-    </script> -->
-    <!-- <script>
-      let colorbg = new Color4Bg.TrianglesMosaicBg({
-        dom: "box",
-        colors: [
-          "#283618",
-          "#0b1207",
-          "#18352a",
-          "#283618",
-          "#0f2912",
-          "#18352a",
-        ],
-        loop: true,
-      });
-    </script> -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         let colorbg = new Color4Bg.WaterDropsBg({
           dom: "box",
-          colors: ["#ffffff"], // Solo un color para evitar el efecto "luces navideñas"
+          colors: ["#ffffff"],
           loop: true,
-          speed: 8, // Velocidad moderada
-          density: 3, // Densidad ajustada
-          minSize: 0.5, // Tamaño mínimo muy pequeño
-          maxSize: 2, // Tamaño máximo pequeño
-          rippleEffect: true, // Efecto de ondas cuando tocan el suelo
+          speed: 8,
+          density: 3,
+          minSize: 0.5,
+          maxSize: 2,
+          rippleEffect: true,
         });
       });
     </script>

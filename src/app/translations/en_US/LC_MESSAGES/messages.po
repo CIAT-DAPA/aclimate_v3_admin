@@ -1,0 +1,436 @@
+# English (United States) translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-05-30 15:30-0500\n"
+"PO-Revision-Date: 2025-05-30 15:31-0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en_US\n"
+"Language-Team: en_US <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/forms/adm1_form.py:8 app/forms/adm2_form.py:8
+#: app/templates/adm1/list.html:34 app/templates/adm2/list.html:34
+#: app/templates/country/list.html:35
+msgid "Nombre"
+msgstr ""
+
+#: app/forms/adm1_form.py:10 app/forms/adm2_form.py:10
+#: app/forms/country_form.py:10
+msgid "El nombre es obligatorio."
+msgstr ""
+
+#: app/forms/adm1_form.py:11 app/forms/adm2_form.py:11
+#: app/forms/country_form.py:11
+msgid "Máximo 255 caracteres."
+msgstr ""
+
+#: app/forms/adm1_form.py:16 app/templates/adm1/list.html:35
+msgid "País"
+msgstr ""
+
+#: app/forms/adm1_form.py:18
+msgid "Debe seleccionar un país."
+msgstr ""
+
+#: app/forms/adm1_form.py:22 app/forms/adm2_form.py:23
+#: app/forms/country_form.py:24
+msgid "¿Está habilitado?"
+msgstr ""
+
+#: app/forms/adm1_form.py:24 app/forms/adm2_form.py:25
+#: app/forms/country_form.py:26
+msgid "Guardar"
+msgstr ""
+
+#: app/forms/adm2_form.py:16
+msgid "División Adm1 asociada"
+msgstr ""
+
+#: app/forms/adm2_form.py:18
+msgid "Debe seleccionar una división de nivel 1."
+msgstr ""
+
+#: app/forms/adm2_form.py:22
+msgid "¿Es visible?"
+msgstr ""
+
+#: app/forms/country_form.py:8
+msgid "Nombre del país"
+msgstr ""
+
+#: app/forms/country_form.py:16
+msgid "Código ISO2"
+msgstr ""
+
+#: app/forms/country_form.py:18
+msgid "El código ISO2 es obligatorio."
+msgstr ""
+
+#: app/forms/country_form.py:19
+msgid "Debe tener exactamente 2 letras."
+msgstr ""
+
+#: app/forms/country_form.py:20
+msgid "Debe contener solo letras mayúsculas."
+msgstr ""
+
+#: app/forms/login_form.py:7
+msgid "Email"
+msgstr ""
+
+#: app/forms/login_form.py:10
+msgid "Ingresa un email válido"
+msgstr ""
+
+#: app/forms/login_form.py:14
+msgid "Contraseña"
+msgstr ""
+
+#: app/forms/login_form.py:18
+msgid "Ingresa tu contraseña"
+msgstr ""
+
+#: app/forms/login_form.py:20
+msgid "Iniciar Sesión"
+msgstr ""
+
+#: app/forms/role_form.py:13
+msgid "Nombre del Rol"
+msgstr ""
+
+#: app/forms/role_form.py:15
+msgid "El nombre del rol es requerido"
+msgstr ""
+
+#: app/forms/role_form.py:16
+msgid "El nombre debe tener entre 2 y 50 caracteres"
+msgstr ""
+
+#: app/forms/role_form.py:18
+msgid "Ej: Editor, Administrador, Visualizador"
+msgstr ""
+
+#: app/forms/role_form.py:20
+msgid "Descripción"
+msgstr ""
+
+#: app/forms/role_form.py:22
+msgid "La descripción no puede exceder 255 caracteres"
+msgstr ""
+
+#: app/forms/role_form.py:25
+msgid "Describe las responsabilidades de este rol..."
+msgstr ""
+
+#: app/forms/role_form.py:30
+msgid "Módulos de Acceso"
+msgstr ""
+
+#: app/forms/role_form.py:32
+msgid "Geográfico - Gestión de información geográfica"
+msgstr ""
+
+#: app/forms/role_form.py:33
+msgid "Cultivos - Administración de cultivos"
+msgstr ""
+
+#: app/forms/role_form.py:34
+msgid "Clima - Información meteorológica"
+msgstr ""
+
+#: app/forms/role_form.py:35
+msgid "Usuarios - Gestión de usuarios del sistema"
+msgstr ""
+
+#: app/forms/role_form.py:36
+msgid "API - Acceso a interfaces de programación"
+msgstr ""
+
+#: app/forms/role_form.py:38
+msgid "Debe seleccionar al menos un módulo"
+msgstr ""
+
+#: app/forms/role_form.py:41 app/templates/adm1/list.html:46
+msgid "Habilitado"
+msgstr ""
+
+#: app/forms/role_form.py:43
+msgid "Guardar Rol"
+msgstr ""
+
+#: app/templates/base.html:6
+msgid "Admin Panel"
+msgstr ""
+
+#: app/templates/base.html:68 app/templates/home.html:9
+msgid "AClimate Admin"
+msgstr ""
+
+#: app/templates/base.html:115
+msgid "Cerrar Sesión"
+msgstr ""
+
+#: app/templates/base.html:138
+msgid "Geográfico"
+msgstr ""
+
+#: app/templates/base.html:148
+msgid "Countries"
+msgstr ""
+
+#: app/templates/base.html:154
+msgid "Adm 1"
+msgstr ""
+
+#: app/templates/base.html:160
+msgid "Adm 2"
+msgstr ""
+
+#: app/templates/base.html:163 app/templates/home.html:103
+msgid "Locations"
+msgstr ""
+
+#: app/templates/base.html:179
+msgid "Cultivos"
+msgstr ""
+
+#: app/templates/base.html:186 app/templates/home.html:120
+msgid "Crops"
+msgstr ""
+
+#: app/templates/base.html:189 app/templates/home.html:133
+msgid "Simulations"
+msgstr ""
+
+#: app/templates/base.html:192 app/templates/base.html:218
+#: app/templates/home.html:151 app/templates/home.html:181
+msgid "Parameters"
+msgstr ""
+
+#: app/templates/base.html:208
+msgid "Clima"
+msgstr ""
+
+#: app/templates/base.html:215 app/templates/home.html:168
+msgid "Weather"
+msgstr ""
+
+#: app/templates/base.html:234
+msgid "Usuarios"
+msgstr ""
+
+#: app/templates/base.html:241 app/templates/home.html:196
+#: app/templates/home.html:230
+msgid "Users"
+msgstr ""
+
+#: app/templates/base.html:247 app/templates/home.html:212
+msgid "Roles"
+msgstr ""
+
+#: app/templates/base.html:289
+msgid "Close"
+msgstr ""
+
+#: app/templates/home.html:12
+msgid ""
+"Manage all necessary AClimate parameters from this system, try any of the"
+" modules listed below."
+msgstr ""
+
+#: app/templates/home.html:23
+msgid "Geographic"
+msgstr ""
+
+#: app/templates/home.html:39
+msgid "Country"
+msgstr ""
+
+#: app/templates/home.html:41 app/templates/home.html:64
+#: app/templates/home.html:87 app/templates/home.html:105
+#: app/templates/home.html:135 app/templates/home.html:153
+#: app/templates/home.html:182 app/templates/home.html:214
+#: app/templates/home.html:232
+msgid "Manage"
+msgstr ""
+
+#: app/templates/home.html:61
+msgid "Administrative level 1"
+msgstr ""
+
+#: app/templates/home.html:84
+msgid "Administrative level 2"
+msgstr ""
+
+#: app/templates/home.html:249
+msgid "System Information"
+msgstr ""
+
+#: app/templates/home.html:261
+msgid "Current user"
+msgstr ""
+
+#: app/templates/home.html:271
+msgid "Role"
+msgstr ""
+
+#: app/templates/login.html:2
+msgid "Iniciar Sesión - AClimate Admin"
+msgstr ""
+
+#: app/templates/login.html:24
+msgid "Bienvenido a"
+msgstr ""
+
+#: app/templates/login.html:27
+msgid "Sistema de administración para la gestión de los datos de AClimate."
+msgstr ""
+
+#: app/templates/login.html:46
+msgid "Accede al panel de administración"
+msgstr ""
+
+#: app/templates/login.html:85
+msgid "Forgot your password?"
+msgstr ""
+
+#: app/templates/adm1/edit.html:1
+msgid "Editar Adm1"
+msgstr ""
+
+#: app/templates/adm1/edit.html:4
+msgid "Editar división administrativa"
+msgstr ""
+
+#: app/templates/adm1/edit.html:30 app/templates/adm1/list.html:127
+#: app/templates/adm2/edit.html:41 app/templates/adm2/list.html:133
+#: app/templates/country/edit.html:29 app/templates/country/list.html:121
+msgid "Cancelar"
+msgstr ""
+
+#: app/templates/adm1/list.html:1
+msgid "Divisiones Adm1"
+msgstr ""
+
+#: app/templates/adm1/list.html:5
+msgid "Divisiones administrativas - Nivel 1"
+msgstr ""
+
+#: app/templates/adm1/list.html:11 app/templates/adm1/list.html:130
+#: app/templates/adm2/list.html:11 app/templates/adm2/list.html:135
+#: app/templates/country/list.html:12 app/templates/country/list.html:124
+msgid "Agregar"
+msgstr ""
+
+#: app/templates/adm1/list.html:20
+msgid "Buscar..."
+msgstr ""
+
+#: app/templates/adm1/list.html:25 app/templates/adm2/list.html:25
+#: app/templates/country/list.html:26
+msgid "Filtros"
+msgstr ""
+
+#: app/templates/adm1/list.html:36 app/templates/adm2/list.html:37
+msgid "Estado"
+msgstr ""
+
+#: app/templates/adm1/list.html:37 app/templates/adm2/list.html:38
+#: app/templates/country/list.html:37
+msgid "Acciones"
+msgstr ""
+
+#: app/templates/adm1/list.html:46
+msgid "Deshabilitado"
+msgstr ""
+
+#: app/templates/adm1/list.html:51
+msgid "Editar"
+msgstr ""
+
+#: app/templates/adm1/list.html:59
+msgid "Deshabilitar"
+msgstr ""
+
+#: app/templates/adm1/list.html:67
+msgid "Recuperar"
+msgstr ""
+
+#: app/templates/adm1/list.html:79 app/templates/adm2/list.html:81
+msgid "No hay divisiones administrativas registradas."
+msgstr ""
+
+#: app/templates/adm1/list.html:97
+msgid "Agregar división Adm1"
+msgstr ""
+
+#: app/templates/adm1/list.html:103
+msgid "Cerrar"
+msgstr ""
+
+#: app/templates/adm2/edit.html:1
+msgid "Editar Adm2"
+msgstr ""
+
+#: app/templates/adm2/edit.html:5
+msgid "Editar división administrativa - Nivel 2"
+msgstr ""
+
+#: app/templates/adm2/edit.html:7
+msgid "Volver al listado"
+msgstr ""
+
+#: app/templates/adm2/list.html:1
+msgid "Divisiones Adm2"
+msgstr ""
+
+#: app/templates/adm2/list.html:5
+msgid "Divisiones administrativas - Nivel 2"
+msgstr ""
+
+#: app/templates/adm2/list.html:35
+msgid "Adm1 asociado"
+msgstr ""
+
+#: app/templates/adm2/list.html:36
+msgid "Visible"
+msgstr ""
+
+#: app/templates/adm2/list.html:99
+msgid "Agregar división Adm2"
+msgstr ""
+
+#: app/templates/country/edit.html:1
+msgid "Editar País"
+msgstr ""
+
+#: app/templates/country/edit.html:4
+msgid "Editar país"
+msgstr ""
+
+#: app/templates/country/list.html:1 app/templates/country/list.html:5
+msgid "Países"
+msgstr ""
+
+#: app/templates/country/list.html:36
+msgid "Código ISO"
+msgstr ""
+
+#: app/templates/country/list.html:77
+msgid "No hay países registrados."
+msgstr ""
+
+#: app/templates/country/list.html:93
+msgid "Agregar país"
+msgstr ""
+

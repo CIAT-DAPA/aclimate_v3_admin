@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_babel import lazy_gettext as _l
 from wtforms import StringField, TextAreaField, SelectMultipleField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length
 from wtforms.widgets import CheckboxInput, ListWidget
@@ -9,37 +10,37 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = CheckboxInput()
 
 class RoleForm(FlaskForm):
-    name = StringField('Nombre del Rol', 
+    name = StringField(_l('Nombre del Rol'), 
                       validators=[
-                          DataRequired(message='El nombre del rol es requerido'),
-                          Length(min=2, max=50, message='El nombre debe tener entre 2 y 50 caracteres')
+                          DataRequired(message=_l('El nombre del rol es requerido')),
+                          Length(min=2, max=50, message=_l('El nombre debe tener entre 2 y 50 caracteres'))
                       ],
-                      render_kw={"placeholder": "Ej: Editor, Administrador, Visualizador"})
+                      render_kw={"placeholder": _l("Ej: Editor, Administrador, Visualizador")})
     
-    description = TextAreaField('Descripción',
+    description = TextAreaField(_l('Descripción'),
                                validators=[
-                                   Length(max=255, message='La descripción no puede exceder 255 caracteres')
+                                   Length(max=255, message=_l('La descripción no puede exceder 255 caracteres'))
                                ],
                                render_kw={
-                                   "placeholder": "Describe las responsabilidades de este rol...",
+                                   "placeholder": _l("Describe las responsabilidades de este rol..."),
                                    "rows": 3
                                })
     
     modules = MultiCheckboxField(
-        'Módulos de Acceso',
+        _l('Módulos de Acceso'),
         choices=[
-            ('geographic', 'Geográfico - Gestión de información geográfica'),
-            ('crops', 'Cultivos - Administración de cultivos'),
-            ('weather', 'Clima - Información meteorológica'),
-            ('users', 'Usuarios - Gestión de usuarios del sistema'),
-            ('api', 'API - Acceso a interfaces de programación')
+            ('geographic', _l('Geográfico - Gestión de información geográfica')),
+            ('crops', _l('Cultivos - Administración de cultivos')),
+            ('weather', _l('Clima - Información meteorológica')),
+            ('users', _l('Usuarios - Gestión de usuarios del sistema')),
+            ('api', _l('API - Acceso a interfaces de programación'))
         ],
-        validators=[DataRequired(message='Debe seleccionar al menos un módulo')]
+        validators=[DataRequired(message=_l('Debe seleccionar al menos un módulo'))]
     )
     
-    enable = BooleanField('Habilitado', default=True)
+    enable = BooleanField(_l('Habilitado'), default=True)
     
-    submit = SubmitField('Guardar Rol')
+    submit = SubmitField(_l('Guardar Rol'))
     
     def __init__(self, *args, **kwargs):
         super(RoleForm, self).__init__(*args, **kwargs)

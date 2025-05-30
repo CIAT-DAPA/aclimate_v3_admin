@@ -1,35 +1,34 @@
-{% extends 'base.html' %}
-{% block title %}Editar Adm1{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}{{_('Editar Adm1')}}{% endblock %} {%
+block content %}
 <div class="container mt-5">
-  <h2>Editar división administrativa</h2>
+  <h2>{{_('Editar división administrativa')}}</h2>
   <form method="POST">
     {{ form.hidden_tag() }}
 
     <div class="mb-3">
-      {{ form.name.label(class="form-label") }}
-      {{ form.name(class="form-control") }}
-      {% for error in form.name.errors %}
-        <div class="text-danger">{{ error }}</div>
+      {{ form.name.label(class="form-label") }} {{
+      form.name(class="form-control") }} {% for error in form.name.errors %}
+      <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
 
     <div class="mb-3">
-      {{ form.country_id.label(class="form-label") }}
-      {{ form.country_id(class="form-select") }}
-      {% for error in form.country_id.errors %}
-        <div class="text-danger">{{ error }}</div>
+      {{ form.country_id.label(class="form-label") }} {{
+      form.country_id(class="form-select") }} {% for error in
+      form.country_id.errors %}
+      <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
 
     <div class="form-check mb-3">
-      {{ form.enable(class="form-check-input") }}
-      {{ form.enable.label(class="form-check-label") }}
+      {{ form.enable(class="form-check-input") }} {{
+      form.enable.label(class="form-check-label") }}
     </div>
 
     {{ form.submit(class="btn btn-success") }}
-    <a href="{{ url_for('adm1.list_adm1') }}" class="btn btn-secondary">Cancelar</a>
+    <a href="{{ url_for('adm1.list_adm1') }}" class="btn btn-secondary"
+      >{{_('Cancelar')}}</a
+    >
   </form>
 </div>
 {% endblock %}
