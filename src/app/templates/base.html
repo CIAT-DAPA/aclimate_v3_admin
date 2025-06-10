@@ -106,7 +106,10 @@
             </div>
 
             <span class="navbar-text me-3 d-flex align-items-center">
-              <i class="fas fa-user-circle me-2"></i>{{ current_user.email }}
+              <i class="fas fa-user-circle me-2"></i>{{ current_user.username }}
+              {% if current_user.email %}
+              <small class="text-muted ms-1">({{ current_user.email }})</small>
+              {% endif %}
             </span>
             <a
               class="nav-link btn btn-sm px-3"

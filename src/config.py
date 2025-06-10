@@ -7,6 +7,9 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///app.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Configuración de la API
+    API_BASE_URL = os.environ.get('API_BASE_URL') or 'http://127.0.0.1:8000'
+
     # Configuración de internacionalización
     LANGUAGES = {
         'es_CO': {

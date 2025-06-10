@@ -1,17 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
+from flask_babel import _
 from app.forms.login_form import LoginForm
 from app.models import User
 from app import login_manager
+from app.decorators import token_required
 
 bp = Blueprint('main', __name__)
 
 @login_manager.user_loader
 def load_user(user_id):
-    # Por ahora solo tenemos un usuario
-    if int(user_id) == 1:
-        return User(id=1, email='admin@test.com', password='123', role='admin')
-    return None
+    """Carga el usuario desde la sesión"""
+    return User.get(user_id)
 
 @bp.route('/')
 def index():
@@ -26,45 +26,49 @@ def login():
     
     form = LoginForm()
     if request.method == 'POST':
-        email = form.email.data.strip() if form.email.data else ''
+        username = form.username.data.strip() if form.username.data else ''
         password = form.password.data if form.password.data else ''
         
         # Validación manual en el servidor
         errors = {}
-        if not email:
-            errors['email'] = 'El email es requerido'
-        elif '@' not in email or '.' not in email.split('@')[-1]:
-            errors['email'] = 'Ingresa un email válido'
+        if not username:
+            errors['username'] = _('Username is required')
+        elif len(username) < 3:
+            errors['username'] = _('Username must be at least 3 characters')
         
         if not password:
-            errors['password'] = 'La contraseña es requerida'
+            errors['password'] = _('Password is required')
         
-        # Si no hay errores de validación, verificar credenciales
+        # Si no hay errores de validación, verificar credenciales contra la API
         if not errors:
-            user = User.get(email)
-            if user and user.check_password(password):
+            user = User.authenticate(username, password)
+            if user:
                 login_user(user)
-                flash('Inicio de sesión exitoso!', 'success')
+                flash(_('Login successful!'), 'success')
                 return redirect(url_for('main.home'))
             else:
-                flash('Correo y/o contraseña inválidas', 'error')
+                flash(_('Invalid username and/or password'), 'error')
         else:
             # Agregar errores al formulario para mostrar en el template
-            if 'email' in errors:
-                form.email.errors = [errors['email']]
+            if 'username' in errors:
+                form.username.errors = [errors['username']]
             if 'password' in errors:
                 form.password.errors = [errors['password']]
     
     return render_template('login.html', form=form)
 
 @bp.route('/logout')
-@login_required
+@token_required
 def logout():
+    # Limpiar la sesión
+    session.pop('access_token', None)
+    session.pop('user_data', None)
+    
     logout_user()
-    flash('Has cerrado sesión exitosamente', 'info')
+    flash(_('You have logged out successfully'), 'info')
     return redirect(url_for('main.login'))
 
 @bp.route('/home')
-@login_required
+@token_required
 def home():
     return render_template('home.html')

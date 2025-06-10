@@ -49,18 +49,18 @@
         <form method="POST" action="">
           {{ form.hidden_tag() }}
 
-          <!-- Email -->
+          <!-- Username -->
           <div class="mb-3">
-            <label for="email" class="form-label">
-              <i class="fas fa-user me-2"></i>{{form.email.label.text}}
+            <label for="username" class="form-label">
+              <i class="fas fa-user me-2"></i>{{form.username.label.text}}
             </label>
-            {% if form.email.errors %} {{ form.email(class="form-control is-invalid", id="email") }}
+            {% if form.username.errors %} {{ form.username(class="form-control is-invalid", id="username") }}
             <div class="invalid-feedback">
-              {% for error in form.email.errors %}
+              {% for error in form.username.errors %}
               <small>{{ error }}</small>
               {% endfor %}
             </div>
-            {% else %} {{ form.email(class="form-control", id="email") }} {%
+            {% else %} {{ form.username(class="form-control", id="username") }} {%
             endif %}
           </div>
 
