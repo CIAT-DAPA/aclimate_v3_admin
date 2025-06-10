@@ -2,7 +2,6 @@ from flask import Flask, request, session
 from flask_login import LoginManager
 from flask_babel import Babel
 from config import Config
-from dotenv import load_dotenv
 from aclimate_v3_orm.database.base import create_tables
 
 login_manager = LoginManager()
@@ -25,7 +24,8 @@ def get_locale():
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    load_dotenv()
+
+    print(f"App config DATABASE_URL: {app.config.get('SQLALCHEMY_DATABASE_URI')}")
 
     create_tables()
     
