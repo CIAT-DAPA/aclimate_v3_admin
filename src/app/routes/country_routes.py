@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
+from flask_babel import _
 from aclimate_v3_orm.services import MngCountryService
 from aclimate_v3_orm.schemas import CountryCreate, CountryUpdate
 from app.forms.country_form import CountryForm
@@ -19,7 +20,7 @@ def list_country():
             enable=form.enable.data
         )
         country_service.create(new_country)
-        flash('País agregado exitosamente.', 'success')
+        flash(_('País agregado exitosamente.'), 'success')
         return redirect(url_for('country.list_country'))
 
     countries = country_service.get_all()
@@ -38,10 +39,10 @@ def add_country():
                 enable=form.enable.data
             )
             country_service.create(country)
-            flash('Country added successfully.', 'success')
+            flash(_('País agregado exitosamente.'), 'success')
             return redirect(url_for('country.list_country'))
         except Exception as e:
-            flash(f'Error adding country: {str(e)}', 'danger')
+            flash(_(f'Error adding country: {str(e)}'), 'danger')
     return render_template('country/add.html', form=form)
 
 # Ruta: Editar país
@@ -50,7 +51,7 @@ def add_country():
 def edit_country(id):
     existing = country_service.get_by_id(id)
     if not existing:
-        flash('País no encontrado.', 'danger')
+        flash(_('País no encontrado.'), 'danger')
         return redirect(url_for('country.list_country'))
 
     form = CountryForm(obj=existing)
@@ -62,7 +63,7 @@ def edit_country(id):
             enable=form.enable.data
         )
 
-        flash('País actualizado correctamente.', 'success')
+        flash(_('País actualizado correctamente.'), 'success')
         return redirect(url_for('country.list_country'))
 
     return render_template('country/edit.html', form=form, country=existing)
@@ -72,9 +73,9 @@ def edit_country(id):
 @login_required
 def delete_country(id):
     if not country_service.delete(id):
-        flash('No se pudo deshabilitar el país.', 'danger')
+        flash(_('No se pudo deshabilitar el país.'), 'danger')
     else:
-        flash('País deshabilitado.', 'warning')
+        flash(_('País deshabilitado.'), 'warning')
     return redirect(url_for('country.list_country'))
 
 # Ruta: Recuperar país
@@ -83,9 +84,9 @@ def delete_country(id):
 def reset_country(id):
     existing = country_service.get_by_id(id)
     if not existing:
-        flash('País no encontrado.', 'danger')
+        flash(_('País no encontrado.'), 'danger')
         return redirect(url_for('country.list_country'))
 
     country_service.update(id=id, obj_in={"enable": True})
-    flash('País recuperado.', 'success')
+    flash(_('País recuperado.'), 'success')
     return redirect(url_for('country.list_country'))

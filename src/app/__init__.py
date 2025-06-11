@@ -57,6 +57,7 @@ def create_app():
     from app.routes.adm1_routes import bp as adm1_bp
     from app.routes.adm2_routes import bp as adm2_bp
     from app.routes.role_routes import bp as role_bp
+    from app.routes.user_routes import bp as user_bp
     from app.routes.language_routes import bp as language_bp
     
     app.register_blueprint(main_bp)
@@ -64,6 +65,7 @@ def create_app():
     app.register_blueprint(adm1_bp)
     app.register_blueprint(adm2_bp)
     app.register_blueprint(role_bp)
+    app.register_blueprint(user_bp)
     app.register_blueprint(language_bp)
 
     return app

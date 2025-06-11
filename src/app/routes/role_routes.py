@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required
+from flask_babel import _
 from app.services.role_service import RoleService
 from app.forms.role_form import RoleForm
 
@@ -27,12 +28,12 @@ def list_role():
                 'enable': form.enable.data
             }
             role_service.create(new_role_data)
-            flash('Rol agregado exitosamente.', 'success')
+            flash(_('Rol agregado exitosamente.'), 'success')
             return redirect(url_for('role.list_role'))
         except ValueError as e:
             flash(str(e), 'error')
         except Exception as e:
-            flash(f'Error al agregar rol: {str(e)}', 'error')
+            flash(_(f'Error al agregar rol: {str(e)}'), 'error')
 
     roles = role_service.get_all()
     return render_template('role/list.html', roles=roles, form=form)
@@ -58,13 +59,13 @@ def add_role():
                 'enable': form.enable.data
             }
             role_service.create(role_data)
-            flash('Rol agregado exitosamente.', 'success')
+            flash(_('Rol agregado exitosamente.'), 'success')
             return redirect(url_for('role.list_role'))
         except ValueError as e:
             flash(str(e), 'error')
         except Exception as e:
-            flash(f'Error al agregar rol: {str(e)}', 'error')
-    
+            flash(_(f'Error al agregar rol: {str(e)}'), 'error')
+
     return render_template('role/add.html', form=form)
 
 # Ruta: Editar rol
@@ -73,7 +74,7 @@ def add_role():
 def edit_role(id):
     existing = role_service.get_by_id(id)
     if not existing:
-        flash('Rol no encontrado.', 'error')
+        flash(_('Rol no encontrado.'), 'error')
         return redirect(url_for('role.list_role'))
 
     # Crear formulario con datos existentes
@@ -109,12 +110,12 @@ def edit_role(id):
             }
             
             role_service.update(id, update_data)
-            flash('Rol actualizado correctamente.', 'success')
+            flash(_('Rol actualizado correctamente.'), 'success')
             return redirect(url_for('role.list_role'))
         except ValueError as e:
             flash(str(e), 'error')
         except Exception as e:
-            flash(f'Error al actualizar rol: {str(e)}', 'error')
+            flash(_(f'Error al actualizar rol: {str(e)}'), 'error')
 
     return render_template('role/edit.html', form=form, role=existing)
 
@@ -124,19 +125,18 @@ def edit_role(id):
 def delete_role(id):
     existing = role_service.get_by_id(id)
     if not existing:
-        flash('Rol no encontrado.', 'error')
+        flash(_('Rol no encontrado.'), 'error')
         return redirect(url_for('role.list_role'))
     
     # Verificar si es un rol crítico que no se puede deshabilitar
     if existing['name'].lower() in ['admin', 'administrador']:
-        flash('No se puede deshabilitar el rol de administrador.', 'error')
+        flash(_('No se puede deshabilitar el rol de administrador.'), 'error')
         return redirect(url_for('role.list_role'))
-    
+
     if not role_service.delete(id):
-        flash('No se pudo deshabilitar el rol.', 'error')
+        flash(_('No se pudo deshabilitar el rol.'), 'error')
     else:
-        flash('Rol deshabilitado.', 'warning')
-    
+        flash(_('Rol deshabilitado.'), 'warning')
     return redirect(url_for('role.list_role'))
 
 # Ruta: Recuperar rol
@@ -145,14 +145,13 @@ def delete_role(id):
 def restore_role(id):
     existing = role_service.get_by_id(id)
     if not existing:
-        flash('Rol no encontrado.', 'error')
+        flash(_('Rol no encontrado.'), 'error')
         return redirect(url_for('role.list_role'))
 
     if role_service.restore(id):
-        flash('Rol recuperado exitosamente.', 'success')
+        flash(_('Rol recuperado exitosamente.'), 'success')
     else:
-        flash('No se pudo recuperar el rol.', 'error')
-    
+        flash(_('No se pudo recuperar el rol.'), 'error')
     return redirect(url_for('role.list_role'))
 
 # Ruta: Ver detalle del rol
@@ -161,7 +160,7 @@ def restore_role(id):
 def view_role(id):
     role = role_service.get_by_id(id)
     if not role:
-        flash('Rol no encontrado.', 'error')
+        flash(_('Rol no encontrado.'), 'error')
         return redirect(url_for('role.list_role'))
     
     return render_template('role/view.html', role=role)

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
+from flask_babel import _
 from aclimate_v3_orm.services import MngAdmin2Service, MngAdmin1Service
 from aclimate_v3_orm.schemas import Admin2Create, Admin2Update
 from app.forms.adm2_form import Adm2Form
@@ -23,7 +24,7 @@ def list_adm2():
             enable=form.enable.data
         )
         adm2_service.create(new_adm2)
-        flash('División administrativa agregada correctamente.', 'success')
+        flash(_('División administrativa agregada correctamente.'), 'success')
         return redirect(url_for('adm2.list_adm2'))
 
     adm2_list = adm2_service.get_all()
@@ -44,7 +45,7 @@ def add_adm2():
             enable=form.enable.data
         )
         adm2_service.create(new_adm2)
-        flash('División administrativa agregada correctamente.', 'success')
+        flash(_('División administrativa agregada correctamente.'), 'success')
         return redirect(url_for('adm2.list_adm2'))
 
     return render_template('adm2/add.html', form=form)
@@ -55,7 +56,7 @@ def add_adm2():
 def edit_adm2(id):
     adm = adm2_service.get_by_id(id)
     if not adm:
-        flash('Registro no encontrado.', 'danger')
+        flash(_('Registro no encontrado.'), 'danger')
         return redirect(url_for('adm2.list_adm2'))
 
     form = Adm2Form(obj=adm)
@@ -72,7 +73,7 @@ def edit_adm2(id):
             enable=form.enable.data
         )
         adm2_service.update(id=id, obj_in=update_data)
-        flash('División administrativa actualizada.', 'success')
+        flash(_('División administrativa actualizada.'), 'success')
         return redirect(url_for('adm2.list_adm2'))
 
     return render_template('adm2/edit.html', form=form, adm=adm)
@@ -82,9 +83,9 @@ def edit_adm2(id):
 @login_required
 def delete_adm2(id):
     if not adm2_service.delete(id):
-        flash('No se pudo deshabilitar la división.', 'danger')
+        flash(_('No se pudo deshabilitar la división.'), 'danger')
     else:
-        flash('División deshabilitada correctamente.', 'warning')
+        flash(_('División deshabilitada correctamente.'), 'warning')
     return redirect(url_for('adm2.list_adm2'))
 
 # Ruta: Recuperar Admin2
@@ -93,9 +94,9 @@ def delete_adm2(id):
 def reset_adm2(id):
     adm = adm2_service.get_by_id(id)
     if not adm:
-        flash('Registro no encontrado.', 'danger')
+        flash(_('Registro no encontrado.'), 'danger')
         return redirect(url_for('adm2.list_adm2'))
 
     adm2_service.update(id=id, obj_in={"enable": True})
-    flash('División administrativa reactivada.', 'success')
+    flash(_('División administrativa reactivada.'), 'success')
     return redirect(url_for('adm2.list_adm2'))

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
+from flask_babel import _
 from aclimate_v3_orm.services import MngAdmin1Service, MngCountryService
 from aclimate_v3_orm.schemas import Admin1Create, Admin1Update
 from app.forms.adm1_form import Adm1Form
@@ -21,7 +22,7 @@ def list_adm1():
             enable=form.enable.data
         )
         adm1_service.create(new_adm1)
-        flash('División administrativa agregada correctamente.', 'success')
+        flash(_('División administrativa agregada correctamente.'), 'success')
         return redirect(url_for('adm1.list_adm1'))
 
     adm1_list = adm1_service.get_all()
@@ -33,7 +34,7 @@ def list_adm1():
 def edit_adm1(id):
     adm = adm1_service.get_by_id(id)
     if not adm:
-        flash('Registro no encontrado.', 'danger')
+        flash(_('Registro no encontrado.'), 'danger')
         return redirect(url_for('adm1.list_adm1'))
 
     form = Adm1Form(obj=adm)
@@ -50,7 +51,7 @@ def edit_adm1(id):
         )
 
         adm1_service.update(id=id, obj_in=update_data)
-        flash('División administrativa actualizada.', 'success')
+        flash(_('División administrativa actualizada.'), 'success')
         return redirect(url_for('adm1.list_adm1'))
 
     return render_template('adm1/edit.html', form=form, adm=adm)
@@ -60,9 +61,9 @@ def edit_adm1(id):
 @login_required
 def delete_adm1(id):
     if not adm1_service.delete(id):
-        flash('No se pudo deshabilitar.', 'danger')
+        flash(_('No se pudo deshabilitar.'), 'danger')
     else:
-        flash('División deshabilitada.', 'warning')
+        flash(_('División deshabilitada.'), 'warning')
     return redirect(url_for('adm1.list_adm1'))
 
 
@@ -71,9 +72,9 @@ def delete_adm1(id):
 def reset_adm1(id):
     adm = adm1_service.get_by_id(id)
     if not adm:
-        flash('Registro no encontrado.', 'danger')
+        flash(_('Registro no encontrado.'), 'danger')
         return redirect(url_for('adm1.list_adm1'))
 
     adm1_service.update(id=id, obj_in={"enable": True})
-    flash('División administrativa reactivada.', 'success')
+    flash(_('División administrativa reactivada.'), 'success')
     return redirect(url_for('adm1.list_adm1'))
