@@ -1,7 +1,6 @@
 from flask_login import UserMixin
-import requests
-from flask import current_app, session
-from config import Config
+from flask import session
+from app.services.auth_service import AuthService
 
 class User(UserMixin):
     def __init__(self, id, username, email=None, token=None, user_data=None):
@@ -13,48 +12,20 @@ class User(UserMixin):
     
     @staticmethod
     def authenticate(username, password):
-        """Autentica al usuario contra la API de Keycloak"""
-        try:
-            response = requests.post(
-                f"{Config.API_BASE_URL}/auth/login",
-                json={
-                    'username': username,
-                    'password': password
-                },
-                timeout=10
+        """Autentica al usuario usando AuthService"""
+        auth_data = AuthService.authenticate(username, password)
+        
+        if auth_data:
+            user_info = auth_data['user_data']
+            return User(
+                id=user_info.get('id', username),
+                username=username,
+                email=user_info.get('email'),
+                token=auth_data['token'],
+                user_data=user_info
             )
-            print(f"{Config.API_BASE_URL}/auth/login") 
-            print(f"Response status code: {response.status_code}")
-            print(f"Response content: {response.content}")
-            if response.status_code == 200:
-                data = response.json()
-                token = data.get('access_token') or data.get('token')
-                user_info = data.get('user', {})
-                
-                if token:
-                    # Crear usuario con el token
-                    user = User(
-                        id=user_info.get('id', username),
-                        username=username,
-                        email=user_info.get('email'),
-                        token=token,
-                        user_data=user_info
-                    )
-                    
-                    # Guardar token en sesión para uso posterior
-                    session['access_token'] = token
-                    session['user_data'] = user_info
-                    
-                    return user
-            
-            return None
-            
-        except requests.exceptions.RequestException as e:
-            current_app.logger.error(f"Error connecting to auth API: {e}")
-            return None
-        except Exception as e:
-            current_app.logger.error(f"Authentication error: {e}")
-            return None
+        
+        return None
     
     @staticmethod
     def get(user_id):
@@ -71,21 +42,8 @@ class User(UserMixin):
         return None
     
     def validate_token(self):
-        """Valida que el token siga siendo válido"""
-        try:
-            if not self.token:
-                return False
-            
-            response = requests.get(
-                f"{Config.API_BASE_URL}/auth/token/validate",
-                headers={'Authorization': f'Bearer {self.token}'},
-                timeout=10
-            )
-            
-            return response.status_code == 200
-            
-        except requests.exceptions.RequestException:
-            return False
+        """Valida que el token siga siendo válido usando AuthService"""
+        return AuthService.validate_token(self.token)
     
     @property
     def role(self):
@@ -94,6 +52,4 @@ class User(UserMixin):
     
     def get_auth_headers(self):
         """Retorna headers de autenticación para peticiones a la API"""
-        if self.token:
-            return {'Authorization': f'Bearer {self.token}'}
-        return {}
+        return AuthService.get_auth_headers(self.token)
