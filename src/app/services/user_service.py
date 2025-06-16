@@ -252,3 +252,77 @@ class UserService:
             print(f"Error inesperado en create: {e}")
             current_app.logger.error(f"Unexpected error creating user: {e}")
             raise Exception(f"Error inesperado: {str(e)}")
+        
+    def delete(self, user_id: str) -> bool:
+        """Eliminar usuario en la API"""
+        try:
+            # Preparar el payload con el user_id
+            delete_data = {
+                "user_id": user_id
+            }
+            
+            print(f"Deleting user with ID: {user_id}")
+            
+            # Asegurar que Content-Type esté en los headers
+            headers = self._get_auth_headers()
+            headers['Content-Type'] = 'application/json'
+            
+            response = requests.delete(
+                f"{Config.API_BASE_URL}/users/delete-user",
+                headers=headers,
+                json=delete_data,
+                timeout=10
+            )
+            
+            print(f"Delete user response status: {response.status_code}")
+            print(f"Delete user response content: {response.text}")
+            
+            if response.status_code == 200:
+                # Usuario eliminado exitosamente
+                print("Usuario eliminado con éxito en la API")
+                return True
+            
+            elif response.status_code == 204:
+                # Usuario eliminado exitosamente (sin contenido)
+                print("Usuario eliminado con éxito en la API (204)")
+                return True
+            
+            elif response.status_code == 404:
+                # Usuario no encontrado
+                print("Error 404: Usuario no encontrado")
+                raise ValueError('Usuario no encontrado')
+            
+            elif response.status_code == 400:
+                # Error de validación
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Error de validación')
+                    print(f"Error 400 de la API: {error_msg}")
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise  # Re-lanzar ValueError
+                except:
+                    raise ValueError('Error de validación en la petición')
+            
+            elif response.status_code == 403:
+                # Sin permisos
+                print("Error 403: Sin permisos para eliminar usuario")
+                raise ValueError('No tienes permisos para eliminar este usuario')
+            
+            else:
+                print(f"Error inesperado de la API: {response.status_code}")
+                raise Exception(f"Error del servidor: {response.status_code} - {response.text}")
+                
+        except requests.exceptions.RequestException as e:
+            print(f"Error de conexión: {e}")
+            current_app.logger.error(f"Error connecting to delete user API: {e}")
+            raise Exception("Error de conexión con el servidor")
+        
+        except ValueError as e:
+            print(f"Error de validación: {e}")
+            raise  # Re-lanzar errores de validación
+        
+        except Exception as e:
+            print(f"Error inesperado en delete: {e}")
+            current_app.logger.error(f"Unexpected error deleting user: {e}")
+            raise Exception(f"Error inesperado: {str(e)}")

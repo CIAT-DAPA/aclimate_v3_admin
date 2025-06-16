@@ -14,142 +14,143 @@ block content %}
   </div>
 
   <!-- Barra de búsqueda y filtros -->
-  <div class="d-flex align-items-center mb-3">
-    <input
-      type="text"
-      class="form-control me-2"
-      placeholder="Buscar usuarios..."
-      style="max-width: 300px"
-      disabled
-    />
-    <button class="btn btn-secondary" disabled>
-      <i class="fas fa-filter"></i> {{_('Filtros')}}
-    </button>
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <div class="position-relative me-2" style="min-width: 300px;">
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        placeholder="{{_('Buscar por usuario, nombre o email...')}}"
+        autocomplete="off"
+      />
+      <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y text-muted"></i>
+    </div>
+    <!-- Botón de filtros -->
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="filtersDropdown" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+      >
+        <i class="fas fa-filter"></i> {{_('Filtros')}}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filtersDropdown" style="min-width: 250px;">
+        <!-- Content will be generated dynamically by JavaScript -->
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> Cargando filtros...</div></li>
+      </ul>
+    </div>
+
+    <span id="searchResults" class="text-muted small"></span>
   </div>
 
   {% if users %}
-  <table class="table table-hover align-middle">
-    <thead class="table-light">
-      <tr>
-        <th style="width: 5%"><input type="checkbox" disabled /></th>
-        <th>Usuario</th>
-        <th>Nombre Completo</th>
-        <th>Email</th>
-        <th>Rol</th>
-        <th>Estado</th>
-        <th>Email Verificado</th>
-        <th class="text-end">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for user in users %}
-      <tr class="{{ 'table-secondary' if not user.get('enabled', True) }}">
-        <td><input type="checkbox" disabled /></td>
-        <td>
-          <div class="d-flex align-items-center">
-            <div class="avatar-circle me-2">
-              <i class="fas fa-user"></i>
+  <div id="usersTableContainer">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 5%"><input type="checkbox" disabled /></th>
+          <th>Usuario</th>
+          <th>Nombre Completo</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="usersTableBody">
+        {% for user in users %}
+        <tr class="user-row {{ 'table-secondary' if not user.get('enabled', True) }}" 
+            data-username="{{ user.username|lower }}"
+            data-fullname="{{ (user.first_name + ' ' + user.last_name)|lower }}"
+            data-email="{{ (user.email or '')|lower }}"
+            data-search="{{ (user.username + ' ' + (user.first_name or '') + ' ' + (user.last_name or '') + ' ' + (user.email or ''))|lower }}">
+          <td><input type="checkbox" disabled /></td>
+          <td>
+            <div class="d-flex align-items-center">
+              <div class="avatar-circle me-2">
+                <i class="fas fa-user"></i>
+              </div>
+              <div>
+                <strong class="searchable-username">{{ user.username }}</strong>
+                <br />
+                <small class="text-muted">ID: {{ user.id[:8] }}...</small>
+              </div>
             </div>
-            <div>
-              <strong>{{ user.username }}</strong>
-              <br />
-              <small class="text-muted">ID: {{ user.id[:8] }}...</small>
-            </div>
-          </div>
-        </td>
-        <td>
-          {% if user.first_name or user.last_name %}
-          <span>{{ user.first_name }} {{ user.last_name }}</span>
-          {% else %}
-          <span class="text-muted fst-italic">Sin nombre</span>
-          {% endif %}
-        </td>
-        <td>
-          <span class="text-break">{{ user.email or 'Sin email' }}</span>
-        </td>
-        <td>
-          <span class="badge bg-info">
-            {% if user.role_name == 'adminsuper' %}
-            <i class="fas fa-crown"></i> Super Admin {% elif user.role_name ==
-            'admin' %} <i class="fas fa-user-shield"></i> Admin {% elif
-            user.role_name == 'Geo Admin' %} <i class="fas fa-map"></i> {{
-            user.role_name }} {% elif user.role_name == 'Guest' %}
-            <i class="fas fa-eye"></i> {{ user.role_name }} {% else %}
-            <i class="fas fa-user-tag"></i> {{ user.role_name }} {% endif %}
-          </span>
-        </td>
-        <td>
-          {% if user.get('enabled', True) %}
-          <span class="badge bg-success">
-            <i class="fas fa-check-circle"></i> Activo
-          </span>
-          {% else %}
-          <span class="badge bg-danger">
-            <i class="fas fa-times-circle"></i> Inactivo
-          </span>
-          {% endif %}
-        </td>
-        <td>
-          {% if user.get('email_verified', False) %}
-          <span class="badge bg-success">
-            <i class="fas fa-check-circle"></i> Verificado
-          </span>
-          {% else %}
-          <span class="badge bg-warning text-dark">
-            <i class="fas fa-exclamation-circle"></i> Pendiente
-          </span>
-          {% endif %}
-        </td>
-        <td class="text-end">
-          <a
-            href="#"
-            class="btn btn-info btn-sm me-1"
-            title="Ver detalles - No implementado"
-            onclick="return false;"
-          >
-            <i class="fas fa-eye"></i>
-          </a>
-          <a
-            href="#"
-            class="btn btn-warning btn-sm me-1"
-            title="Editar - No implementado"
-            onclick="return false;"
-          >
-            <i class="fas fa-pen"></i>
-          </a>
-          {% if user.get('enabled', True) %} {% if user.username.lower() not in
-          ['admin', 'administrator'] %}
-          <a
-            href="#"
-            class="btn btn-danger btn-sm"
-            title="Deshabilitar - No implementado"
-            onclick="return false;"
-          >
-            <i class="fas fa-ban"></i>
-          </a>
-          {% else %}
-          <button
-            class="btn btn-secondary btn-sm"
-            disabled
-            title="No se puede deshabilitar usuario administrador"
-          >
-            <i class="fas fa-shield-alt"></i>
-          </button>
-          {% endif %} {% else %}
-          <a
-            href="#"
-            class="btn btn-success btn-sm"
-            title="Restaurar - No implementado"
-            onclick="return false;"
-          >
-            <i class="fas fa-undo"></i>
-          </a>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+          </td>
+          <td>
+            {% if user.first_name or user.last_name %}
+            <span class="searchable-fullname">{{ user.first_name }} {{ user.last_name }}</span>
+            {% else %}
+            <span class="text-muted fst-italic">Sin nombre</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="text-break searchable-email">{{ user.email or 'Sin email' }}</span>
+          </td>
+          <td>
+            <span class="badge bg-info">
+              {% if user.role_name == 'adminsuper' %}
+              <i class="fas fa-crown"></i> Super Admin {% elif user.role_name ==
+              'admin' %} <i class="fas fa-user-shield"></i> Admin {% elif
+              user.role_name == 'Geo Admin' %}
+              <i class="fas fa-map"></i> {{ user.role_name }} {% elif
+              user.role_name == 'Guest' %}
+              <i class="fas fa-eye"></i> {{ user.role_name }} {% else %}
+              <i class="fas fa-user-tag"></i> {{ user.role_name }} {% endif %}
+            </span>
+          </td>
+          <td class="text-end">
+            <a
+              href="#"
+              class="btn btn-warning btn-sm me-1"
+              title="Editar - No implementado"
+              onclick="return false;"
+            >
+              <i class="fas fa-pen"></i>
+            </a>
+            {% if user.get('enabled', True) %} 
+            {% if user.username.lower() not in ['admin', 'administrator'] %}
+            <button 
+              type="button"
+              class="btn btn-danger btn-sm"
+              title="Eliminar usuario"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteUserModal"
+              data-user-id="{{ user.id }}"
+              data-username="{{ user.username }}"
+              data-user-name="{{ user.first_name }} {{ user.last_name }}"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+            {% else %}
+            <button
+              class="btn btn-secondary btn-sm"
+              disabled
+              title="No se puede eliminar usuario administrador"
+            >
+              <i class="fas fa-shield-alt"></i>
+            </button>
+            {% endif %} 
+            {% else %}
+            <span class="badge bg-secondary">Eliminado</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Mensaje cuando no hay resultados de búsqueda -->
+  <div id="noSearchResults" class="alert alert-warning mt-4" style="display: none;">
+    <i class="fas fa-search"></i>
+    <span id="noResultsText">{{_('No se encontraron usuarios que coincidan con la búsqueda')}}</span> "<span id="searchTerm"></span>".
+    <br>
+    <small class="text-muted">{{_('Intenta con otros términos o limpia la búsqueda para ver todos los usuarios.')}}</small>
+  </div>
+  
   {% else %}
   <div class="alert alert-info mt-4">
     <i class="fas fa-info-circle"></i>
@@ -158,6 +159,7 @@ block content %}
   {% endif %}
 </div>
 
+<!-- ...resto de los modales (sin cambios)... -->
 <!-- Modal para agregar usuario -->
 <div
   class="modal fade"
@@ -287,6 +289,55 @@ block content %}
   </div>
 </div>
 
+<!-- Modal para confirmar eliminación -->
+<div
+  class="modal fade"
+  id="deleteUserModal"
+  tabindex="-1"
+  aria-labelledby="deleteUserLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteUserLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>{{_('Confirmar Eliminación')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center mb-3">
+          {{_('¿Está seguro de que desea eliminar al usuario')}} <strong id="deleteUserName"></strong>?
+        </p>
+        <div class="mb-3">
+          <strong>{{_('Información del usuario:')}}</strong>
+          <ul class="list-unstyled mt-2">
+            <li><i class="fas fa-user me-2"></i><strong>{{_('Usuario:')}} </strong><span id="deleteUsername"></span></li>
+            <li><i class="fas fa-id-card me-2"></i><strong>{{_('Nombre:')}} </strong><span id="deleteFullName"></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times"></i> {{_('Cancelar')}}
+        </button>
+        <form method="POST" action="" id="deleteUserForm" style="display: inline;">
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> {{_('Eliminar Usuario')}}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript para búsqueda en vivo y modal de eliminación -->
+<script src="{{ url_for('static', filename='js/user/user.js') }}"></script>
 <style>
   .avatar-circle {
     width: 40px;
@@ -298,6 +349,26 @@ block content %}
     justify-content: center;
     color: white;
     font-size: 16px;
+  }
+  
+  /* Estilos para el resaltado de búsqueda */
+  .user-row mark {
+    background-color: #ffc107 !important;
+    color: #000;
+    font-weight: bold;
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+  
+  /* Estilo para el input de búsqueda */
+  #searchInput:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #0d6efd;
+  }
+  
+  /* Animación suave para mostrar/ocultar filas */
+  .user-row {
+    transition: opacity 0.2s ease-in-out;
   }
 </style>
 {% endblock %}
