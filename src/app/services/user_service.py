@@ -1,36 +1,51 @@
-from typing import List, Dict, Optional
+from typing import List, Dict
 from datetime import datetime
 import requests
 from flask import current_app, session
 from config import Config
 
 class UserService:
-    """Servicio para manejar usuarios con API real"""
-    
-    def __init__(self):
-        # Datos simulados como fallback
-        self._fallback_users = [
-            {
-                'id': 1,
-                'username': 'admin',
-                'email': 'admin@aclimate.org',
-                'role_id': 1,
-                'role_name': 'Admin',
-                'enabled': True,
-                'email_verified': True,
-                'created_timestamp': int(datetime.now().timestamp() * 1000),
-                'created_at': datetime.now(),
-                'updated_at': datetime.now()
-            }
-        ]
-        self._next_id = 2
-    
+    """Servicio para manejar usuarios"""
     def _get_auth_headers(self) -> Dict[str, str]:
         """Obtener headers de autenticación"""
         token = session.get('access_token')
         if token:
             return {'Authorization': f'Bearer {token}'}
         return {}
+    
+    def _normalize_user_data(self, api_user: Dict) -> Dict:
+        """Convierte la estructura de la API a la estructura interna"""
+        # Obtener el primer rol o asignar valores por defecto
+        client_roles = api_user.get('client_roles', [])
+        if client_roles:
+            first_role = client_roles[0]
+            role_id = first_role.get('id', 'unknown')
+            role_name = first_role.get('name', 'Unknown')
+        else:
+            role_id = 'guest'
+            role_name = 'Guest'
+        
+        # Convertir timestamp de milisegundos a datetime
+        created_timestamp = api_user.get('createdTimestamp', 0)
+        created_at = datetime.fromtimestamp(created_timestamp / 1000) if created_timestamp else datetime.now()
+        
+        return {
+            'id': api_user.get('id'),
+            'username': api_user.get('username'),
+            'email': api_user.get('email'),
+            'first_name': api_user.get('firstName', ''),
+            'last_name': api_user.get('lastName', ''),
+            'role_id': role_id,
+            'role_name': role_name,
+            'enabled': api_user.get('enabled', True),
+            'email_verified': api_user.get('emailVerified', False),
+            'created_timestamp': created_timestamp,
+            'created_at': created_at,
+            'updated_at': created_at,
+            'totp': api_user.get('totp', False),
+            'access': api_user.get('access', {}),
+            'client_roles': client_roles
+        }
     
     def get_all(self) -> List[Dict]:
         """Obtener todos los usuarios desde la API"""
@@ -41,245 +56,199 @@ class UserService:
                 timeout=10
             )
             
+            print(f"API Response Status: {response.status_code}")
+            print(f"API Response Content: {response.text[:500]}...")
+            
             if response.status_code == 200:
-                return response.json().get('users', [])
+                api_users = response.json()
+                
+                # La respuesta es una lista directamente
+                if isinstance(api_users, list):
+                    normalized_users = []
+                    for api_user in api_users:
+                        try:
+                            normalized_user = self._normalize_user_data(api_user)
+                            normalized_users.append(normalized_user)
+                        except Exception as e:
+                            current_app.logger.error(f"Error normalizing user {api_user.get('id', 'unknown')}: {e}")
+                            continue
+                    
+                    return normalized_users
+                
+                else:
+                    current_app.logger.error(f"Unexpected API response format: {type(api_users)}")
+                    return []
             else:
                 current_app.logger.error(f"Error fetching users from API: {response.status_code}")
-                return self._fallback_users.copy()
+                return []
                 
         except requests.exceptions.RequestException as e:
             current_app.logger.error(f"Error connecting to users API: {e}")
-            return self._fallback_users.copy()
-    
-    def get_active_users(self) -> List[Dict]:
-        """Obtener solo los usuarios activos"""
-        all_users = self.get_all()
-        return [user for user in all_users if user.get('enabled', True)]
-    
-    def get_by_id(self, user_id: int) -> Optional[Dict]:
-        """Obtener usuario por ID desde la API"""
-        try:
-            response = requests.get(
-                f"{Config.API_BASE_URL}/users/get-users/{user_id}",
-                headers=self._get_auth_headers(),
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                return response.json()
-            else:
-                # Fallback a datos simulados
-                for user in self._fallback_users:
-                    if user['id'] == user_id:
-                        return user.copy()
-                return None
-                
-        except requests.exceptions.RequestException as e:
-            current_app.logger.error(f"Error fetching user from API: {e}")
-            # Fallback a datos simulados
-            for user in self._fallback_users:
-                if user['id'] == user_id:
-                    return user.copy()
-            return None
-    
-    def get_by_username(self, username: str) -> Optional[Dict]:
-        """Obtener usuario por nombre de usuario"""
-        all_users = self.get_all()
-        for user in all_users:
-            if user['username'].lower() == username.lower():
-                return user
-        return None
-    
-    def get_by_email(self, email: str) -> Optional[Dict]:
-        """Obtener usuario por email"""
-        all_users = self.get_all()
-        for user in all_users:
-            if user['email'].lower() == email.lower():
-                return user
-        return None
-
-    def create(self, username: str, email: str, name: str, last_name: str, password: str) -> Dict:
+            return []
+        except Exception as e:
+            current_app.logger.error(f"Unexpected error in get_all: {e}")
+            return []
+        
+    def create(self, username: str, email: str, first_name: str, last_name: str, password: str) -> Dict:
         """Crear nuevo usuario en la API"""
         try:
-            response = requests.post(
-                f"{Config.API_BASE_URL}/users/create-user",
-                headers=self._get_auth_headers(),
-                json={
-                    "username": username,
-                    "email": email,
-                    "firstName": name,
-                    "lastName": last_name,
-                    "emailVerified": False,
-                    "enabled": True,
-                    "attributes": {},
-                    "credentials": [
-                        {
+            # Preparar el payload según la estructura que espera la API
+            user_data = {
+                "username": username,
+                "email": email,
+                "firstName": first_name,
+                "lastName": last_name,
+                "emailVerified": False,
+                "enabled": True,
+                "attributes": {},
+                "credentials": [
+                    {
                         "type": "password",
                         "value": password,
                         "temporary": False
-                        }
-                    ]
-                },
+                    }
+                ]
+            }
+            
+            print(f"Creating user with data: {user_data}")
+            
+            # Asegurar que Content-Type esté en los headers
+            headers = self._get_auth_headers()
+            headers['Content-Type'] = 'application/json'
+            
+            response = requests.post(
+                f"{Config.API_BASE_URL}/users/create-user",
+                headers=headers,
+                json=user_data,
                 timeout=10
             )
             
-            if response.status_code == 201:
-                return response.json()
-            elif response.status_code == 400:
-                error_data = response.json()
-                raise ValueError(error_data.get('message', 'Error creating user'))
-            else:
-                raise Exception(f"Error creating user: {response.status_code}")
-                
-        except requests.exceptions.RequestException as e:
-            current_app.logger.error(f"Error creating user in API: {e}")
-            # Fallback: crear en memoria como antes
-            return self._create_fallback(username, email, name, last_name, password)
-        except ValueError:
-            raise  # Re-raise validation errors
-        except Exception as e:
-            current_app.logger.error(f"Unexpected error creating user: {e}")
-            raise
-    
-    def update(self, user_id: int, username: str = None, email: str = None, role_id: int = None, role_name: str = None) -> Optional[Dict]:
-        """Actualizar usuario existente en la API"""
-        try:
-            update_data = {}
-            if username is not None:
-                update_data['username'] = username
-            if email is not None:
-                update_data['email'] = email
-            if role_id is not None:
-                update_data['role_id'] = role_id
+            print(f"Create user response status: {response.status_code}")
+            print(f"Create user response content: {response.text}")
             
-            response = requests.put(
-                f"{Config.API_BASE_URL}/users/update-user/{user_id}",
-                headers=self._get_auth_headers(),
-                json=update_data,
-                timeout=10
-            )
-            
+            # Tu API devuelve 200 en lugar de 201
             if response.status_code == 200:
-                return response.json()
+                # Usuario creado exitosamente
+                print("Usuario creado con éxito en la API")
+                
+                # Tu API devuelve: {"message":"User created and 'webadminsimple' role assigned successfully","user_id":"f0ceba5f-eada-484c-ba54-95f0f2bbb8c6"}
+                if response.content:
+                    try:
+                        api_response = response.json()
+                        user_id = api_response.get('user_id')
+                        message = api_response.get('message', '')
+                        
+                        print(f"API Response: {api_response}")
+                        
+                        # Crear una respuesta normalizada con la información disponible
+                        return {
+                            'id': user_id,
+                            'username': username,
+                            'email': email,
+                            'first_name': first_name,
+                            'last_name': last_name,
+                            'role_id': 'webadminsimple',  # Extraído del mensaje
+                            'role_name': 'Web Admin Simple',
+                            'enabled': True,
+                            'email_verified': False,
+                            'created_timestamp': int(datetime.now().timestamp() * 1000),
+                            'created_at': datetime.now(),
+                            'updated_at': datetime.now(),
+                            'api_message': message
+                        }
+                        
+                    except Exception as json_error:
+                        print(f"Error parsing JSON response: {json_error}")
+                        # Si no puede parsear la respuesta, crear una respuesta simulada
+                        return {
+                            'id': 'temp_id',
+                            'username': username,
+                            'email': email,
+                            'first_name': first_name,
+                            'last_name': last_name,
+                            'role_id': 'guest',
+                            'role_name': 'Guest',
+                            'enabled': True,
+                            'email_verified': False,
+                            'created_timestamp': int(datetime.now().timestamp() * 1000),
+                            'created_at': datetime.now(),
+                            'updated_at': datetime.now()
+                        }
+                else:
+                    # Sin contenido
+                    print("API devolvió 200 sin contenido")
+                    return {
+                        'id': 'created_successfully',
+                        'username': username,
+                        'email': email,
+                        'first_name': first_name,
+                        'last_name': last_name,
+                        'role_id': 'guest',
+                        'role_name': 'Guest',
+                        'enabled': True,
+                        'email_verified': False,
+                        'created_timestamp': int(datetime.now().timestamp() * 1000),
+                        'created_at': datetime.now(),
+                        'updated_at': datetime.now()
+                    }
+            
+            elif response.status_code == 201:
+                # Por si acaso también acepta 201
+                print("Usuario creado con éxito en la API (201)")
+                if response.content:
+                    try:
+                        api_user = response.json()
+                        normalized_user = self._normalize_user_data(api_user)
+                        print(f"Usuario normalizado: {normalized_user}")
+                        return normalized_user
+                    except Exception as json_error:
+                        print(f"Error parsing JSON response: {json_error}")
+                        return {
+                            'id': 'temp_id',
+                            'username': username,
+                            'email': email,
+                            'first_name': first_name,
+                            'last_name': last_name,
+                            'role_id': 'guest',
+                            'role_name': 'Guest',
+                            'enabled': True,
+                            'email_verified': False,
+                            'created_timestamp': int(datetime.now().timestamp() * 1000),
+                            'created_at': datetime.now(),
+                            'updated_at': datetime.now()
+                        }
+            
             elif response.status_code == 400:
-                error_data = response.json()
-                raise ValueError(error_data.get('message', 'Error updating user'))
+                # Error de validación
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Error de validación')
+                    print(f"Error 400 de la API: {error_msg}")
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise  # Re-lanzar ValueError
+                except:
+                    raise ValueError('Error de validación en los datos del usuario')
+            
+            elif response.status_code == 409:
+                # Usuario ya existe
+                print("Error 409: Usuario ya existe")
+                raise ValueError('Ya existe un usuario con ese nombre de usuario o email')
+            
             else:
-                return None
+                print(f"Error inesperado de la API: {response.status_code}")
+                raise Exception(f"Error del servidor: {response.status_code} - {response.text}")
                 
         except requests.exceptions.RequestException as e:
-            current_app.logger.error(f"Error updating user in API: {e}")
-            return None
-        except ValueError:
-            raise  # Re-raise validation errors
-    
-    def delete(self, user_id: int) -> bool:
-        """Eliminar (deshabilitar) usuario en la API"""
-        try:
-            response = requests.delete(
-                f"{Config.API_BASE_URL}/users/delete-user/{user_id}",
-                headers=self._get_auth_headers(),
-                timeout=10
-            )
-            
-            return response.status_code == 200
-            
-        except requests.exceptions.RequestException as e:
-            current_app.logger.error(f"Error deleting user in API: {e}")
-            return False
-    
-    def assign_role(self, user_id: int, role_id: int) -> bool:
-        """Asignar rol a usuario en la API"""
-        try:
-            response = requests.post(
-                f"{Config.API_BASE_URL}/users/assign-role",
-                headers=self._get_auth_headers(),
-                json={
-                    'user_id': user_id,
-                    'role_id': role_id
-                },
-                timeout=10
-            )
-            
-            return response.status_code == 200
-            
-        except requests.exceptions.RequestException as e:
-            current_app.logger.error(f"Error assigning role in API: {e}")
-            return False
-    
-    def restore(self, user_id: int) -> bool:
-        """Restaurar usuario deshabilitado"""
-        try:
-            response = requests.post(
-                f"{Config.API_BASE_URL}/users/restore-user/{user_id}",
-                headers=self._get_auth_headers(),
-                timeout=10
-            )
-            
-            return response.status_code == 200
-            
-        except requests.exceptions.RequestException as e:
-            current_app.logger.error(f"Error restoring user in API: {e}")
-            return False
-    
-    def search_users(self, query: str) -> List[Dict]:
-        """Buscar usuarios por username o email"""
-        all_users = self.get_all()
-        query_lower = query.lower()
-        results = []
+            print(f"Error de conexión: {e}")
+            current_app.logger.error(f"Error connecting to create user API: {e}")
+            raise Exception("Error de conexión con el servidor")
         
-        for user in all_users:
-            if user.get('enabled', True):
-                if (query_lower in user.get('username', '').lower() or 
-                    query_lower in user.get('email', '').lower()):
-                    results.append(user)
+        except ValueError as e:
+            print(f"Error de validación: {e}")
+            raise  # Re-lanzar errores de validación
         
-        return results
-    
-    def get_users_by_role(self, role_id: int) -> List[Dict]:
-        """Obtener usuarios por rol"""
-        all_users = self.get_all()
-        return [user for user in all_users if user['role_id'] == role_id and user.get('enabled', True)]
-    
-    def get_user_count(self) -> Dict[str, int]:
-        """Obtener estadísticas de usuarios"""
-        all_users = self.get_all()
-        total = len(all_users)
-        active = len([u for u in all_users if u.get('enabled', True)])
-        inactive = total - active
-        verified = len([u for u in all_users if u.get('email_verified', False)])
-        
-        return {
-            'total': total,
-            'active': active,
-            'inactive': inactive,
-            'verified': verified,
-            'unverified': total - verified
-        }
-    
-    def _create_fallback(self, username: str, email: str, role_id: int, role_name: str) -> Dict:
-        """Crear usuario en fallback (memoria) cuando API no esté disponible"""
-        # Verificar duplicados en fallback
-        if any(u['username'].lower() == username.lower() for u in self._fallback_users):
-            raise ValueError(f"Ya existe un usuario con el nombre '{username}'")
-        
-        if any(u['email'].lower() == email.lower() for u in self._fallback_users):
-            raise ValueError(f"Ya existe un usuario con el email '{email}'")
-        
-        new_user = {
-            'id': self._next_id,
-            'username': username,
-            'email': email,
-            'role_id': role_id,
-            'role_name': role_name,
-            'enabled': True,
-            'email_verified': False,
-            'created_timestamp': int(datetime.now().timestamp() * 1000),
-            'created_at': datetime.now(),
-            'updated_at': datetime.now()
-        }
-        
-        self._fallback_users.append(new_user)
-        self._next_id += 1
-        
-        return new_user.copy()
+        except Exception as e:
+            print(f"Error inesperado en create: {e}")
+            current_app.logger.error(f"Unexpected error creating user: {e}")
+            raise Exception(f"Error inesperado: {str(e)}")

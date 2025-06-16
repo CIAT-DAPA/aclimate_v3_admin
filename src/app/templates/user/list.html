@@ -32,12 +32,13 @@ block content %}
     <thead class="table-light">
       <tr>
         <th style="width: 5%"><input type="checkbox" disabled /></th>
-        <th>{{ _('Usuario') }}</th>
-        <th>{{ _('Email') }}</th>
-        <th>{{ _('Rol') }}</th>
-        <th>{{ _('Estado') }}</th>
-        <th>{{ _('Email Verificado') }}</th>
-        <th class="text-end">{{ _('Acciones') }}</th>
+        <th>Usuario</th>
+        <th>Nombre Completo</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Email Verificado</th>
+        <th class="text-end">Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -52,17 +53,25 @@ block content %}
             <div>
               <strong>{{ user.username }}</strong>
               <br />
-              <small class="text-muted">ID: {{ user.id }}</small>
+              <small class="text-muted">ID: {{ user.id[:8] }}...</small>
             </div>
           </div>
         </td>
         <td>
-          <span class="text-break">{{ user.email }}</span>
+          {% if user.first_name or user.last_name %}
+          <span>{{ user.first_name }} {{ user.last_name }}</span>
+          {% else %}
+          <span class="text-muted fst-italic">Sin nombre</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="text-break">{{ user.email or 'Sin email' }}</span>
         </td>
         <td>
           <span class="badge bg-info">
-            {% if user.role_name == 'Admin' %}
-            <i class="fas fa-crown"></i> {{ user.role_name }} {% elif
+            {% if user.role_name == 'adminsuper' %}
+            <i class="fas fa-crown"></i> Super Admin {% elif user.role_name ==
+            'admin' %} <i class="fas fa-user-shield"></i> Admin {% elif
             user.role_name == 'Geo Admin' %} <i class="fas fa-map"></i> {{
             user.role_name }} {% elif user.role_name == 'Guest' %}
             <i class="fas fa-eye"></i> {{ user.role_name }} {% else %}
@@ -72,40 +81,49 @@ block content %}
         <td>
           {% if user.get('enabled', True) %}
           <span class="badge bg-success">
-            <i class="fas fa-check-circle"></i> {{ _('Activo') }}
+            <i class="fas fa-check-circle"></i> Activo
           </span>
           {% else %}
           <span class="badge bg-danger">
-            <i class="fas fa-times-circle"></i> {{ _('Inactivo') }}
+            <i class="fas fa-times-circle"></i> Inactivo
           </span>
           {% endif %}
         </td>
         <td>
           {% if user.get('email_verified', False) %}
           <span class="badge bg-success">
-            <i class="fas fa-check-circle"></i> {{ _('Verificado') }}
+            <i class="fas fa-check-circle"></i> Verificado
           </span>
           {% else %}
           <span class="badge bg-warning text-dark">
-            <i class="fas fa-exclamation-circle"></i> {{ _('Pendiente') }}
+            <i class="fas fa-exclamation-circle"></i> Pendiente
           </span>
           {% endif %}
         </td>
         <td class="text-end">
           <a
-            href="{{ url_for('user.edit_user', id=user.id) }}"
+            href="#"
+            class="btn btn-info btn-sm me-1"
+            title="Ver detalles - No implementado"
+            onclick="return false;"
+          >
+            <i class="fas fa-eye"></i>
+          </a>
+          <a
+            href="#"
             class="btn btn-warning btn-sm me-1"
-            title="Editar"
+            title="Editar - No implementado"
+            onclick="return false;"
           >
             <i class="fas fa-pen"></i>
           </a>
           {% if user.get('enabled', True) %} {% if user.username.lower() not in
           ['admin', 'administrator'] %}
           <a
-            href="{{ url_for('user.delete_user', id=user.id) }}"
+            href="#"
             class="btn btn-danger btn-sm"
-            title="Deshabilitar"
-            onclick="return confirm('¿Está seguro de deshabilitar este usuario?')"
+            title="Deshabilitar - No implementado"
+            onclick="return false;"
           >
             <i class="fas fa-ban"></i>
           </a>
@@ -119,10 +137,10 @@ block content %}
           </button>
           {% endif %} {% else %}
           <a
-            href="{{ url_for('user.reset_user', id=user.id) }}"
+            href="#"
             class="btn btn-success btn-sm"
-            title="Restaurar"
-            onclick="return confirm('¿Está seguro de restaurar este usuario?')"
+            title="Restaurar - No implementado"
+            onclick="return false;"
           >
             <i class="fas fa-undo"></i>
           </a>
@@ -135,7 +153,7 @@ block content %}
   {% else %}
   <div class="alert alert-info mt-4">
     <i class="fas fa-info-circle"></i>
-    {{ _('No hay usuarios registrados.') }}
+    No hay usuarios registrados o no se pudieron cargar desde la API.
   </div>
   {% endif %}
 </div>
@@ -148,12 +166,12 @@ block content %}
   aria-labelledby="addUserLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog">
-    <form method="POST" class="modal-content">
+  <div class="modal-dialog modal-lg">
+    <form method="POST" action="{{ url_for('user.create_user') }}" class="modal-content">
       {{ form.hidden_tag() }}
       <div class="modal-header">
         <h5 class="modal-title" id="addUserLabel">
-          <i class="fas fa-user-plus"></i> {{ _('Agregar Usuario') }}
+          <i class="fas fa-user-plus"></i> {{_('Agregar Usuario')}}
         </h5>
         <button
           type="button"
@@ -163,36 +181,106 @@ block content %}
         ></button>
       </div>
       <div class="modal-body">
-        <div class="mb-3">
-          {{ form.username.label(class="form-label") }} {{
-          form.username(class="form-control") }} {% for error in
-          form.username.errors %}
-          <div class="text-danger small">{{ error }}</div>
-          {% endfor %}
+        <!-- Row for Name and Last Name -->
+        <div class="row">
+          <!-- First Name -->
+          <div class="col-md-6 mb-3">
+            <label for="first_name" class="form-label fw-semibold">
+              <i class="fas fa-id-badge me-2"></i>{{ form.first_name.label.text }}
+            </label>
+            {% if form.first_name.errors %}
+            {{ form.first_name(class="form-control is-invalid", id="first_name", placeholder=_('Ingresa el nombre')) }}
+            <div class="invalid-feedback">
+              {% for error in form.first_name.errors %}
+              <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+              {% endfor %}
+            </div>
+            {% else %}
+            {{ form.first_name(class="form-control", id="first_name", placeholder=_('Ingresa el nombre')) }}
+            {% endif %}
+          </div>
+
+          <!-- Last Name -->
+          <div class="col-md-6 mb-3">
+            <label for="last_name" class="form-label fw-semibold">
+              <i class="fas fa-user-tag me-2"></i>{{ form.last_name.label.text }}
+            </label>
+            {% if form.last_name.errors %}
+            {{ form.last_name(class="form-control is-invalid", id="last_name", placeholder=_('Ingresa el apellido')) }}
+            <div class="invalid-feedback">
+              {% for error in form.last_name.errors %}
+              <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+              {% endfor %}
+            </div>
+            {% else %}
+            {{ form.last_name(class="form-control", id="last_name", placeholder=_('Ingresa el apellido')) }}
+            {% endif %}
+          </div>
         </div>
 
+        <!-- Username -->
         <div class="mb-3">
-          {{ form.email.label(class="form-label") }} {{
-          form.email(class="form-control") }} {% for error in form.email.errors
-          %}
-          <div class="text-danger small">{{ error }}</div>
-          {% endfor %}
+          <label for="username" class="form-label fw-semibold">
+            <i class="fas fa-at me-2"></i>{{ form.username.label.text }}
+          </label>
+          {% if form.username.errors %}
+          {{ form.username(class="form-control is-invalid", id="username", placeholder=_('Elige un nombre de usuario único')) }}
+          <div class="invalid-feedback">
+            {% for error in form.username.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.username(class="form-control", id="username", placeholder=_('Elige un nombre de usuario único')) }}
+          {% endif %}
+          <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>{{_('Mínimo 3 caracteres, sin espacios')}}
+          </div>
         </div>
 
+        <!-- Email -->
         <div class="mb-3">
-          {{ form.role_id.label(class="form-label") }} {{
-          form.role_id(class="form-select") }} {% for error in
-          form.role_id.errors %}
-          <div class="text-danger small">{{ error }}</div>
-          {% endfor %}
+          <label for="email" class="form-label fw-semibold">
+            <i class="fas fa-envelope me-2"></i>{{ form.email.label.text }}
+          </label>
+          {% if form.email.errors %}
+          {{ form.email(class="form-control is-invalid", id="email", placeholder=_('ejemplo@dominio.com')) }}
+          <div class="invalid-feedback">
+            {% for error in form.email.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.email(class="form-control", id="email", placeholder=_('ejemplo@dominio.com')) }}
+          {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label for="password" class="form-label fw-semibold">
+            <i class="fas fa-key me-2"></i>{{ form.password.label.text }}
+          </label>
+          {% if form.password.errors %}
+          {{ form.password(class="form-control is-invalid", id="password", placeholder=_('Crea una contraseña segura'), type="password") }}
+          <div class="invalid-feedback">
+            {% for error in form.password.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.password(class="form-control", id="password", placeholder=_('Crea una contraseña segura'), type="password") }}
+          {% endif %}
+          <div class="form-text">
+            <i class="fas fa-shield-alt me-1"></i>{{_('Crea una contraseña segura para el usuario')}}
+          </div>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          <i class="fas fa-times"></i> {{ _('Cancelar') }}
+          <i class="fas fa-times"></i> {{_('Cancelar')}}
         </button>
         <button type="submit" class="btn btn-primary">
-          <i class="fas fa-save"></i> {{ _('Guardar Usuario') }}
+          <i class="fas fa-save"></i> {{_('Guardar Usuario')}}
         </button>
       </div>
     </form>
