@@ -127,10 +127,8 @@ block content %}
           </td>
           <td class="text-end">
             <a
-              href="#"
+              href="{{ url_for('user.edit_user', user_id=user.id) }}"
               class="btn btn-warning btn-sm me-1"
-              title="Editar - No implementado"
-              onclick="return false;"
             >
               <i class="fas fa-pen"></i>
             </a>

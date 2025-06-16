@@ -1,393 +1,114 @@
 {% extends 'base.html' %} 
 {% block title %}{{_('Editar Usuario')}}{% endblock %} 
 
-{% block extra_css %}
-<style>
-  .user-info-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 15px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .avatar-large {
-    width: 80px;
-    height: 80px;
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 2rem;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-  }
-  
-  .user-meta {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-  }
-  
-  .form-section {
-    background: white;
-    border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .section-title {
-    color: #495057;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e9ecef;
-  }
-  
-  .form-label {
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 0.5rem;
-  }
-  
-  .form-control:focus, .form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-  }
-  
-  .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    padding: 0.75rem 2rem;
-    border-radius: 25px;
-    font-weight: 600;
-  }
-  
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-    transform: translateY(-1px);
-  }
-  
-  .btn-secondary {
-    padding: 0.75rem 2rem;
-    border-radius: 25px;
-    font-weight: 600;
-  }
-  
-  .status-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 0.875rem;
-  }
-  
-  .status-active {
-    background-color: #d4edda;
-    color: #155724;
-  }
-  
-  .status-inactive {
-    background-color: #f8d7da;
-    color: #721c24;
-  }
-  
-  .readonly-field {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    color: #6c757d;
-    cursor: not-allowed;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container-fluid mt-4" style="margin-bottom: 100px">
-  <!-- Header with user info -->
-  <div class="user-info-card">
-    <div class="row align-items-center">
-      <div class="col-auto">
-        <div class="avatar-large">
-          <i class="fas fa-user"></i>
-        </div>
-      </div>
-      <div class="col">
-        <h3 class="mb-2">
-          {{_('Editar Usuario:')}} {{ user.username }}
-        </h3>
-        <div class="row">
-          <div class="col-md-4">
-            <div class="user-meta">
-              <i class="fas fa-id-card me-2"></i>
-              <strong>ID:</strong> {{ user.id[:8] }}...
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="user-meta">
-              <i class="fas fa-calendar-plus me-2"></i>
-              <strong>{{_('Creado:')}} </strong> {{ user.created_at.strftime('%d/%m/%Y') if user.created_at else 'N/A' }}
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="user-meta">
-              <span class="status-badge {{ 'status-active' if user.get('enabled', True) else 'status-inactive' }}">
-                <i class="fas {{ 'fa-check-circle' if user.get('enabled', True) else 'fa-times-circle' }} me-1"></i>
-                {{ _('Activo') if user.get('enabled', True) else _('Inactivo') }}
-              </span>
-            </div>
-          </div>
-        </div>
+<div class="container-fluid mt-4">
+  
+  <!-- Page Header -->
+  <div class="bg-dark text-white rounded p-3 mb-4">
+    <div class="d-flex align-items-center">
+      <div>
+        <h4 class="mb-1">{{_('Editar Usuario')}}</h4>
+        <p class="mb-0">{{_('Modificar rol del usuario:')}} <strong>{{ user.username }}</strong></p>
       </div>
     </div>
   </div>
 
-  <!-- Edit Form -->
-  <div class="form-section">
-    <h4 class="section-title">
-      <i class="fas fa-edit me-2"></i>{{_('Información del Usuario')}}
-    </h4>
-    
-    <form method="POST">
-      {{ form.hidden_tag() }}
-
+  <!-- User Information & Edit Form -->
+  <div class="card">
+    <div class="card-body">
       <div class="row">
-        <!-- Username (readonly) -->
-        <div class="col-md-6 mb-3">
-          <label class="form-label">
-            <i class="fas fa-at me-2"></i>{{_('Nombre de Usuario')}}
-          </label>
-          <input 
-            type="text" 
-            class="form-control readonly-field" 
-            value="{{ user.username }}" 
-            readonly
-            title="{{_('El nombre de usuario no se puede modificar')}}"
-          >
-          <div class="form-text">
-            <i class="fas fa-info-circle me-1"></i>{{_('El nombre de usuario no se puede modificar')}}
+        
+        <!-- User Information -->
+        <div class="col-md-6">
+          <h5 class="mb-3">{{_('Información del Usuario')}}</h5>
+          
+          <div class="bg-light rounded p-3 mb-3">
+            <div class="fw-bold text-muted small mb-1">
+              <i class="fas fa-user me-2"></i>{{_('Nombre Completo')}}
+            </div>
+            <p class="mb-0">
+              {% if user.first_name or user.last_name %}
+                {{ user.first_name }} {{ user.last_name }}
+              {% else %}
+                {{_('Sin nombre')}}
+              {% endif %}
+            </p>
+          </div>
+
+          <div class="bg-light rounded p-3 mb-3">
+            <div class="fw-bold text-muted small mb-1">
+              <i class="fas fa-at me-2"></i>{{_('Nombre de Usuario')}}
+            </div>
+            <p class="mb-0">{{ user.username }}</p>
+          </div>
+
+          <div class="bg-light rounded p-3 mb-3">
+            <div class="fw-bold text-muted small mb-1">
+              <i class="fas fa-envelope me-2"></i>{{_('Correo Electrónico')}}
+            </div>
+            <p class="mb-0">{{ user.email or _('Sin correo') }}</p>
+          </div>
+
+          <div class="bg-light rounded p-3 mb-3">
+            <div class="fw-bold text-muted small mb-1">
+              <i class="fas fa-user-tag me-2"></i>{{_('Roles Actuales')}}
+            </div>
+            <div>
+              {% if user.client_roles %}
+                {% for role in user.client_roles %}
+                  <span class="badge bg-dark me-1">{{ role.name }}</span>
+                {% endfor %}
+              {% else %}
+                <span class="badge bg-dark">{{ user.role_name or _('Sin rol') }}</span>
+              {% endif %}
+            </div>
           </div>
         </div>
 
-        <!-- Email -->
-        <div class="col-md-6 mb-3">
-          <label for="email" class="form-label">
-            <i class="fas fa-envelope me-2"></i>{{ form.email.label.text }}
-          </label>
-          {% if form.email.errors %}
-          {{ form.email(class="form-control is-invalid", id="email") }}
-          <div class="invalid-feedback">
-            {% for error in form.email.errors %}
-            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-            {% endfor %}
-          </div>
-          {% else %}
-          {{ form.email(class="form-control", id="email") }}
-          {% endif %}
-        </div>
-      </div>
+        <!-- Role Assignment Form -->
+        <div class="col-md-6">
+          <h5 class="mb-3">{{_('Asignar Nuevo Rol')}}</h5>
+          
+          <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="mb-3">
+              <label for="role_id" class="form-label fw-bold">
+                <i class="fas fa-exchange-alt me-2"></i>{{_('Seleccionar Rol')}}
+              </label>
+              {% if form.role_id.errors %}
+              {{ form.role_id(class="form-select is-invalid", id="role_id") }}
+              <div class="invalid-feedback">
+                {% for error in form.role_id.errors %}
+                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                {% endfor %}
+              </div>
+              {% else %}
+              {{ form.role_id(class="form-select", id="role_id") }}
+              {% endif %}
+              <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>{{_('El cambio de rol se aplicará inmediatamente')}}
+              </div>
+            </div>
 
-      <div class="row">
-        <!-- First Name -->
-        <div class="col-md-6 mb-3">
-          <label for="first_name" class="form-label">
-            <i class="fas fa-id-badge me-2"></i>{{ form.first_name.label.text }}
-          </label>
-          {% if form.first_name.errors %}
-          {{ form.first_name(class="form-control is-invalid", id="first_name") }}
-          <div class="invalid-feedback">
-            {% for error in form.first_name.errors %}
-            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-            {% endfor %}
-          </div>
-          {% else %}
-          {{ form.first_name(class="form-control", id="first_name") }}
-          {% endif %}
-        </div>
-
-        <!-- Last Name -->
-        <div class="col-md-6 mb-3">
-          <label for="last_name" class="form-label">
-            <i class="fas fa-user-tag me-2"></i>{{ form.last_name.label.text }}
-          </label>
-          {% if form.last_name.errors %}
-          {{ form.last_name(class="form-control is-invalid", id="last_name") }}
-          <div class="invalid-feedback">
-            {% for error in form.last_name.errors %}
-            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-            {% endfor %}
-          </div>
-          {% else %}
-          {{ form.last_name(class="form-control", id="last_name") }}
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Role Selection -->
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="role" class="form-label">
-            <i class="fas fa-user-shield me-2"></i>{{ form.role.label.text }}
-          </label>
-          {% if form.role.errors %}
-          {{ form.role(class="form-select is-invalid", id="role") }}
-          <div class="invalid-feedback">
-            {% for error in form.role.errors %}
-            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-            {% endfor %}
-          </div>
-          {% else %}
-          {{ form.role(class="form-select", id="role") }}
-          {% endif %}
-          <div class="form-text">
-            <i class="fas fa-info-circle me-1"></i>{{_('Selecciona el rol que tendrá este usuario en el sistema')}}
-          </div>
-        </div>
-
-        <!-- Enabled Status -->
-        <div class="col-md-6 mb-3">
-          <label class="form-label">
-            <i class="fas fa-toggle-on me-2"></i>{{_('Estado del Usuario')}}
-          </label>
-          <div class="form-check mt-2">
-            {{ form.enabled(class="form-check-input", id="enabled") }}
-            <label class="form-check-label" for="enabled">
-              {{ form.enabled.label.text }}
-            </label>
-          </div>
-          <div class="form-text">
-            <i class="fas fa-info-circle me-1"></i>{{_('Los usuarios inactivos no pueden acceder al sistema')}}
-          </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>{{_('Actualizar Rol')}}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
-      <!-- Current Role Info -->
-      <div class="alert alert-info">
-        <h6 class="alert-heading">
-          <i class="fas fa-info-circle me-2"></i>{{_('Rol Actual')}}
-        </h6>
-        <p class="mb-0">
-          {{_('Rol actual del usuario:')}} 
-          <span class="badge bg-primary ms-2">
-            {% if user.role_name == 'adminsuper' %}
-            <i class="fas fa-crown me-1"></i>Super Admin
-            {% elif user.role_name == 'admin' %}
-            <i class="fas fa-user-shield me-1"></i>Admin
-            {% elif user.role_name == 'guest' %}
-            <i class="fas fa-eye me-1"></i>Guest
-            {% else %}
-            <i class="fas fa-user-tag me-1"></i>{{ user.role_name }}
-            {% endif %}
-          </span>
-        </p>
-      </div>
-
-      <!-- Form Actions -->
-      <div class="d-flex justify-content-between mt-4">
+      <!-- Navigation -->
+      <hr class="my-4">
+      <div>
         <a href="{{ url_for('user.list_user') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left me-2"></i>{{_('Volver al Listado')}}
         </a>
-        
-        <div>
-          <button type="submit" class="btn btn-primary me-2">
-            <i class="fas fa-save me-2"></i>{{_('Guardar Cambios')}}
-          </button>
-        </div>
-      </div>
-    </form>
-  </div>
-
-  <!-- Additional Info Section -->
-  <div class="form-section mt-4">
-    <h4 class="section-title">
-      <i class="fas fa-info-circle me-2"></i>{{_('Información Adicional')}}
-    </h4>
-    
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card border-0 bg-light">
-          <div class="card-body text-center">
-            <i class="fas fa-envelope-check fa-2x text-primary mb-2"></i>
-            <h6>{{_('Email Verificado')}}</h6>
-            <p class="mb-0">
-              {% if user.get('email_verified', False) %}
-              <span class="badge bg-success">{{_('Sí')}}</span>
-              {% else %}
-              <span class="badge bg-warning">{{_('No')}}</span>
-              {% endif %}
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-md-4">
-        <div class="card border-0 bg-light">
-          <div class="card-body text-center">
-            <i class="fas fa-shield-alt fa-2x text-info mb-2"></i>
-            <h6>{{_('Autenticación 2FA')}}</h6>
-            <p class="mb-0">
-              {% if user.get('totp', False) %}
-              <span class="badge bg-success">{{_('Activado')}}</span>
-              {% else %}
-              <span class="badge bg-secondary">{{_('Desactivado')}}</span>
-              {% endif %}
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-md-4">
-        <div class="card border-0 bg-light">
-          <div class="card-body text-center">
-            <i class="fas fa-clock fa-2x text-success mb-2"></i>
-            <h6>{{_('Última Actualización')}}</h6>
-            <p class="mb-0">
-              <small>{{ user.updated_at.strftime('%d/%m/%Y %H:%M') if user.updated_at else 'N/A' }}</small>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Toast for success/error messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-      {% for category, message in messages %}
-        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-          <div class="toast-header">
-            {% if category == 'success' %}
-            <i class="fas fa-check-circle text-success me-2"></i>
-            <strong class="me-auto">{{_('Éxito')}}</strong>
-            {% else %}
-            <i class="fas fa-exclamation-triangle text-danger me-2"></i>
-            <strong class="me-auto">{{_('Error')}}</strong>
-            {% endif %}
-            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-          </div>
-          <div class="toast-body">
-            {{ message }}
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
-{% endblock %}
-
-{% block extra_js %}
-<script>
-// Auto-hide toasts after 5 seconds
-document.addEventListener('DOMContentLoaded', function() {
-    const toasts = document.querySelectorAll('.toast');
-    toasts.forEach(toast => {
-        setTimeout(() => {
-            const bsToast = new bootstrap.Toast(toast);
-            bsToast.hide();
-        }, 5000);
-    });
-});
-</script>
 {% endblock %}

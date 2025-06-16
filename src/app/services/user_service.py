@@ -326,3 +326,114 @@ class UserService:
             print(f"Error inesperado en delete: {e}")
             current_app.logger.error(f"Unexpected error deleting user: {e}")
             raise Exception(f"Error inesperado: {str(e)}")
+        
+    def assign_role(self, user_id: str, role_id: str) -> bool:
+        """Asignar/cambiar el rol de un usuario"""
+        try:
+            print(f"Attempting to assign role {role_id} to user {user_id}")
+            
+            # Preparar datos para la API
+            role_data = {
+                "user_id": user_id,
+                "role_id": role_id
+            }
+            
+            print(f"Assigning role with data: {role_data}")
+            
+            # Asegurar que Content-Type esté en los headers
+            headers = self._get_auth_headers()
+            headers['Content-Type'] = 'application/json'
+            
+            response = requests.post(
+                f"{Config.API_BASE_URL}/users/assign-role",
+                headers=headers,
+                json=role_data,
+                timeout=10
+            )
+            
+            print(f"Assign role response status: {response.status_code}")
+            print(f"Assign role response content: {response.text}")
+            
+            if response.status_code == 200:
+                # Rol asignado exitosamente
+                print("Rol asignado con éxito en la API")
+                return True
+            
+            elif response.status_code == 201:
+                # Rol asignado exitosamente (creado)
+                print("Rol asignado con éxito en la API (201)")
+                return True
+            
+            elif response.status_code == 204:
+                # Rol asignado exitosamente (sin contenido)
+                print("Rol asignado con éxito en la API (204)")
+                return True
+            
+            elif response.status_code == 404:
+                # Usuario o rol no encontrado
+                print("Error 404: Usuario o rol no encontrado")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Usuario o rol no encontrado')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('Usuario o rol no encontrado')
+            
+            elif response.status_code == 400:
+                # Error de validación
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Error en los datos enviados')
+                    print(f"Error 400 de la API: {error_msg}")
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise  # Re-lanzar ValueError
+                except:
+                    raise ValueError('Error de validación en los datos enviados')
+            
+            elif response.status_code == 403:
+                # Sin permisos
+                print("Error 403: Sin permisos para asignar roles")
+                raise ValueError('No tienes permisos para asignar roles a usuarios')
+            
+            elif response.status_code == 409:
+                # Conflicto - el usuario ya tiene ese rol
+                print("Error 409: El usuario ya tiene asignado ese rol")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'El usuario ya tiene asignado ese rol')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('El usuario ya tiene asignado ese rol')
+            
+            else:
+                print(f"Error inesperado de la API: {response.status_code}")
+                raise Exception(f"Error del servidor: {response.status_code} - {response.text}")
+                
+        except requests.exceptions.Timeout:
+            print("Error: Timeout en la conexión")
+            current_app.logger.error("Timeout connecting to assign role API")
+            raise Exception("Tiempo de espera agotado - intenta nuevamente")
+        
+        except requests.exceptions.ConnectionError:
+            print("Error: Error de conexión")
+            current_app.logger.error("Connection error to assign role API")
+            raise Exception("Error de conexión con el servidor")
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Error de conexión: {e}")
+            current_app.logger.error(f"Error connecting to assign role API: {e}")
+            raise Exception("Error de conexión con el servidor")
+        
+        except ValueError as e:
+            print(f"Error de validación: {e}")
+            raise  # Re-lanzar errores de validación
+        
+        except Exception as e:
+            print(f"Error inesperado en assign_role: {e}")
+            current_app.logger.error(f"Unexpected error assigning role: {e}")
+            raise Exception(f"Error inesperado: {str(e)}")
