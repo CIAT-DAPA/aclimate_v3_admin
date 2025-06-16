@@ -23,7 +23,7 @@ block content %}
         placeholder="{{_('Buscar por usuario, nombre o email...')}}"
         autocomplete="off"
       />
-      <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y text-muted"></i>
+      <i id="searchIcon" class="fas fa-search search-icon" title="{{_('Buscar')}}"></i>
     </div>
     <!-- Botón de filtros -->
     <div class="dropdown">
@@ -51,7 +51,23 @@ block content %}
     <table class="table table-hover align-middle">
       <thead class="table-light">
         <tr>
-          <th style="width: 5%"><input type="checkbox" disabled /></th>
+          <th style="width: 5%">
+            <div class="d-flex align-items-center gap-2">
+              <input type="checkbox" id="selectAllCheckbox" class="form-check-input" />
+              <!-- Botón de eliminación masiva (inicialmente oculto) -->
+              <button 
+                id="bulkDeleteBtn" 
+                class="btn btn-danger btn-sm align-items-baseline" 
+                style="display: none;"
+                title="{{_('Eliminar usuarios seleccionados')}}"
+                data-bs-toggle="modal"
+                data-bs-target="#bulkDeleteModal"
+              >
+                <i class="fas fa-trash me-2"></i>
+                <span id="selectedCount">0</span>
+              </button>
+            </div>
+          </th>
           <th>Usuario</th>
           <th>Nombre Completo</th>
           <th>Email</th>
@@ -65,8 +81,16 @@ block content %}
             data-username="{{ user.username|lower }}"
             data-fullname="{{ (user.first_name + ' ' + user.last_name)|lower }}"
             data-email="{{ (user.email or '')|lower }}"
-            data-search="{{ (user.username + ' ' + (user.first_name or '') + ' ' + (user.last_name or '') + ' ' + (user.email or ''))|lower }}">
-          <td><input type="checkbox" disabled /></td>
+            data-search="{{ (user.username + ' ' + (user.first_name or '') + ' ' + (user.last_name or '') + ' ' + (user.email or ''))|lower }}"
+            data-user-id="{{ user.id }}"
+            data-can-delete="{{ 'true' if user.username.lower() not in ['admin', 'administrator'] and user.get('enabled', True) else 'false' }}">
+          <td>
+            {% if user.username.lower() not in ['admin', 'administrator'] and user.get('enabled', True) %}
+            <input type="checkbox" class="form-check-input user-checkbox" value="{{ user.id }}" data-username="{{ user.username }}" />
+            {% else %}
+            <input type="checkbox" class="form-check-input" disabled title="{{_('No se puede seleccionar este usuario')}}" />
+            {% endif %}
+          </td>
           <td>
             <div class="d-flex align-items-center">
               <div class="avatar-circle me-2">
@@ -90,7 +114,7 @@ block content %}
             <span class="text-break searchable-email">{{ user.email or 'Sin email' }}</span>
           </td>
           <td>
-            <span class="badge bg-info">
+            <span class="badge bg-dark">
               {% if user.role_name == 'adminsuper' %}
               <i class="fas fa-crown"></i> Super Admin {% elif user.role_name ==
               'admin' %} <i class="fas fa-user-shield"></i> Admin {% elif
@@ -159,7 +183,6 @@ block content %}
   {% endif %}
 </div>
 
-<!-- ...resto de los modales (sin cambios)... -->
 <!-- Modal para agregar usuario -->
 <div
   class="modal fade"
@@ -289,7 +312,7 @@ block content %}
   </div>
 </div>
 
-<!-- Modal para confirmar eliminación -->
+<!-- Modal para confirmar eliminación individual -->
 <div
   class="modal fade"
   id="deleteUserModal"
@@ -336,8 +359,65 @@ block content %}
   </div>
 </div>
 
-<!-- JavaScript para búsqueda en vivo y modal de eliminación -->
-<script src="{{ url_for('static', filename='js/user/user.js') }}"></script>
+<!-- Modal para confirmación de eliminación masiva -->
+<div
+  class="modal fade"
+  id="bulkDeleteModal"
+  tabindex="-1"
+  aria-labelledby="bulkDeleteLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="bulkDeleteLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>{{_('Confirmar Eliminación Masiva')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>{{_('¡Atención!')}}</strong> {{_('Esta acción eliminará permanentemente los usuarios seleccionados.')}}
+        </div>
+        
+        <p class="mb-3">
+          {{_('¿Está seguro de que desea eliminar')}} <strong id="bulkDeleteCount">0</strong> {{_('usuarios seleccionados')}}?
+        </p>
+        
+        <div class="mb-3">
+          <strong>{{_('Usuarios que serán eliminados:')}}</strong>
+          <div id="selectedUsersList" class="mt-2 p-3 border rounded bg-light" style="max-height: 200px; overflow-y: auto;">
+            <!-- Lista generada dinámicamente -->
+          </div>
+        </div>
+        
+        <!-- Barra de progreso para la eliminación -->
+        <div id="bulkDeleteProgress" style="display: none;">
+          <p class="mb-2">{{_('Eliminando usuarios...')}}</p>
+          <div class="progress mb-2">
+            <div id="bulkDeleteProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+          </div>
+          <small id="bulkDeleteStatus" class="text-muted">{{_('Preparando...')}}</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="bulkDeleteCancelBtn">
+          <i class="fas fa-times"></i> {{_('Cancelar')}}
+        </button>
+        <button type="button" class="btn btn-danger" id="bulkDeleteConfirmBtn">
+          <i class="fas fa-trash"></i> {{_('Eliminar Todos')}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
   .avatar-circle {
     width: 40px;
@@ -361,14 +441,134 @@ block content %}
   }
   
   /* Estilo para el input de búsqueda */
+  #searchInput {
+    padding-right: 40px;
+  }
+  
   #searchInput:focus {
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     border-color: #0d6efd;
+  }
+  
+  /* Estilo para el icono de búsqueda/limpiar */
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    z-index: 10;
+  }
+  
+  .search-icon:hover {
+    color: #0d6efd;
+  }
+  
+  .search-icon.clear-icon {
+    color: #dc3545;
+  }
+  
+  .search-icon.clear-icon:hover {
+    color: #b02a37;
   }
   
   /* Animación suave para mostrar/ocultar filas */
   .user-row {
     transition: opacity 0.2s ease-in-out;
   }
+  
+  /* Estilos para checkboxes */
+  .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  /* Estilo para filas seleccionadas */
+  .user-row.selected {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+  }
+  
+  /* Estilos para el dropdown de filtros */
+  .dropdown-item-text {
+    padding: 0.25rem 1rem;
+  }
+  
+  .form-check {
+    margin-bottom: 0;
+  }
+  
+  .form-check-label {
+    cursor: pointer;
+    width: 100%;
+    padding: 0.25rem 0;
+  }
+  
+  /* Estilo para el botón de filtros activos */
+  #filtersDropdown.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+  }
+  
+  #filtersDropdown.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+  }
+  
+  /* Estilos para la lista de usuarios seleccionados */
+  .selected-user-item {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .selected-user-item:last-child {
+    border-bottom: none;
+  }
+  
+  .selected-user-avatar {
+    width: 24px;
+    height: 24px;
+    background-color: #6c757d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 10px;
+    margin-right: 0.5rem;
+  }
 </style>
+
+<!-- Translations for JavaScript -->
+<script>
+window.translations = {
+    showing: "{{_('Mostrando')}}",
+    user: "{{_('usuario')}}",
+    users: "{{_('usuarios')}}",
+    of: "{{_('de')}}",
+    total: "{{_('Total')}}",
+    noName: "{{_('Sin nombre')}}",
+    search: "{{_('Buscar')}}",
+    clear: "{{_('Limpiar búsqueda')}}",
+    selectAll: "{{_('Seleccionar todos')}}",
+    deselectAll: "{{_('Deseleccionar todos')}}",
+    selected: "{{_('seleccionado')}}",
+    selectedPlural: "{{_('seleccionados')}}",
+    deleting: "{{_('Eliminando')}}",
+    deleted: "{{_('Eliminado')}}",
+    deletingUsers: "{{_('Eliminando usuarios...')}}",
+    deletionComplete: "{{_('Eliminación completada')}}",
+    errorDeleting: "{{_('Error al eliminar')}}",
+    usersDeleted: "{{_('usuarios eliminados exitosamente')}}",
+    someErrors: "{{_('Algunos usuarios no pudieron ser eliminados')}}",
+    preparing: "{{_('Preparando...')}}"
+};
+</script>
+
+<!-- User Management JavaScript -->
+<script src="{{ url_for('static', filename='js/user/user.js') }}"></script>
 {% endblock %}

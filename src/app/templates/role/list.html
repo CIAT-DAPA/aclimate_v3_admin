@@ -1,135 +1,187 @@
-{% extends 'base.html' %} {% block title %}Roles{% endblock %} {% block content
-%}
+{% extends 'base.html' %} {% block title %}{{_('Roles')}}{% endblock %} {%
+block content %}
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Roles</h2>
+    <h2>{{_('Roles')}}</h2>
 
+    {# Comentado hasta que se implemente la ruta create_role
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
       data-bs-target="#addRoleModal"
     >
-      <i class="fas fa-plus"></i> Agregar
+      <i class="fas fa-plus"></i> {{_('Agregar')}}
     </button>
+    #}
   </div>
 
   <!-- Barra de búsqueda y filtros -->
-  <div class="d-flex align-items-center mb-3">
-    <input
-      type="text"
-      class="form-control me-2"
-      placeholder="Buscar rol..."
-      style="max-width: 300px"
-      disabled
-    />
-    <button class="btn btn-secondary" disabled>
-      <i class="fas fa-filter"></i> Filtros
-    </button>
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <div class="position-relative me-2" style="min-width: 300px;">
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        placeholder="{{_('Buscar por nombre o descripción...')}}"
+        autocomplete="off"
+      />
+      <i id="searchIcon" class="fas fa-search search-icon" title="{{_('Buscar')}}"></i>
+    </div>
+    <!-- Botón de filtros -->
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="filtersDropdown" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+      >
+        <i class="fas fa-filter"></i> {{_('Filtros')}}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filtersDropdown" style="min-width: 250px;">
+        <!-- Content will be generated dynamically by JavaScript -->
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> Cargando filtros...</div></li>
+      </ul>
+    </div>
+
+    <span id="searchResults" class="text-muted small"></span>
   </div>
 
   {% if roles %}
-  <table class="table table-hover align-middle">
-    <thead class="table-light">
-      <tr>
-        <th style="width: 5%"><input type="checkbox" disabled /></th>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Módulos</th>
-        <th>Estado</th>
-        <th class="text-end">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for role in roles %}
-      <tr class="{{ 'table-secondary' if not role.get('enable', True) }}">
-        <td><input type="checkbox" disabled /></td>
-        <td>
-          <strong>{{ role.name }}</strong>
-        </td>
-        <td>
-          <small class="text-muted"
-            >{{ role.description or 'Sin descripción' }}</small
-          >
-        </td>
-        <td>
-          {% if role.modules %} {% for module, access in role.modules.items() %}
-          {% if access %}
-          <span class="badge bg-success me-1 mb-1">
-            {% if module == 'geographic' %}
-            <i class="fas fa-globe"></i> Geográfico {% elif module == 'crops' %}
-            <i class="fas fa-seedling"></i> Cultivos {% elif module == 'weather'
-            %} <i class="fas fa-cloud-sun"></i> Clima {% elif module == 'users'
-            %} <i class="fas fa-users"></i> Usuarios {% elif module == 'api' %}
-            <i class="fas fa-code"></i> API {% else %} {{ module.title() }} {%
-            endif %}
-          </span>
-          {% endif %} {% endfor %} {% if not role.modules.values() | select %}
-          <span class="text-muted"><i>Sin módulos asignados</i></span>
-          {% endif %} {% else %}
-          <span class="text-muted"><i>Sin módulos</i></span>
-          {% endif %}
-        </td>
-        <td>
-          {% if role.get('enable', True) %}
-          <span class="badge bg-success">
-            <i class="fas fa-check-circle"></i> Activo
-          </span>
-          {% else %}
-          <span class="badge bg-danger">
-            <i class="fas fa-times-circle"></i> Inactivo
-          </span>
-          {% endif %}
-        </td>
-        <td class="text-end">
-          <a
-            href="{{ url_for('role.edit_role', id=role.id) }}"
-            class="btn btn-warning btn-sm me-1"
-            title="Editar"
-          >
-            <i class="fas fa-pen"></i>
-          </a>
-          {% if role.get('enable', True) %} {% if role.name.lower() not in
-          ['admin', 'administrador'] %}
-          <a
-            href="{{ url_for('role.delete_role', id=role.id) }}"
-            class="btn btn-danger btn-sm"
-            title="Deshabilitar"
-            onclick="return confirm('¿Está seguro de deshabilitar este rol?')"
-          >
-            <i class="fas fa-ban"></i>
-          </a>
-          {% else %}
-          <button
-            class="btn btn-secondary btn-sm"
-            disabled
-            title="No se puede deshabilitar rol administrador"
-          >
-            <i class="fas fa-shield-alt"></i>
-          </button>
-          {% endif %} {% else %}
-          <a
-            href="{{ url_for('role.restore_role', id=role.id) }}"
-            class="btn btn-success btn-sm"
-            title="Restaurar"
-            onclick="return confirm('¿Está seguro de restaurar este rol?')"
-          >
-            <i class="fas fa-undo"></i>
-          </a>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div id="rolesTableContainer">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 5%">
+            <div class="d-flex align-items-center gap-2">
+              <input type="checkbox" id="selectAllCheckbox" class="form-check-input" />
+              <!-- Botón de eliminación masiva (inicialmente oculto) -->
+              <button 
+                id="bulkDeleteBtn" 
+                class="btn btn-danger btn-sm align-items-baseline" 
+                style="display: none;"
+                title="{{_('Eliminar roles seleccionados')}}"
+                data-bs-toggle="modal"
+                data-bs-target="#bulkDeleteModal"
+              >
+                <i class="fas fa-trash me-2"></i>
+                <span id="selectedCount">0</span>
+              </button>
+            </div>
+          </th>
+          <th>Nombre del Rol</th>
+          <th>Descripción</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="rolesTableBody">
+        {% for role in roles %}
+        <tr class="role-row" 
+            data-rolename="{{ role.name|lower }}"
+            data-description="{{ (role.description or '')|lower }}"
+            data-search="{{ (role.name + ' ' + (role.description or ''))|lower }}"
+            data-role-id="{{ role.id }}"
+            data-can-delete="{{ 'true' if not role.name.lower() in ['admin', 'super-admin', 'system'] else 'false' }}">
+          <td>
+            {% if not role.name.lower() in ['admin', 'super-admin', 'system'] %}
+            <input type="checkbox" class="form-check-input role-checkbox" value="{{ role.id }}" data-rolename="{{ role.name }}" />
+            {% else %}
+            <input type="checkbox" class="form-check-input" disabled title="{{_('No se puede seleccionar este rol del sistema')}}" />
+            {% endif %}
+          </td>
+          <td>
+            <div class="d-flex align-items-center">
+              <div class="role-icon me-2">
+                {% if role.name.lower() in ['admin', 'super-admin'] %}
+                <i class="fas fa-crown text-warning"></i>
+                {% elif role.name.lower() in ['manager', 'supervisor'] %}
+                <i class="fas fa-user-shield text-primary"></i>
+                {% elif role.name.lower() in ['editor', 'moderator'] %}
+                <i class="fas fa-user-edit text-info"></i>
+                {% elif role.name.lower() in ['viewer', 'guest'] %}
+                <i class="fas fa-eye text-secondary"></i>
+                {% else %}
+                <i class="fas fa-user-tag text-dark"></i>
+                {% endif %}
+              </div>
+              <div>
+                <strong class="searchable-rolename">{{ role.display_name }}</strong>
+                <br />
+                <small class="text-muted">ID: {{ role.id[:8] }}...</small>
+              </div>
+            </div>
+          </td>
+          <td>
+            {% if role.description %}
+            <span class="searchable-description">{{ role.description }}</span>
+            {% else %}
+            <span class="text-muted fst-italic">Sin descripción</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            {# Comentado hasta que se implemente la ruta edit_role
+            <a
+              href="{{ url_for('role.edit_role', role_id=role.id) }}"
+              class="btn btn-warning btn-sm me-1"
+              title="Editar rol"
+            >
+              <i class="fas fa-pen"></i>
+            </a>
+            #}
+            <button
+              class="btn btn-warning btn-sm me-1"
+              disabled
+              title="Editar - No implementado"
+            >
+              <i class="fas fa-pen"></i>
+            </button>
+            {% if not role.name.lower() in ['admin', 'super-admin', 'system'] %}
+            <button 
+              type="button"
+              class="btn btn-danger btn-sm"
+              title="Eliminar rol"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteRoleModal"
+              data-role-id="{{ role.id }}"
+              data-rolename="{{ role.name }}"
+              data-role-description="{{ role.description or 'Sin descripción' }}"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+            {% else %}
+            <button
+              class="btn btn-secondary btn-sm"
+              disabled
+              title="No se puede eliminar rol del sistema"
+            >
+              <i class="fas fa-shield-alt"></i>
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Mensaje cuando no hay resultados de búsqueda -->
+  <div id="noSearchResults" class="alert alert-warning mt-4" style="display: none;">
+    <i class="fas fa-search"></i>
+    <span id="noResultsText">{{_('No se encontraron roles que coincidan con la búsqueda')}}</span> "<span id="searchTerm"></span>".
+    <br>
+    <small class="text-muted">{{_('Intenta con otros términos o limpia la búsqueda para ver todos los roles.')}}</small>
+  </div>
+  
   {% else %}
   <div class="alert alert-info mt-4">
     <i class="fas fa-info-circle"></i>
-    No hay roles registrados.
+    No hay roles registrados o no se pudieron cargar desde la API.
   </div>
   {% endif %}
 </div>
 
-<!-- Modal para agregar rol -->
+{# Los modales están comentados hasta que se implementen las rutas correspondientes
 <div
   class="modal fade"
   id="addRoleModal"
@@ -138,11 +190,11 @@
   aria-hidden="true"
 >
   <div class="modal-dialog modal-lg">
-    <form method="POST" class="modal-content">
+    <form method="POST" action="{{ url_for('role.create_role') }}" class="modal-content">
       {{ form.hidden_tag() }}
       <div class="modal-header">
         <h5 class="modal-title" id="addRoleLabel">
-          <i class="fas fa-user-tag"></i> Agregar Rol
+          <i class="fas fa-user-tag"></i> {{_('Agregar Rol')}}
         </h5>
         <button
           type="button"
@@ -152,74 +204,152 @@
         ></button>
       </div>
       <div class="modal-body">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="mb-3">
-              {{ form.name.label(class="form-label") }} {{
-              form.name(class="form-control") }} {% for error in
-              form.name.errors %}
-              <div class="text-danger small">{{ error }}</div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-check mt-4">
-              {{ form.enable(class="form-check-input") }} {{
-              form.enable.label(class="form-check-label") }}
-            </div>
-          </div>
-        </div>
-
         <div class="mb-3">
-          {{ form.description.label(class="form-label") }} {{
-          form.description(class="form-control") }} {% for error in
-          form.description.errors %}
-          <div class="text-danger small">{{ error }}</div>
-          {% endfor %}
-        </div>
-
-        <div class="mb-3">
-          {{ form.modules.label(class="form-label") }}
-          <div class="row">
-            {% for subfield in form.modules %}
-            <div class="col-md-6 mb-2">
-              <div class="form-check">
-                {{ subfield(class="form-check-input") }}
-                <label class="form-check-label" for="{{ subfield.id }}">
-                  {% if subfield.data == 'geographic' %}
-                  <i class="fas fa-map-marker-alt text-primary"></i> {{
-                  subfield.label.text }} {% elif subfield.data == 'crops' %}
-                  <i class="fas fa-seedling text-success"></i> {{
-                  subfield.label.text }} {% elif subfield.data == 'weather' %}
-                  <i class="fas fa-cloud-sun text-info"></i> {{
-                  subfield.label.text }} {% elif subfield.data == 'users' %}
-                  <i class="fas fa-users text-warning"></i> {{
-                  subfield.label.text }} {% elif subfield.data == 'api' %}
-                  <i class="fas fa-code text-secondary"></i> {{
-                  subfield.label.text }} {% else %} {{ subfield.label.text }} {%
-                  endif %}
-                </label>
-              </div>
-            </div>
+          <label for="name" class="form-label fw-semibold">
+            <i class="fas fa-tag me-2"></i>{{ form.name.label.text }}
+          </label>
+          {% if form.name.errors %}
+          {{ form.name(class="form-control is-invalid", id="name", placeholder=_('Ingresa el nombre del rol')) }}
+          <div class="invalid-feedback">
+            {% for error in form.name.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
             {% endfor %}
           </div>
-          {% for error in form.modules.errors %}
-          <div class="text-danger small">{{ error }}</div>
-          {% endfor %}
+          {% else %}
+          {{ form.name(class="form-control", id="name", placeholder=_('Ingresa el nombre del rol')) }}
+          {% endif %}
+          <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>{{_('Nombre único para identificar el rol')}}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label fw-semibold">
+            <i class="fas fa-align-left me-2"></i>{{ form.description.label.text }}
+          </label>
+          {% if form.description.errors %}
+          {{ form.description(class="form-control is-invalid", id="description", placeholder=_('Describe las funciones de este rol'), rows="3") }}
+          <div class="invalid-feedback">
+            {% for error in form.description.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.description(class="form-control", id="description", placeholder=_('Describe las funciones de este rol'), rows="3") }}
+          {% endif %}
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          <i class="fas fa-times"></i> Cancelar
+          <i class="fas fa-times"></i> {{_('Cancelar')}}
         </button>
         <button type="submit" class="btn btn-primary">
-          <i class="fas fa-save"></i> Guardar Rol
+          <i class="fas fa-save"></i> {{_('Guardar Rol')}}
         </button>
       </div>
     </form>
   </div>
 </div>
+#}
 
-<!-- JavaScript para manejar interacciones -->
-<script src="{{ url_for('static', filename='js/roles/list.js') }}"></script>
+<style>
+  .role-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+  
+  /* Estilos para el resaltado de búsqueda */
+  .role-row mark {
+    background-color: #ffc107 !important;
+    color: #000;
+    font-weight: bold;
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+  
+  /* Estilo para el input de búsqueda */
+  #searchInput {
+    padding-right: 40px;
+  }
+  
+  #searchInput:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #0d6efd;
+  }
+  
+  /* Estilo para el icono de búsqueda/limpiar */
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    z-index: 10;
+  }
+  
+  .search-icon:hover {
+    color: #0d6efd;
+  }
+  
+  .search-icon.clear-icon {
+    color: #dc3545;
+  }
+  
+  .search-icon.clear-icon:hover {
+    color: #b02a37;
+  }
+  
+  /* Animación suave para mostrar/ocultar filas */
+  .role-row {
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  /* Estilos para checkboxes */
+  .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  /* Estilo para filas seleccionadas */
+  .role-row.selected {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+  }
+</style>
+
+<!-- Translations for JavaScript -->
+<script>
+window.translations = {
+    showing: "{{_('Mostrando')}}",
+    role: "{{_('rol')}}",
+    roles: "{{_('roles')}}",
+    of: "{{_('de')}}",
+    total: "{{_('Total')}}",
+    noDescription: "{{_('Sin descripción')}}",
+    search: "{{_('Buscar')}}",
+    clear: "{{_('Limpiar búsqueda')}}",
+    selectAll: "{{_('Seleccionar todos')}}",
+    deselectAll: "{{_('Deseleccionar todos')}}",
+    selected: "{{_('seleccionado')}}",
+    selectedPlural: "{{_('seleccionados')}}",
+    deleting: "{{_('Eliminando')}}",
+    deleted: "{{_('Eliminado')}}",
+    deletingRoles: "{{_('Eliminando roles...')}}",
+    deletionComplete: "{{_('Eliminación completada')}}",
+    errorDeleting: "{{_('Error al eliminar')}}",
+    rolesDeleted: "{{_('roles eliminados exitosamente')}}",
+    someErrors: "{{_('Algunos roles no pudieron ser eliminados')}}",
+    preparing: "{{_('Preparando...')}}"
+};
+</script>
+
+{# Role Management JavaScript - comentado hasta implementar #}
+{# <script src="{{ url_for('static', filename='js/role/role.js') }}"></script> #}
 {% endblock %}

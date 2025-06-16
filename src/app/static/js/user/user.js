@@ -1,6 +1,6 @@
 /**
  * User Management JavaScript
- * Handles user search, filtering, and modal interactions
+ * Handles user search, filtering, modal interactions and bulk operations
  */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -18,18 +18,290 @@ document.addEventListener("DOMContentLoaded", function () {
     "#filtersDropdown + .dropdown-menu"
   );
 
-  // Get all user rows
+  // Bulk selection elements
+  const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+  const bulkDeleteBtn = document.getElementById("bulkDeleteBtn");
+  const selectedCount = document.getElementById("selectedCount");
+  const bulkDeleteModal = document.getElementById("bulkDeleteModal");
+  const bulkDeleteConfirmBtn = document.getElementById("bulkDeleteConfirmBtn");
+  const bulkDeleteCancelBtn = document.getElementById("bulkDeleteCancelBtn");
+
+  // Get all user rows and checkboxes
   const userRows = document.querySelectorAll(".user-row");
+  const userCheckboxes = document.querySelectorAll(".user-checkbox");
   const totalUsers = userRows.length;
 
-  // Active filters
+  // Active filters and selections
   let activeRoleFilters = new Set();
+  let selectedUsers = new Set();
+  let isDeleting = false;
+
+  /**
+   * Update bulk selection UI
+   */
+  function updateBulkSelectionUI() {
+    const selectedCount = selectedUsers.size;
+
+    if (selectedCount > 0) {
+      bulkDeleteBtn.style.display = "flex";
+      document.getElementById("selectedCount").textContent = selectedCount;
+      bulkDeleteBtn.title = `${
+        window.translations?.deleting || "Eliminar"
+      } ${selectedCount} ${
+        selectedCount === 1
+          ? window.translations?.user || "usuario"
+          : window.translations?.users || "usuarios"
+      } ${
+        selectedCount === 1
+          ? window.translations?.selected || "seleccionado"
+          : window.translations?.selectedPlural || "seleccionados"
+      }`;
+    } else {
+      bulkDeleteBtn.style.display = "none";
+    }
+
+    // Update select all checkbox state
+    const visibleCheckboxes = Array.from(userCheckboxes).filter(
+      (cb) =>
+        !cb.closest(".user-row").style.display ||
+        cb.closest(".user-row").style.display !== "none"
+    );
+    const checkedVisibleCheckboxes = visibleCheckboxes.filter(
+      (cb) => cb.checked
+    );
+
+    if (checkedVisibleCheckboxes.length === 0) {
+      selectAllCheckbox.checked = false;
+      selectAllCheckbox.indeterminate = false;
+    } else if (checkedVisibleCheckboxes.length === visibleCheckboxes.length) {
+      selectAllCheckbox.checked = true;
+      selectAllCheckbox.indeterminate = false;
+    } else {
+      selectAllCheckbox.checked = false;
+      selectAllCheckbox.indeterminate = true;
+    }
+  }
+
+  /**
+   * Handle individual checkbox change
+   */
+  function handleUserCheckboxChange(event) {
+    const checkbox = event.target;
+    const userId = checkbox.value;
+    const userRow = checkbox.closest(".user-row");
+
+    if (checkbox.checked) {
+      selectedUsers.add(userId);
+      userRow.classList.add("selected");
+    } else {
+      selectedUsers.delete(userId);
+      userRow.classList.remove("selected");
+    }
+
+    updateBulkSelectionUI();
+  }
+
+  /**
+   * Handle select all checkbox change
+   */
+  function handleSelectAllChange(event) {
+    const isChecked = event.target.checked;
+
+    // Get only visible and enabled user checkboxes
+    const visibleCheckboxes = Array.from(userCheckboxes).filter((cb) => {
+      const row = cb.closest(".user-row");
+      return (
+        (!row.style.display || row.style.display !== "none") && !cb.disabled
+      );
+    });
+
+    visibleCheckboxes.forEach((checkbox) => {
+      const userId = checkbox.value;
+      const userRow = checkbox.closest(".user-row");
+
+      checkbox.checked = isChecked;
+
+      if (isChecked) {
+        selectedUsers.add(userId);
+        userRow.classList.add("selected");
+      } else {
+        selectedUsers.delete(userId);
+        userRow.classList.remove("selected");
+      }
+    });
+
+    updateBulkSelectionUI();
+  }
+
+  /**
+   * Prepare bulk delete modal
+   */
+  function prepareBulkDeleteModal() {
+    const selectedUsersList = document.getElementById("selectedUsersList");
+    const bulkDeleteCount = document.getElementById("bulkDeleteCount");
+
+    bulkDeleteCount.textContent = selectedUsers.size;
+
+    // Generate list of selected users
+    let userListHTML = "";
+    selectedUsers.forEach((userId) => {
+      const checkbox = document.querySelector(
+        `.user-checkbox[value="${userId}"]`
+      );
+      if (checkbox) {
+        const username = checkbox.dataset.username;
+        const userRow = checkbox.closest(".user-row");
+        const fullNameElement = userRow.querySelector(".searchable-fullname");
+        const fullName = fullNameElement
+          ? fullNameElement.textContent.trim()
+          : window.translations?.noName || "Sin nombre";
+
+        userListHTML += `
+          <div class="selected-user-item">
+            <div class="selected-user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div>
+              <strong>${username}</strong>
+              <br>
+              <small class="text-muted">${fullName}</small>
+            </div>
+          </div>
+        `;
+      }
+    });
+
+    selectedUsersList.innerHTML = userListHTML;
+  }
+
+  /**
+   * Perform bulk delete operation
+   */
+  async function performBulkDelete() {
+    if (isDeleting) return;
+
+    isDeleting = true;
+    const progressContainer = document.getElementById("bulkDeleteProgress");
+    const progressBar = document.getElementById("bulkDeleteProgressBar");
+    const statusText = document.getElementById("bulkDeleteStatus");
+
+    // Show progress UI
+    progressContainer.style.display = "block";
+    bulkDeleteConfirmBtn.style.display = "none";
+    bulkDeleteCancelBtn.disabled = true;
+
+    const userIds = Array.from(selectedUsers);
+    const totalToDelete = userIds.length;
+    let deletedCount = 0;
+    let errorCount = 0;
+
+    statusText.textContent = window.translations?.preparing || "Preparando...";
+
+    // Delete users one by one
+    for (let i = 0; i < userIds.length; i++) {
+      const userId = userIds[i];
+      const checkbox = document.querySelector(
+        `.user-checkbox[value="${userId}"]`
+      );
+      const username = checkbox ? checkbox.dataset.username : "Unknown";
+
+      try {
+        statusText.textContent = `${
+          window.translations?.deleting || "Eliminando"
+        } ${username}... (${i + 1}/${totalToDelete})`;
+
+        // Make delete request
+        const response = await fetch(`/user/delete/${userId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        });
+
+        if (response.ok) {
+          deletedCount++;
+          statusText.textContent = `${
+            window.translations?.deleted || "Eliminado"
+          }: ${username}`;
+
+          // Remove user row from table
+          const userRow = checkbox.closest(".user-row");
+          if (userRow) {
+            userRow.style.transition = "opacity 0.3s ease-out";
+            userRow.style.opacity = "0";
+            setTimeout(() => {
+              userRow.remove();
+            }, 300);
+          }
+
+          // Remove from selected users
+          selectedUsers.delete(userId);
+        } else {
+          errorCount++;
+          console.error(
+            `Error deleting user ${username}:`,
+            response.statusText
+          );
+        }
+      } catch (error) {
+        errorCount++;
+        console.error(`Error deleting user ${username}:`, error);
+      }
+
+      // Update progress bar
+      const progress = ((i + 1) / totalToDelete) * 100;
+      progressBar.style.width = `${progress}%`;
+
+      // Small delay to show progress
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+
+    // Show completion message
+    progressBar.classList.remove("progress-bar-animated");
+    statusText.textContent = `${
+      window.translations?.deletionComplete || "Eliminación completada"
+    }: ${deletedCount} ${
+      window.translations?.usersDeleted || "usuarios eliminados exitosamente"
+    }${
+      errorCount > 0
+        ? `. ${errorCount} ${window.translations?.someErrors || "errores"}`
+        : ""
+    }`;
+
+    // Update UI
+    updateBulkSelectionUI();
+    applyFilters(); // Refresh the view
+
+    // Auto close modal after 2 seconds
+    setTimeout(() => {
+      const modal = bootstrap.Modal.getInstance(bulkDeleteModal);
+      if (modal) {
+        modal.hide();
+      }
+
+      // Show success message
+      if (deletedCount > 0) {
+        // You can trigger a flash message here or show a toast
+        console.log(`Successfully deleted ${deletedCount} users`);
+      }
+
+      // Reset modal state
+      setTimeout(() => {
+        progressContainer.style.display = "none";
+        bulkDeleteConfirmBtn.style.display = "inline-block";
+        bulkDeleteCancelBtn.disabled = false;
+        progressBar.style.width = "0%";
+        progressBar.classList.add("progress-bar-animated");
+        isDeleting = false;
+      }, 500);
+    }, 2000);
+  }
 
   /**
    * Get unique roles from current users
    */
   function getUniqueRoles() {
-    const roles = new Map(); // Using Map to store role info
+    const roles = new Map();
 
     userRows.forEach((row) => {
       const roleElement = row.querySelector(".badge");
@@ -38,7 +310,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const roleIcon = roleElement.querySelector("i");
         const iconClass = roleIcon ? roleIcon.className : "fas fa-user-tag";
 
-        // Extract clean role name (remove icon text)
         const cleanRoleName = roleText.replace(/^\s*\w+\s+/, "").trim();
 
         if (cleanRoleName && !roles.has(cleanRoleName)) {
@@ -58,11 +329,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const uniqueRoles = getUniqueRoles();
 
-    let menuHTML = `
-      <li><h6 class="dropdown-header">Filtrar por Rol</h6></li>
-    `;
+    let menuHTML = `<li><h6 class="dropdown-header">Filtrar por Rol</h6></li>`;
 
-    // Add role filters
     uniqueRoles.forEach((iconClass, roleName) => {
       const filterId = `filter-${roleName.toLowerCase().replace(/\s+/g, "-")}`;
       menuHTML += `
@@ -79,7 +347,6 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
     });
 
-    // Add divider and clear filters
     menuHTML += `
       <li><hr class="dropdown-divider"></li>
       <li>
@@ -90,8 +357,6 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
 
     filtersMenu.innerHTML = menuHTML;
-
-    // Add event listeners to the new checkboxes
     initializeFilterEventListeners();
   }
 
@@ -99,13 +364,11 @@ document.addEventListener("DOMContentLoaded", function () {
    * Initialize filter event listeners
    */
   function initializeFilterEventListeners() {
-    // Role filter checkboxes
     const roleFilterCheckboxes = document.querySelectorAll(".role-filter");
     roleFilterCheckboxes.forEach((checkbox) => {
       checkbox.addEventListener("change", handleRoleFilterChange);
     });
 
-    // Clear filters button
     const clearFiltersBtn = document.getElementById("clearFilters");
     if (clearFiltersBtn) {
       clearFiltersBtn.addEventListener("click", function (e) {
@@ -138,14 +401,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!filtersDropdown) return;
 
     const filterCount = activeRoleFilters.size;
-    const filterText =
-      filtersDropdown.querySelector(".filter-text") || filtersDropdown;
 
     if (filterCount > 0) {
       filtersDropdown.classList.remove("btn-outline-secondary");
       filtersDropdown.classList.add("btn-primary");
 
-      // Update button text to show active filters count
       const buttonContent = `<i class="fas fa-filter me-2"></i>Filtros (${filterCount})`;
       if (filtersDropdown.innerHTML !== buttonContent) {
         filtersDropdown.innerHTML = buttonContent;
@@ -163,7 +423,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function clearAllFilters() {
     activeRoleFilters.clear();
 
-    // Uncheck all filter checkboxes
     const roleFilterCheckboxes = document.querySelectorAll(".role-filter");
     roleFilterCheckboxes.forEach((checkbox) => {
       checkbox.checked = false;
@@ -177,7 +436,6 @@ document.addEventListener("DOMContentLoaded", function () {
    * Check if a row matches the role filters
    */
   function matchesRoleFilters(row) {
-    // If no role filters are active, show all
     if (activeRoleFilters.size === 0) {
       return true;
     }
@@ -197,11 +455,9 @@ document.addEventListener("DOMContentLoaded", function () {
   function updateSearchIcon() {
     if (searchInput && searchIcon) {
       if (searchInput.value.trim()) {
-        // Has content - show clear icon
         searchIcon.className = "fas fa-times search-icon clear-icon";
         searchIcon.title = window.translations?.clear || "Limpiar búsqueda";
       } else {
-        // Empty - show search icon
         searchIcon.className = "fas fa-search search-icon";
         searchIcon.title = window.translations?.search || "Buscar";
       }
@@ -214,10 +470,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function handleSearchIconClick() {
     if (searchInput && searchIcon) {
       if (searchInput.value.trim()) {
-        // Has content - clear it
         clearSearch();
       } else {
-        // Empty - focus input
         searchInput.focus();
       }
     }
@@ -260,10 +514,8 @@ document.addEventListener("DOMContentLoaded", function () {
       : "";
     let visibleCount = 0;
 
-    // Update search icon
     updateSearchIcon();
 
-    // Clear previous highlights
     userRows.forEach((row) => {
       const searchableElements = row.querySelectorAll(
         ".searchable-username, .searchable-fullname, .searchable-email"
@@ -271,7 +523,6 @@ document.addEventListener("DOMContentLoaded", function () {
       searchableElements.forEach((element) => clearHighlight(element));
     });
 
-    // Filter rows based on both search and role filters
     userRows.forEach((row) => {
       const searchData = row.getAttribute("data-search");
       const matchesSearch = !searchText || searchData.includes(searchText);
@@ -281,7 +532,6 @@ document.addEventListener("DOMContentLoaded", function () {
         row.style.display = "";
         visibleCount++;
 
-        // Highlight matching text if there's a search
         if (searchText) {
           const username = row.querySelector(".searchable-username");
           const fullname = row.querySelector(".searchable-fullname");
@@ -294,18 +544,26 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       } else {
         row.style.display = "none";
+
+        // Uncheck hidden rows and remove from selection
+        const checkbox = row.querySelector(".user-checkbox");
+        if (checkbox && checkbox.checked) {
+          checkbox.checked = false;
+          selectedUsers.delete(checkbox.value);
+          row.classList.remove("selected");
+        }
       }
     });
 
-    // Update search results display
     updateSearchResults(searchText, visibleCount);
+    updateBulkSelectionUI();
   }
 
   /**
    * Perform live search on user table
    */
   function performSearch() {
-    applyFilters(); // Use the combined filter function
+    applyFilters();
   }
 
   /**
@@ -316,7 +574,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (searchText || hasActiveFilters) {
       if (visibleCount === 0) {
-        // No results found
         usersTableContainer.style.display = "none";
         noSearchResults.style.display = "block";
 
@@ -333,11 +590,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         searchResults.textContent = "";
       } else {
-        // Results found
         usersTableContainer.style.display = "block";
         noSearchResults.style.display = "none";
 
-        // Get localized text
         const resultText =
           visibleCount === 1
             ? `${window.translations?.showing || "Mostrando"} ${visibleCount} ${
@@ -359,7 +614,6 @@ document.addEventListener("DOMContentLoaded", function () {
         } ${totalUsers}`;
       }
     } else {
-      // No search or filters, show all
       usersTableContainer.style.display = "block";
       noSearchResults.style.display = "none";
       searchResults.textContent = `${
@@ -373,26 +627,21 @@ document.addEventListener("DOMContentLoaded", function () {
    */
   function initializeSearch() {
     if (searchInput) {
-      // Real-time search event listener
       searchInput.addEventListener("input", performSearch);
 
-      // Search icon click event
       if (searchIcon) {
         searchIcon.addEventListener("click", handleSearchIconClick);
       }
 
-      // Initialize counter and icon
       updateSearchResults("", totalUsers);
       updateSearchIcon();
 
-      // Add keyboard shortcuts
       searchInput.addEventListener("keydown", function (e) {
         if (e.key === "Escape") {
           clearSearch();
         }
       });
 
-      // Update icon when input changes
       searchInput.addEventListener("input", updateSearchIcon);
     }
   }
@@ -402,15 +651,37 @@ document.addEventListener("DOMContentLoaded", function () {
    */
   function initializeFilters() {
     if (filtersDropdown) {
-      // Enable the filters dropdown
       filtersDropdown.disabled = false;
-
-      // Generate dynamic filters menu
       generateFiltersMenu();
-
-      // Initialize display
       updateFiltersDisplay();
     }
+  }
+
+  /**
+   * Initialize bulk selection functionality
+   */
+  function initializeBulkSelection() {
+    // Select all checkbox
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener("change", handleSelectAllChange);
+    }
+
+    // Individual user checkboxes
+    userCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", handleUserCheckboxChange);
+    });
+
+    // Bulk delete modal events
+    if (bulkDeleteModal) {
+      bulkDeleteModal.addEventListener("show.bs.modal", prepareBulkDeleteModal);
+    }
+
+    if (bulkDeleteConfirmBtn) {
+      bulkDeleteConfirmBtn.addEventListener("click", performBulkDelete);
+    }
+
+    // Initialize UI
+    updateBulkSelectionUI();
   }
 
   /**
@@ -430,28 +701,23 @@ document.addEventListener("DOMContentLoaded", function () {
   function initializeDeleteModal() {
     if (deleteModal) {
       deleteModal.addEventListener("show.bs.modal", function (event) {
-        // Button that triggered the modal
         const button = event.relatedTarget;
 
-        // Extract info from data-* attributes
         const userId = button.getAttribute("data-user-id");
         const username = button.getAttribute("data-username");
         const userName = button.getAttribute("data-user-name");
 
-        // Update modal content
         const modalUserName = deleteModal.querySelector("#deleteUserName");
         const modalUsername = deleteModal.querySelector("#deleteUsername");
         const modalFullName = deleteModal.querySelector("#deleteFullName");
         const deleteForm = deleteModal.querySelector("#deleteUserForm");
 
-        // Set values
         if (modalUserName) modalUserName.textContent = username;
         if (modalUsername) modalUsername.textContent = username;
         if (modalFullName)
           modalFullName.textContent =
             userName || window.translations?.noName || "Sin nombre";
 
-        // Configure form action
         if (deleteForm) deleteForm.action = `/user/delete/${userId}`;
       });
     }
@@ -463,6 +729,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function init() {
     initializeSearch();
     initializeFilters();
+    initializeBulkSelection();
     initializeDeleteModal();
 
     // Make functions available globally
