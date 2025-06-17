@@ -4,7 +4,6 @@ block content %}
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{_('Roles')}}</h2>
 
-    {# Comentado hasta que se implemente la ruta create_role
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
@@ -12,7 +11,6 @@ block content %}
     >
       <i class="fas fa-plus"></i> {{_('Agregar')}}
     </button>
-    #}
   </div>
 
   <!-- Barra de búsqueda y filtros -->
@@ -82,9 +80,9 @@ block content %}
             data-description="{{ (role.description or '')|lower }}"
             data-search="{{ (role.name + ' ' + (role.description or ''))|lower }}"
             data-role-id="{{ role.id }}"
-            data-can-delete="{{ 'true' if not role.name.lower() in ['admin', 'super-admin', 'system'] else 'false' }}">
+            data-can-delete="{{ 'true' if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] else 'false' }}">
           <td>
-            {% if not role.name.lower() in ['admin', 'super-admin', 'system'] %}
+            {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
             <input type="checkbox" class="form-check-input role-checkbox" value="{{ role.id }}" data-rolename="{{ role.name }}" />
             {% else %}
             <input type="checkbox" class="form-check-input" disabled title="{{_('No se puede seleccionar este rol del sistema')}}" />
@@ -120,23 +118,7 @@ block content %}
             {% endif %}
           </td>
           <td class="text-end">
-            {# Comentado hasta que se implemente la ruta edit_role
-            <a
-              href="{{ url_for('role.edit_role', role_id=role.id) }}"
-              class="btn btn-warning btn-sm me-1"
-              title="Editar rol"
-            >
-              <i class="fas fa-pen"></i>
-            </a>
-            #}
-            <button
-              class="btn btn-warning btn-sm me-1"
-              disabled
-              title="Editar - No implementado"
-            >
-              <i class="fas fa-pen"></i>
-            </button>
-            {% if not role.name.lower() in ['admin', 'super-admin', 'system'] %}
+            {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
             <button 
               type="button"
               class="btn btn-danger btn-sm"
@@ -181,7 +163,7 @@ block content %}
   {% endif %}
 </div>
 
-{# Los modales están comentados hasta que se implementen las rutas correspondientes
+
 <div
   class="modal fade"
   id="addRoleModal"
@@ -250,7 +232,6 @@ block content %}
     </form>
   </div>
 </div>
-#}
 
 <style>
   .role-icon {
@@ -350,6 +331,5 @@ window.translations = {
 };
 </script>
 
-{# Role Management JavaScript - comentado hasta implementar #}
-{# <script src="{{ url_for('static', filename='js/role/role.js') }}"></script> #}
+<script src="{{ url_for('static', filename='js/role/role.js') }}"></script>
 {% endblock %}

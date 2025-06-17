@@ -106,3 +106,170 @@ class RoleService:
         except Exception as e:
             current_app.logger.error(f"Unexpected error in RoleService.get_all: {e}")
             return []
+
+    def create(self, name: str, description: str = "", composite: bool = False) -> Dict:
+        """Crear un nuevo rol"""
+        try:
+            print(f"Attempting to create role: {name}")
+            
+            # Preparar datos para la API
+            role_data = {
+                "name": name,
+                "description": description,
+                "composite": composite
+            }
+            
+            print(f"Creating role with data: {role_data}")
+            
+            # Asegurar que Content-Type esté en los headers
+            headers = self._get_auth_headers()
+            headers['Content-Type'] = 'application/json'
+            
+            response = requests.post(
+                f"{Config.API_BASE_URL}/roles/create",
+                headers=headers,
+                json=role_data,
+                timeout=10
+            )
+            
+            print(f"Create role response status: {response.status_code}")
+            print(f"Create role response content: {response.text}")
+            
+            if response.status_code == 200:
+                # Rol creado exitosamente
+                print("Rol creado con éxito en la API")
+                
+                if response.content:
+                    try:
+                        api_response = response.json()
+                        
+                        # Si la respuesta contiene el rol creado, normalizarlo
+                        if isinstance(api_response, dict) and 'id' in api_response:
+                            normalized_role = self._normalize_role_data(api_response)
+                            print(f"Rol normalizado: {normalized_role}")
+                            return normalized_role
+                        
+                        # Si la respuesta tiene un mensaje y ID
+                        elif isinstance(api_response, dict) and 'role_id' in api_response:
+                            role_id = api_response.get('role_id')
+                            message = api_response.get('message', '')
+                            print(f"API Response: {api_response}")
+                            
+                            # Crear respuesta normalizada
+                            return {
+                                'id': role_id,
+                                'name': name,
+                                'display_name': name,
+                                'description': description,
+                                'composite': composite,
+                                'client_role': True,
+                                'container_id': ''
+                            }
+                        
+                        else:
+                            print(f"Unexpected response format: {api_response}")
+                            # Crear respuesta básica
+                            return {
+                                'id': 'temp_id',
+                                'name': name,
+                                'display_name': name,
+                                'description': description,
+                                'composite': composite,
+                                'client_role': True,
+                                'container_id': ''
+                            }
+                            
+                    except Exception as json_error:
+                        print(f"Error parsing create role response: {json_error}")
+                        return {
+                            'id': 'temp_id',
+                            'name': name,
+                            'display_name': name,
+                            'description': description,
+                            'composite': composite,
+                            'client_role': True,
+                            'container_id': ''
+                        }
+                else:
+                    # Sin contenido en la respuesta
+                    return {
+                        'id': 'temp_id',
+                        'name': name,
+                        'display_name': name,
+                        'description': description,
+                        'composite': composite,
+                        'client_role': True,
+                        'container_id': ''
+                    }
+                    
+            elif response.status_code == 201:
+                # Rol creado exitosamente (código estándar para creación)
+                print("Rol creado con éxito (201)")
+                
+                if response.content:
+                    try:
+                        api_role = response.json()
+                        normalized_role = self._normalize_role_data(api_role)
+                        print(f"Rol normalizado: {normalized_role}")
+                        return normalized_role
+                    except Exception as json_error:
+                        print(f"Error parsing JSON response: {json_error}")
+                        return {
+                            'id': 'temp_id',
+                            'name': name,
+                            'display_name': name,
+                            'description': description,
+                            'composite': composite,
+                            'client_role': True,
+                            'container_id': ''
+                        }
+            
+            elif response.status_code == 400:
+                # Error de validación
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Error de validación')
+                    print(f"Error 400 de la API: {error_msg}")
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise  # Re-lanzar ValueError
+                except:
+                    raise ValueError('Error de validación en los datos del rol')
+            
+            elif response.status_code == 409:
+                # Rol ya existe
+                print("Error 409: Rol ya existe")
+                raise ValueError('Ya existe un rol con ese nombre')
+            
+            elif response.status_code == 403:
+                # Sin permisos
+                print("Error 403: Sin permisos para crear roles")
+                raise ValueError('No tienes permisos para crear roles')
+            
+            else:
+                print(f"Error inesperado de la API: {response.status_code}")
+                raise Exception(f"Error del servidor: {response.status_code} - {response.text}")
+                
+        except requests.exceptions.Timeout:
+            print("Error: Timeout en la conexión")
+            current_app.logger.error("Timeout connecting to create role API")
+            raise Exception("Tiempo de espera agotado - intenta nuevamente")
+        
+        except requests.exceptions.ConnectionError:
+            print("Error: Error de conexión")
+            current_app.logger.error("Connection error to create role API")
+            raise Exception("Error de conexión con el servidor")
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Error de conexión: {e}")
+            current_app.logger.error(f"Error connecting to create role API: {e}")
+            raise Exception("Error de conexión con el servidor")
+        
+        except ValueError as e:
+            print(f"Error de validación: {e}")
+            raise  # Re-lanzar errores de validación
+        
+        except Exception as e:
+            print(f"Error inesperado en create: {e}")
+            current_app.logger.error(f"Unexpected error creating role: {e}")
+            raise Exception(f"Error inesperado: {str(e)}")
