@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_babel import lazy_gettext as _l
 from wtforms import StringField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Length, Email
+from wtforms.validators import DataRequired, Length, Email, Optional
 
 class UserForm(FlaskForm):
     username = StringField(
@@ -47,7 +47,32 @@ class UserForm(FlaskForm):
     submit = SubmitField(_l('Guardar Usuario'))
 
 class UserEditForm(FlaskForm):
-    """Formulario para editar usuario - solo permite cambiar el rol"""
+    """Formulario para editar usuario"""
+    first_name = StringField(
+        _l('Nombre'),
+        validators=[
+            Optional(),
+            Length(max=50, message=_l('Máximo 50 caracteres.'))
+        ]
+    )
+
+    last_name = StringField(
+        _l('Apellido'),
+        validators=[
+            Optional(),
+            Length(max=50, message=_l('Máximo 50 caracteres.'))
+        ]
+    )
+
+    email = StringField(
+        _l('Email'),
+        validators=[
+            Optional(),
+            Email(message=_l('Ingrese un email válido.')),
+            Length(max=255, message=_l('Máximo 255 caracteres.'))
+        ]
+    )
+
     role_id = SelectField(
         _l('Rol'),
         validators=[
@@ -57,4 +82,4 @@ class UserEditForm(FlaskForm):
         coerce=str
     )
 
-    submit = SubmitField(_l('Actualizar Rol'))
+    submit = SubmitField(_l('Actualizar Usuario'))

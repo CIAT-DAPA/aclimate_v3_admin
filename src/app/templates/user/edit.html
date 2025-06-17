@@ -7,9 +7,12 @@
   <!-- Page Header -->
   <div class="bg-dark text-white rounded p-3 mb-4">
     <div class="d-flex align-items-center">
+      <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+        <i class="fas fa-user"></i>
+      </div>
       <div>
         <h4 class="mb-1">{{_('Editar Usuario')}}</h4>
-        <p class="mb-0">{{_('Modificar rol del usuario:')}} <strong>{{ user.username }}</strong></p>
+        <p class="mb-0">{{_('Modificar información del usuario:')}} <strong>{{ user.username }}</strong></p>
       </div>
     </div>
   </div>
@@ -19,40 +22,21 @@
     <div class="card-body">
       <div class="row">
         
-        <!-- User Information -->
-        <div class="col-md-6">
+        <!-- User Information (Read-only) -->
+        <div class="col-md-4">
           <h5 class="mb-3">{{_('Información del Usuario')}}</h5>
           
-          <div class="bg-light rounded p-3 mb-3">
-            <div class="fw-bold text-muted small mb-1">
-              <i class="fas fa-user me-2"></i>{{_('Nombre Completo')}}
-            </div>
-            <p class="mb-0">
-              {% if user.first_name or user.last_name %}
-                {{ user.first_name }} {{ user.last_name }}
-              {% else %}
-                {{_('Sin nombre')}}
-              {% endif %}
-            </p>
-          </div>
-
           <div class="bg-light rounded p-3 mb-3">
             <div class="fw-bold text-muted small mb-1">
               <i class="fas fa-at me-2"></i>{{_('Nombre de Usuario')}}
             </div>
             <p class="mb-0">{{ user.username }}</p>
+            <small class="text-muted">{{_('No se puede modificar')}}</small>
           </div>
 
           <div class="bg-light rounded p-3 mb-3">
             <div class="fw-bold text-muted small mb-1">
-              <i class="fas fa-envelope me-2"></i>{{_('Correo Electrónico')}}
-            </div>
-            <p class="mb-0">{{ user.email or _('Sin correo') }}</p>
-          </div>
-
-          <div class="bg-light rounded p-3 mb-3">
-            <div class="fw-bold text-muted small mb-1">
-              <i class="fas fa-user-tag me-2"></i>{{_('Roles Actuales')}}
+              <i class="fas fa-user-tag me-2"></i>{{_('Rol Actual')}}
             </div>
             <div>
               {% if user.client_roles %}
@@ -66,16 +50,79 @@
           </div>
         </div>
 
-        <!-- Role Assignment Form -->
-        <div class="col-md-6">
-          <h5 class="mb-3">{{_('Asignar Nuevo Rol')}}</h5>
+        <!-- Edit Form -->
+        <div class="col-md-8">
+          <h5 class="mb-3">{{_('Editar Información')}}</h5>
           
           <form method="POST">
             {{ form.hidden_tag() }}
             
+            <!-- First Name -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="first_name" class="form-label fw-bold">
+                  <i class="fas fa-id-badge me-2"></i>{{ form.first_name.label.text }}
+                </label>
+                {% if form.first_name.errors %}
+                {{ form.first_name(class="form-control is-invalid", id="first_name", placeholder=_('Ingresa el nombre')) }}
+                <div class="invalid-feedback">
+                  {% for error in form.first_name.errors %}
+                  <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                  {% endfor %}
+                </div>
+                {% else %}
+                {{ form.first_name(class="form-control", id="first_name", placeholder=_('Ingresa el nombre')) }}
+                {% endif %}
+                <div class="form-text">
+                  <i class="fas fa-info-circle me-1"></i>{{_('Nombre del usuario')}}
+                </div>
+              </div>
+
+              <!-- Last Name -->
+              <div class="col-md-6 mb-3">
+                <label for="last_name" class="form-label fw-bold">
+                  <i class="fas fa-user-tag me-2"></i>{{ form.last_name.label.text }}
+                </label>
+                {% if form.last_name.errors %}
+                {{ form.last_name(class="form-control is-invalid", id="last_name", placeholder=_('Ingresa el apellido')) }}
+                <div class="invalid-feedback">
+                  {% for error in form.last_name.errors %}
+                  <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                  {% endfor %}
+                </div>
+                {% else %}
+                {{ form.last_name(class="form-control", id="last_name", placeholder=_('Ingresa el apellido')) }}
+                {% endif %}
+                <div class="form-text">
+                  <i class="fas fa-info-circle me-1"></i>{{_('Apellido del usuario')}}
+                </div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label fw-bold">
+                <i class="fas fa-envelope me-2"></i>{{ form.email.label.text }}
+              </label>
+              {% if form.email.errors %}
+              {{ form.email(class="form-control is-invalid", id="email", placeholder=_('ejemplo@dominio.com')) }}
+              <div class="invalid-feedback">
+                {% for error in form.email.errors %}
+                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                {% endfor %}
+              </div>
+              {% else %}
+              {{ form.email(class="form-control", id="email", placeholder=_('ejemplo@dominio.com')) }}
+              {% endif %}
+              <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>{{_('Correo electrónico del usuario')}}
+              </div>
+            </div>
+
+            <!-- Role Selection -->
             <div class="mb-3">
               <label for="role_id" class="form-label fw-bold">
-                <i class="fas fa-exchange-alt me-2"></i>{{_('Seleccionar Rol')}}
+                <i class="fas fa-exchange-alt me-2"></i>{{ form.role_id.label.text }}
               </label>
               {% if form.role_id.errors %}
               {{ form.role_id(class="form-select is-invalid", id="role_id") }}
@@ -88,13 +135,14 @@
               {{ form.role_id(class="form-select", id="role_id") }}
               {% endif %}
               <div class="form-text">
-                <i class="fas fa-info-circle me-1"></i>{{_('El cambio de rol se aplicará inmediatamente')}}
+                <i class="fas fa-info-circle me-1"></i>{{_('Rol que tendrá el usuario en el sistema')}}
               </div>
             </div>
 
+            <!-- Submit Button -->
             <div class="d-grid">
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-2"></i>{{_('Actualizar Rol')}}
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i>{{ form.submit.label.text }}
               </button>
             </div>
           </form>

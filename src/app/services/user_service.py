@@ -437,3 +437,284 @@ class UserService:
             print(f"Error inesperado en assign_role: {e}")
             current_app.logger.error(f"Unexpected error assigning role: {e}")
             raise Exception(f"Error inesperado: {str(e)}")
+
+    def update(self, user_id: str, first_name: str = None, last_name: str = None, email: str = None, email_verified: bool = None, enabled: bool = None) -> bool:
+        """Actualizar información de un usuario"""
+        try:
+            print(f"Attempting to update user {user_id}")
+            
+            # Preparar datos para la API - solo incluir campos que no sean None
+            user_data = {}
+            
+            if first_name is not None:
+                user_data["firstName"] = first_name
+            if last_name is not None:
+                user_data["lastName"] = last_name
+            if email is not None:
+                user_data["email"] = email
+            if email_verified is not None:
+                user_data["emailVerified"] = email_verified
+            if enabled is not None:
+                user_data["enabled"] = enabled
+            
+            # Validar que hay al menos un campo para actualizar
+            if not user_data:
+                raise ValueError("No hay campos para actualizar")
+            
+            print(f"Updating user with data: {user_data}")
+            
+            # Asegurar que Content-Type esté en los headers
+            headers = self._get_auth_headers()
+            headers['Content-Type'] = 'application/json'
+            
+            response = requests.patch(
+                f"{Config.API_BASE_URL}/users/edit-user/{user_id}",
+                headers=headers,
+                json=user_data,
+                timeout=10
+            )
+            
+            print(f"Update user response status: {response.status_code}")
+            print(f"Update user response content: {response.text}")
+            
+            if response.status_code == 200:
+                # Usuario actualizado exitosamente
+                print("Usuario actualizado con éxito en la API")
+                return True
+            
+            elif response.status_code == 204:
+                # Usuario actualizado exitosamente (sin contenido)
+                print("Usuario actualizado con éxito en la API (204)")
+                return True
+            
+            elif response.status_code == 404:
+                # Usuario no encontrado
+                print("Error 404: Usuario no encontrado")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Usuario no encontrado')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('Usuario no encontrado')
+            
+            elif response.status_code == 400:
+                # Error de validación
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Error de validación en los datos')
+                    print(f"Error 400 de la API: {error_msg}")
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise  # Re-lanzar ValueError
+                except:
+                    raise ValueError('Error de validación en los datos del usuario')
+            
+            elif response.status_code == 403:
+                # Sin permisos
+                print("Error 403: Sin permisos para editar usuario")
+                raise ValueError('No tienes permisos para editar este usuario')
+            
+            elif response.status_code == 409:
+                # Conflicto - email duplicado u otro conflicto
+                print("Error 409: Conflicto con los datos")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Ya existe un usuario con ese email')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('Ya existe un usuario con ese email')
+            
+            else:
+                print(f"Error inesperado de la API: {response.status_code}")
+                raise Exception(f"Error del servidor: {response.status_code} - {response.text}")
+                
+        except requests.exceptions.Timeout:
+            print("Error: Timeout en la conexión")
+            current_app.logger.error("Timeout connecting to update user API")
+            raise Exception("Tiempo de espera agotado - intenta nuevamente")
+        
+        except requests.exceptions.ConnectionError:
+            print("Error: Error de conexión")
+            current_app.logger.error("Connection error to update user API")
+            raise Exception("Error de conexión con el servidor")
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Error de conexión: {e}")
+            current_app.logger.error(f"Error connecting to update user API: {e}")
+            raise Exception("Error de conexión con el servidor")
+        
+        except ValueError as e:
+            print(f"Error de validación: {e}")
+            raise  # Re-lanzar errores de validación
+        
+        except Exception as e:
+            print(f"Error inesperado en update: {e}")
+            current_app.logger.error(f"Unexpected error updating user: {e}")
+            raise Exception(f"Error inesperado: {str(e)}")
+        
+    def get_by_id(self, user_id: str) -> Dict:
+        """Obtener un usuario específico por ID"""
+        try:
+            print(f"Getting user by ID: {user_id}")
+            
+            response = requests.get(
+                f"{Config.API_BASE_URL}/users/get-user/{user_id}",
+                headers=self._get_auth_headers(),
+                timeout=10
+            )
+            
+            print(f"Get user by ID response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                api_user = response.json()
+                normalized_user = self._normalize_user_data(api_user)
+                print(f"Usuario obtenido: {normalized_user}")
+                return normalized_user
+            
+            elif response.status_code == 404:
+                print("Error 404: Usuario no encontrado")
+                raise ValueError('Usuario no encontrado')
+            
+            else:
+                print(f"Error obteniendo usuario: {response.status_code}")
+                raise Exception(f"Error del servidor: {response.status_code}")
+                
+        except requests.exceptions.RequestException as e:
+            print(f"Error de conexión: {e}")
+            current_app.logger.error(f"Error connecting to get user API: {e}")
+            raise Exception("Error de conexión con el servidor")
+        
+        except ValueError as e:
+            raise  # Re-lanzar errores de validación
+        
+        except Exception as e:
+            print(f"Error inesperado en get_by_id: {e}")
+            current_app.logger.error(f"Unexpected error getting user by ID: {e}")
+            raise Exception(f"Error inesperado: {str(e)}")
+            
+    def remove_role(self, user_id: str, role_id: str) -> bool:
+        """Remover/desasignar un rol específico de un usuario"""
+        try:
+            print(f"Attempting to remove role {role_id} from user {user_id}")
+            
+            # Preparar datos para la API
+            role_data = {
+                "user_id": user_id,
+                "role_id": role_id
+            }
+            
+            print(f"Removing role with data: {role_data}")
+            
+            # Asegurar que Content-Type esté en los headers
+            headers = self._get_auth_headers()
+            headers['Content-Type'] = 'application/json'
+            
+            response = requests.post(
+                f"{Config.API_BASE_URL}/users/remove-role",
+                headers=headers,
+                json=role_data,
+                timeout=10
+            )
+            
+            print(f"Remove role response status: {response.status_code}")
+            print(f"Remove role response content: {response.text}")
+            
+            if response.status_code == 200:
+                # Rol removido exitosamente
+                print("Rol removido con éxito en la API")
+                return True
+            
+            elif response.status_code == 201:
+                # Rol removido exitosamente (creado - aunque raro para remoción)
+                print("Rol removido con éxito en la API (201)")
+                return True
+            
+            elif response.status_code == 204:
+                # Rol removido exitosamente (sin contenido)
+                print("Rol removido con éxito en la API (204)")
+                return True
+            
+            elif response.status_code == 404:
+                # Usuario o rol no encontrado
+                print("Error 404: Usuario o rol no encontrado")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Usuario o rol no encontrado')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('Usuario o rol no encontrado')
+            
+            elif response.status_code == 400:
+                # Error de validación
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Error en los datos enviados')
+                    print(f"Error 400 de la API: {error_msg}")
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise  # Re-lanzar ValueError
+                except:
+                    raise ValueError('Error de validación en los datos enviados')
+            
+            elif response.status_code == 403:
+                # Sin permisos
+                print("Error 403: Sin permisos para remover roles")
+                raise ValueError('No tienes permisos para remover roles de usuarios')
+            
+            elif response.status_code == 409:
+                # Conflicto - el usuario no tiene ese rol asignado
+                print("Error 409: El usuario no tiene asignado ese rol")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'El usuario no tiene asignado ese rol')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('El usuario no tiene asignado ese rol')
+            
+            elif response.status_code == 422:
+                # Error de procesamiento - posible caso cuando el rol no se puede remover
+                print("Error 422: No se puede procesar la remoción del rol")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'No se puede remover este rol del usuario')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('No se puede remover este rol del usuario')
+            
+            else:
+                print(f"Error inesperado de la API: {response.status_code}")
+                raise Exception(f"Error del servidor: {response.status_code} - {response.text}")
+                
+        except requests.exceptions.Timeout:
+            print("Error: Timeout en la conexión")
+            current_app.logger.error("Timeout connecting to remove role API")
+            raise Exception("Tiempo de espera agotado - intenta nuevamente")
+        
+        except requests.exceptions.ConnectionError:
+            print("Error: Error de conexión")
+            current_app.logger.error("Connection error to remove role API")
+            raise Exception("Error de conexión con el servidor")
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Error de conexión: {e}")
+            current_app.logger.error(f"Error connecting to remove role API: {e}")
+            raise Exception("Error de conexión con el servidor")
+        
+        except ValueError as e:
+            print(f"Error de validación: {e}")
+            raise  # Re-lanzar errores de validación
+        
+        except Exception as e:
+            print(f"Error inesperado en remove_role: {e}")
+            current_app.logger.error(f"Unexpected error removing role: {e}")
+            raise Exception(f"Error inesperado: {str(e)}")
