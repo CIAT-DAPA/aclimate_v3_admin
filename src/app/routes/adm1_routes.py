@@ -13,7 +13,7 @@ country_service = MngCountryService()
 @login_required
 def list_adm1():
     form = Adm1Form()
-    form.country_id.choices = [(c.id, c.name) for c in country_service.get_all()]
+    form.country_id.choices = [(c.id, c.name) for c in country_service.get_all_enable()]
 
     if form.validate_on_submit():
         new_adm1 = Admin1Create(
@@ -77,4 +77,34 @@ def reset_adm1(id):
 
     adm1_service.update(id=id, obj_in={"enable": True})
     flash(_('División administrativa reactivada.'), 'success')
+    return redirect(url_for('adm1.list_adm1'))
+
+@bp.route('/adm1/bulk_action', methods=['POST'])
+@login_required
+def bulk_action():
+    ids = request.form.getlist('selected_ids')
+    action = request.form.get('action')
+    if not ids:
+        flash('No se seleccionaron adm1.', 'warning')
+        return redirect(url_for('adm1.list_adm1'))
+
+    count = 0
+    for loc_id in ids:
+        try:
+            loc_id_int = int(loc_id)
+            if action == 'disable':
+                if adm1_service.delete(loc_id_int):
+                    count += 1
+            elif action == 'recover':
+                adm1_service.update(id=loc_id_int, obj_in={"enable": True})
+                count += 1
+        except Exception:
+            continue
+
+    if action == 'disable':
+        flash(f'{count} adm1(s) deshabilitado(s).', 'warning')
+    elif action == 'recover':
+        flash(f'{count} adm1(s) recuperado(s).', 'success')
+    else:
+        flash('Acción no reconocida.', 'danger')
     return redirect(url_for('adm1.list_adm1'))

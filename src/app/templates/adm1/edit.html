@@ -1,7 +1,15 @@
 {% extends 'base.html' %} {% block title %}{{_('Editar Adm1')}}{% endblock %} {%
 block content %}
-<div class="container mt-5">
-  <h2>{{_('Editar división administrativa')}}</h2>
+<div class="container">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('adm1.list_adm1') }}">{{_('Nivel administrativo 1')}}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ adm.name if adm else '' }}</li>
+    </ol>
+  </nav>
+  <h2 class="mb-4">{{ _('Editar Locación') }}</h2>
   <form method="POST">
     {{ form.hidden_tag() }}
 

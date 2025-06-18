@@ -1,0 +1,145 @@
+{% extends 'base.html' %} {% block title %}{{ _('Editar Locación') }}{% endblock %}
+{% block content %}
+<div class="container">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('location.list_location') }}">{{_('Locaciones')}}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ loc.name if loc else '' }}</li>
+    </ol>
+  </nav>
+  <h2 class="mb-4">{{ _('Editar Locación') }}</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="row mb-3">
+      <div class="col-6">
+        {{ form.country.label(class="form-label") }}
+        {{ form.country(class="form-select", id="country") }}
+        {% for error in form.country.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="col-6">
+        {{ form.source_id.label(class="form-label") }}
+        {{ form.source_id(class="form-control", id="source_id") }}
+        {% for error in form.source_id.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-6">
+        {{ form.admin_1_id.label(class="form-label") }}
+        {{ form.admin_1_id(class="form-select", id="admin_1_id") }}
+        {% for error in form.admin_1_id.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="col-6">
+        {{ form.admin_2_id.label(class="form-label") }}
+        {{ form.admin_2_id(class="form-select", id="admin_2_id") }}
+        {% for error in form.admin_2_id.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="mb-3">
+      {{ form.ubi.label(class="form-label") }}
+      {{ form.ubi(class="form-control", id="ubi") }}
+      {% for error in form.ubi.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="row mb-3">
+      <div class="col-6">
+        {{ form.latitude.label(class="form-label") }}
+        {{ form.latitude(class="form-control", id="latitude") }}
+        {% for error in form.latitude.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="col-6">
+        {{ form.longitude.label(class="form-label") }}
+        {{ form.longitude(class="form-control", id="longitude") }}
+        {% for error in form.longitude.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-6">
+        {{ form.altitude.label(class="form-label") }}
+        {{ form.altitude(class="form-control", id="altitude") }}
+        {% for error in form.altitude.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="form-check mb-3">
+      {{ form.visible(class="form-check-input", id="visible") }}
+      {{ form.visible.label(class="form-check-label", for="visible") }}
+    </div>
+    <div class="d-flex justify-content-between">
+      <a href="{{ url_for('location.list_location') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> {{ _('Cancelar') }}
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> {{ _('Guardar cambios') }}
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const countrySelect = document.getElementById('country');
+    const admin1Select = document.getElementById('admin_1_id');
+    const admin2Select = document.getElementById('admin_2_id');
+
+    if (countrySelect) {
+        countrySelect.addEventListener('change', function() {
+            const countryId = this.value;
+            if (!countryId) {
+                admin1Select.innerHTML = '<option value="">Seleccione...</option>';
+                admin2Select.innerHTML = '<option value="">Seleccione...</option>';
+                return;
+            }
+            fetch(`/api/admin1/${countryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    admin1Select.innerHTML = '<option value="">Seleccione...</option>';
+                    data.forEach(function(item) {
+                        admin1Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    admin2Select.innerHTML = '<option value="">Seleccione...</option>';
+                });
+        });
+    }
+
+    if (admin1Select) {
+        admin1Select.addEventListener('change', function() {
+            const admin1Id = this.value;
+            if (!admin1Id) {
+                admin2Select.innerHTML = '<option value="">Seleccione...</option>';
+                return;
+            }
+            fetch(`/api/admin2/${admin1Id}`)
+                .then(response => response.json())
+                .then(data => {
+                    admin2Select.innerHTML = '<option value="">Seleccione...</option>';
+                    data.forEach(function(item) {
+                        admin2Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                });
+        });
+    }
+
+    // Mostrar el modal si hay errores de validación
+    //{% if show_modal %}
+    //var addLocationModal = new bootstrap.Modal(document.getElementById('addLocationModal'));
+    //addLocationModal.show();
+    //{% endif %}
+});
+</script>
+{% endblock %}

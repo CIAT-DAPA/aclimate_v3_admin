@@ -100,3 +100,33 @@ def reset_adm2(id):
     adm2_service.update(id=id, obj_in={"enable": True})
     flash(_('División administrativa reactivada.'), 'success')
     return redirect(url_for('adm2.list_adm2'))
+
+@bp.route('/adm2/bulk_action', methods=['POST'])
+@login_required
+def bulk_action():
+    ids = request.form.getlist('selected_ids')
+    action = request.form.get('action')
+    if not ids:
+        flash('No se seleccionaron adm2.', 'warning')
+        return redirect(url_for('adm2.list_adm2'))
+
+    count = 0
+    for loc_id in ids:
+        try:
+            loc_id_int = int(loc_id)
+            if action == 'disable':
+                if adm2_service.delete(loc_id_int):
+                    count += 1
+            elif action == 'recover':
+                adm2_service.update(id=loc_id_int, obj_in={"enable": True})
+                count += 1
+        except Exception:
+            continue
+
+    if action == 'disable':
+        flash(f'{count} adm2(s) deshabilitado(s).', 'warning')
+    elif action == 'recover':
+        flash(f'{count} adm2(s) recuperado(s).', 'success')
+    else:
+        flash('Acción no reconocida.', 'danger')
+    return redirect(url_for('adm2.list_adm2'))

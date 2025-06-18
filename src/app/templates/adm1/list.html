@@ -27,10 +27,20 @@
   </div>
 
   {% if adm1 %}
+  <form id="bulk-action-form" method="POST" action="{{ url_for('adm1.bulk_action') }}">
+    <div class="mb-2">
+      <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+      <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+        <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+      </button>
+      <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+        <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+      </button>
+    </div>
   <table class="table table-hover align-middle">
     <thead class="table-light">
       <tr>
-        <th style="width: 5%"><input type="checkbox" disabled /></th>
+        <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
         <th>{{ _('Nombre') }}</th>
         <th>{{ _('País') }}</th>
         <th>{{ _('Estado') }}</th>
@@ -40,7 +50,7 @@
     <tbody>
       {% for adm in adm1 %}
       <tr>
-        <td><input type="checkbox" disabled /></td>
+        <td><input type="checkbox" name="selected_ids" value="{{ adm.id }}" class="select-row" /></td>
         <td>{{ adm.name }}</td>
         <td>{{ adm.country.name }}</td>
         <td>{{ _('Habilitado') if adm.enable else _('Deshabilitado') }}</td>
@@ -74,6 +84,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </form>
   {% else %}
   <div class="alert alert-info mt-4">
     {{ _('No hay divisiones administrativas registradas.') }}
@@ -133,4 +144,56 @@
     </form>
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+   // Checkbox select all
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.select-row');
+    const bulkDisable = document.getElementById('bulk-disable');
+    const bulkRecover = document.getElementById('bulk-recover');
+    const form = document.getElementById('bulk-action-form');
+
+    function updateBulkButtons() {
+      const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+      if (anyChecked) {
+      bulkDisable.style.visibility = 'visible';
+      bulkRecover.style.visibility = 'visible';
+      } else {
+      bulkDisable.style.visibility = 'hidden';
+      bulkRecover.style.visibility = 'hidden';
+      }
+      bulkDisable.disabled = !anyChecked;
+      bulkRecover.disabled = !anyChecked;
+    }
+
+    // Inicializar visibilidad al cargar
+    updateBulkButtons();
+
+    if (selectAll) {
+      selectAll.addEventListener('change', function() {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateBulkButtons();
+      });
+    }
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateBulkButtons);
+    });
+
+    // Opcional: deshabilitar ambos botones al enviar el form
+    form.addEventListener('submit', function() {
+      bulkDisable.disabled = true;
+      bulkRecover.disabled = true;
+    });
+
+    bulkDisable.addEventListener('click', function() {
+      document.getElementById('bulk-action-hidden').value = 'disable';
+      form.submit();
+    });
+    bulkRecover.addEventListener('click', function() {
+      document.getElementById('bulk-action-hidden').value = 'recover';
+      form.submit();
+    });
+
+});    
+</script>
 {% endblock %}

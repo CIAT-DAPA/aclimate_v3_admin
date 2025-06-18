@@ -1,0 +1,308 @@
+{% extends 'base.html' %} {% block title %}{{ _('Locaciones') }}{% endblock
+%} {% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Locaciones') }}</h2>
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addLocationModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda (estática) -->
+  <div class="d-flex align-items-center mb-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+      disabled
+    />
+    <button class="btn btn-secondary" disabled>
+      <i class="fas fa-filter"></i> {{ _('Filtros') }}
+    </button>
+  </div>
+
+  {% if location %}
+  <form id="bulk-action-form" method="POST" action="{{ url_for('location.bulk_action') }}">
+    <div class="mb-2">
+      <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+      <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+        <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+      </button>
+      <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+        <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+      </button>
+    </div>
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 5%">
+            <input type="checkbox" id="select-all" />
+          </th>
+          <th>{{ _('Locación') }}</th>
+          <th>{{ _('División administrativa 1') }}</th>
+          <th>{{ _('División administrativa 2') }}</th>
+          <th>{{ _('País') }}</th>
+          <th>{{_('Estado')}}</th>
+          <th class="text-end">{{ _('Acciones') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for loc in location %}
+        <tr>
+          <td>
+            <input type="checkbox" name="selected_ids" value="{{ loc.id }}" class="select-row" />
+          </td>
+          <td>{{ loc.name }}</td>
+          <td>{{ loc.admin_2.admin_1.name }}</td>
+          <td>{{ loc.admin_2.name }}</td>
+          <td>{{ loc.admin_2.admin_1.country.name }}</td>
+          <td>{{ _('Habilitado') if loc.enable else _('Deshabilitado') }}</td>
+          <td class="text-end">
+            <a
+              href="{{ url_for('location.edit_location', id=loc.id) }}"
+              class="btn btn-warning btn-sm me-2"
+              title="{{ _('Editar') }}"
+            >
+              <i class="fas fa-pen"></i>
+            </a>
+            {% if loc.enable %}
+            <a
+              href="{{ url_for('location.delete_location', id=loc.id) }}"
+              class="btn btn-danger btn-sm"
+              title="{{ _('Deshabilitar') }}"
+            >
+              <i class="fas fa-trash"></i>
+            </a>
+            {% else %}
+            <a
+              href="{{ url_for('location.reset_location', id=loc.id) }}"
+              class="btn btn-success btn-sm"
+              title="{{ _('Recuperar') }}"
+            >
+              <i class="fas fa-undo"></i>
+            </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </form>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay locaciones registradas.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Locación -->
+<div
+  class="modal fade"
+  id="addLocationModal"
+  tabindex="-1"
+  aria-labelledby="addLocationLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addLocationLabel">
+          {{ _('Agregar Locación') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Cerrar') }}"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-3">
+          <div class="col-6">
+            {{ form.country.label(class="form-label") }}
+            {{ form.country(class="form-select", id="country") }}
+            {% for error in form.country.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-6">
+            {{ form.source_id.label(class="form-label") }}
+            {{ form.source_id(class="form-control", id="source_id") }}
+            {% for error in form.source_id.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6">
+            {{ form.admin_1_id.label(class="form-label") }}
+            {{ form.admin_1_id(class="form-select", id="admin_1_id") }}
+            {% for error in form.admin_1_id.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-6">
+            {{ form.admin_2_id.label(class="form-label") }}
+            {{ form.admin_2_id(class="form-select", id="admin_2_id") }}
+            {% for error in form.admin_2_id.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="mb-3">
+          {{ form.ubi.label(class="form-label") }}
+          {{ form.ubi(class="form-control", id="ubi") }}
+          {% for error in form.ubi.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="row mb-3">
+          <div class="col-6">
+            {{ form.latitude.label(class="form-label") }}
+            {{ form.latitude(class="form-control", id="latitude") }}
+            {% for error in form.latitude.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-6">
+            {{ form.longitude.label(class="form-label") }}
+            {{ form.longitude(class="form-control", id="longitude") }}
+            {% for error in form.longitude.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6">
+            {{ form.altitude.label(class="form-label") }}
+            {{ form.altitude(class="form-control", id="altitude") }}
+            {% for error in form.altitude.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          
+        </div>
+        <div class="form-check mb-2">
+          {{ form.visible(class="form-check-input") }} {{
+          form.visible.label(class="form-check-label") }}
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times"></i> {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-plus"></i> {{ _('Agregar') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const countrySelect = document.getElementById('country');
+    const admin1Select = document.getElementById('admin_1_id');
+    const admin2Select = document.getElementById('admin_2_id');
+
+    if (countrySelect) {
+        countrySelect.addEventListener('change', function() {
+            const countryId = this.value;
+            if (!countryId) {
+                admin1Select.innerHTML = '<option value="">Seleccione...</option>';
+                admin2Select.innerHTML = '<option value="">Seleccione...</option>';
+                return;
+            }
+            fetch(`/api/admin1/${countryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    admin1Select.innerHTML = '<option value="">Seleccione...</option>';
+                    data.forEach(function(item) {
+                        admin1Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    admin2Select.innerHTML = '<option value="">Seleccione...</option>';
+                });
+        });
+    }
+
+    if (admin1Select) {
+        admin1Select.addEventListener('change', function() {
+            const admin1Id = this.value;
+            if (!admin1Id) {
+                admin2Select.innerHTML = '<option value="">Seleccione...</option>';
+                return;
+            }
+            fetch(`/api/admin2/${admin1Id}`)
+                .then(response => response.json())
+                .then(data => {
+                    admin2Select.innerHTML = '<option value="">Seleccione...</option>';
+                    data.forEach(function(item) {
+                        admin2Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                });
+        });
+    }
+
+    // Mostrar el modal si hay errores de validación
+    //{% if show_modal %}
+    //var addLocationModal = new bootstrap.Modal(document.getElementById('addLocationModal'));
+    //addLocationModal.show();
+    //{% endif %}
+
+    // Checkbox select all
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.select-row');
+    const bulkDisable = document.getElementById('bulk-disable');
+    const bulkRecover = document.getElementById('bulk-recover');
+    const form = document.getElementById('bulk-action-form');
+
+    function updateBulkButtons() {
+      const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+      if (anyChecked) {
+      bulkDisable.style.visibility = 'visible';
+      bulkRecover.style.visibility = 'visible';
+      } else {
+      bulkDisable.style.visibility = 'hidden';
+      bulkRecover.style.visibility = 'hidden';
+      }
+      bulkDisable.disabled = !anyChecked;
+      bulkRecover.disabled = !anyChecked;
+    }
+
+    // Inicializar visibilidad al cargar
+    updateBulkButtons();
+
+    if (selectAll) {
+      selectAll.addEventListener('change', function() {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateBulkButtons();
+      });
+    }
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateBulkButtons);
+    });
+
+    // Opcional: deshabilitar ambos botones al enviar el form
+    form.addEventListener('submit', function() {
+      bulkDisable.disabled = true;
+      bulkRecover.disabled = true;
+    });
+
+    bulkDisable.addEventListener('click', function() {
+      document.getElementById('bulk-action-hidden').value = 'disable';
+      form.submit();
+    });
+    bulkRecover.addEventListener('click', function() {
+      document.getElementById('bulk-action-hidden').value = 'recover';
+      form.submit();
+    });
+
+});    
+</script>
+{% endblock %}

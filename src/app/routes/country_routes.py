@@ -90,3 +90,33 @@ def reset_country(id):
     country_service.update(id=id, obj_in={"enable": True})
     flash(_('País recuperado.'), 'success')
     return redirect(url_for('country.list_country'))
+
+@bp.route('/country/bulk_action', methods=['POST'])
+@login_required
+def bulk_action():
+    ids = request.form.getlist('selected_ids')
+    action = request.form.get('action')
+    if not ids:
+        flash('No se seleccionaron países.', 'warning')
+        return redirect(url_for('country.list_country'))
+
+    count = 0
+    for loc_id in ids:
+        try:
+            loc_id_int = int(loc_id)
+            if action == 'disable':
+                if country_service.delete(loc_id_int):
+                    count += 1
+            elif action == 'recover':
+                country_service.update(id=loc_id_int, obj_in={"enable": True})
+                count += 1
+        except Exception:
+            continue
+
+    if action == 'disable':
+        flash(f'{count} país(es) deshabilitado(s).', 'warning')
+    elif action == 'recover':
+        flash(f'{count} país(es) recuperado(s).', 'success')
+    else:
+        flash('Acción no reconocida.', 'danger')
+    return redirect(url_for('country.list_country'))
