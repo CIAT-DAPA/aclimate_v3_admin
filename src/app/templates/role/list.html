@@ -233,6 +233,46 @@ block content %}
   </div>
 </div>
 
+<!-- Modal para confirmar eliminación individual -->
+<div
+  class="modal fade"
+  id="deleteRoleModal"
+  tabindex="-1"
+  aria-labelledby="deleteRoleLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteUserLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>{{_('Confirmar Eliminación')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center mb-3">
+          {{_('¿Está seguro de que desea eliminar el rol')}} <strong id="deleteRolName"></strong>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times"></i> {{_('Cancelar')}}
+        </button>
+        <form method="POST" action="" id="deleteRoleForm" style="display: inline;">
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> {{_('Eliminar Rol')}}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
   .role-icon {
     width: 40px;

@@ -665,22 +665,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const button = event.relatedTarget;
         const roleId = button.getAttribute("data-role-id");
         const roleName = button.getAttribute("data-rolename");
-        const roleDescription = button.getAttribute("data-role-description");
 
         // Update modal content
-        const deleteRoleName = document.getElementById("deleteRoleName");
-        const deleteRoleNameDetail = document.getElementById(
-          "deleteRoleNameDetail"
-        );
-        const deleteRoleDescription = document.getElementById(
-          "deleteRoleDescription"
-        );
+        const deleteRoleName = document.getElementById("deleteRolName");
         const deleteRoleForm = document.getElementById("deleteRoleForm");
 
         if (deleteRoleName) deleteRoleName.textContent = roleName;
-        if (deleteRoleNameDetail) deleteRoleNameDetail.textContent = roleName;
-        if (deleteRoleDescription)
-          deleteRoleDescription.textContent = roleDescription;
         if (deleteRoleForm) {
           deleteRoleForm.action = `/role/delete/${roleId}`;
         }

@@ -50,3 +50,26 @@ def create_role():
     
     # Siempre redirigir a la lista (formulario estará limpio)
     return redirect(url_for('role.list_role'))
+
+# Ruta: Eliminar rol
+@bp.route('/role/delete/<string:role_id>', methods=['POST'])
+@token_required
+def delete_role(role_id):
+    """Eliminar rol"""
+    try:
+        print(f"Intentando eliminar rol con ID: {role_id}")
+        
+        success = role_service.delete(role_id)
+        
+        if success:
+            flash('Rol eliminado exitosamente.', 'success')
+        else:
+            flash('No se pudo eliminar el rol.', 'danger')
+            
+    except ValueError as e:
+        print(f"Error de validación: {e}")
+        flash(f'Error: {str(e)}', 'danger')
+    except Exception as e:
+        print(f"Error inesperado eliminando rol: {e}")
+        flash(f'Error al eliminar rol: {str(e)}', 'danger')
+    return redirect(url_for('role.list_role'))

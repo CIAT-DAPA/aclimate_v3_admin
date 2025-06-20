@@ -273,3 +273,112 @@ class RoleService:
             print(f"Error inesperado en create: {e}")
             current_app.logger.error(f"Unexpected error creating role: {e}")
             raise Exception(f"Error inesperado: {str(e)}")
+        
+    def delete(self, role_id: str) -> bool:
+        """Eliminar un rol"""
+        try:
+            print(f"Attempting to delete role with ID: {role_id}")
+            
+            # Asegurar que Content-Type esté en los headers
+            headers = self._get_auth_headers()
+            headers['Content-Type'] = 'application/json'
+            
+            response = requests.delete(
+                f"{Config.API_BASE_URL}/roles/delete/{role_id}",
+                headers=headers,
+                timeout=10
+            )
+            
+            print(f"Delete role response status: {response.status_code}")
+            print(f"Delete role response content: {response.text}")
+            
+            if response.status_code == 200:
+                # Rol eliminado exitosamente
+                print("Rol eliminado con éxito en la API")
+                return True
+            
+            elif response.status_code == 204:
+                # Rol eliminado exitosamente (sin contenido)
+                print("Rol eliminado con éxito en la API (204)")
+                return True
+            
+            elif response.status_code == 404:
+                # Rol no encontrado
+                print("Error 404: Rol no encontrado")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Rol no encontrado')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('Rol no encontrado')
+            
+            elif response.status_code == 400:
+                # Error de validación
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Error de validación en la petición')
+                    print(f"Error 400 de la API: {error_msg}")
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise  # Re-lanzar ValueError
+                except:
+                    raise ValueError('Error de validación en la petición')
+            
+            elif response.status_code == 403:
+                # Sin permisos
+                print("Error 403: Sin permisos para eliminar roles")
+                raise ValueError('No tienes permisos para eliminar este rol')
+            
+            elif response.status_code == 409:
+                # Conflicto - el rol está siendo usado por usuarios
+                print("Error 409: El rol está siendo utilizado")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'No se puede eliminar el rol porque está siendo utilizado por usuarios')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('No se puede eliminar el rol porque está siendo utilizado por usuarios')
+            
+            elif response.status_code == 422:
+                # Error de procesamiento - posible caso cuando el rol es crítico del sistema
+                print("Error 422: No se puede procesar la eliminación del rol")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'No se puede eliminar este rol del sistema')
+                    raise ValueError(error_msg)
+                except ValueError:
+                    raise
+                except:
+                    raise ValueError('No se puede eliminar este rol del sistema')
+            
+            else:
+                print(f"Error inesperado de la API: {response.status_code}")
+                raise Exception(f"Error del servidor: {response.status_code} - {response.text}")
+                
+        except requests.exceptions.Timeout:
+            print("Error: Timeout en la conexión")
+            current_app.logger.error("Timeout connecting to delete role API")
+            raise Exception("Tiempo de espera agotado - intenta nuevamente")
+        
+        except requests.exceptions.ConnectionError:
+            print("Error: Error de conexión")
+            current_app.logger.error("Connection error to delete role API")
+            raise Exception("Error de conexión con el servidor")
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Error de conexión: {e}")
+            current_app.logger.error(f"Error connecting to delete role API: {e}")
+            raise Exception("Error de conexión con el servidor")
+        
+        except ValueError as e:
+            print(f"Error de validación: {e}")
+            raise  # Re-lanzar errores de validación
+        
+        except Exception as e:
+            print(f"Error inesperado en delete: {e}")
+            current_app.logger.error(f"Unexpected error deleting role: {e}")
+            raise Exception(f"Error inesperado: {str(e)}")
