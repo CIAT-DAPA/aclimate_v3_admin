@@ -260,3 +260,27 @@ def edit_user(user_id):
         print(f"Error inesperado en edit_user: {e}")
         flash(f'Error al cargar usuario: {str(e)}', 'danger')
         return redirect(url_for('user.list_user'))
+    
+@bp.route('/users/bulk_action', methods=['POST'])
+@token_required
+def bulk_action():
+    ids = request.form.getlist('selected_ids')
+    action = request.form.get('action')
+    if not ids:
+        flash('No se seleccionaron usuarios.', 'warning')
+        return redirect(url_for('user.list_user'))
+
+    count = 0
+    for loc_id in ids:
+        try:
+            if action == 'disable':
+                if user_service.delete(loc_id):
+                    count += 1
+        except Exception:
+            continue
+
+    if action == 'disable':
+        flash(f'{count} usuarios deshabilitado(s).', 'warning')
+    else:
+        flash('Acción no reconocida.', 'danger')
+    return redirect(url_for('user.list_user'))
