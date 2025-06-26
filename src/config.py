@@ -26,3 +26,26 @@ class Config:
     # Idioma por defecto
     BABEL_DEFAULT_LOCALE = 'es_CO'
     BABEL_DEFAULT_TIMEZONE = 'UTC'
+
+     # Keycloak OAuth Configuration
+    KEYCLOAK_SERVER_URL = os.environ.get('KEYCLOAK_SERVER_URL', 'http://localhost:8080')
+    KEYCLOAK_REALM = os.environ.get('KEYCLOAK_REALM', 'aclimate')
+    KEYCLOAK_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'aclimate_admin')
+    KEYCLOAK_CLIENT_SECRET = os.environ.get('KEYCLOAK_CLIENT_SECRET', 'your-client-secret')
+    
+    # OAuth URLs
+    @property
+    def KEYCLOAK_AUTHORIZATION_URL(self):
+        return f"{self.KEYCLOAK_SERVER_URL}/realms/{self.KEYCLOAK_REALM}/protocol/openid-connect/auth"
+    
+    @property
+    def KEYCLOAK_TOKEN_URL(self):
+        return f"{self.KEYCLOAK_SERVER_URL}/realms/{self.KEYCLOAK_REALM}/protocol/openid-connect/token"
+    
+    @property
+    def KEYCLOAK_USERINFO_URL(self):
+        return f"{self.KEYCLOAK_SERVER_URL}/realms/{self.KEYCLOAK_REALM}/protocol/openid-connect/userinfo"
+    
+    @property
+    def KEYCLOAK_LOGOUT_URL(self):
+        return f"{self.KEYCLOAK_SERVER_URL}/realms/{self.KEYCLOAK_REALM}/protocol/openid-connect/logout"

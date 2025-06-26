@@ -1,99 +1,26 @@
-{% extends "base.html" %} {% block title %}
-{{_('Iniciar Sesión - AClimate Admin')}}{% endblock %} 
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/login.js') }}"></script>
-{% endblock %} {% block content %}
-<div class="container-fluid p-0">
-  <div class="row g-0 min-vh-100">
-    <!-- Lado izquierdo con fondo animado -->
-    <div
-      class="col-md-8 bg-dark text-white position-relative d-flex flex-column"
-      id="box"
-    >
-      <div class="p-4 position-relative" style="z-index: 2">
-        <img
-          src="{{ url_for('static', filename='img/logo.png') }}"
-          class="img-fluid"
-          alt="AClimate Logo"
-          style="max-width: 60px"
-        />
+{% extends 'base.html' %} {% block title %}{{_('Login')}}{% endblock %} {% block
+content %}
+<div
+  class="container-fluid d-flex justify-content-center align-items-center min-vh-100"
+>
+  <div class="card shadow-lg" style="width: 100%; max-width: 400px">
+    <div class="card-body p-5">
+      <div class="text-center mb-4">
+        <h3 class="card-title">{{_('Welcome')}}</h3>
+        <p class="text-muted">{{_('Please sign in to continue')}}</p>
       </div>
 
-      <div class="flex-grow-1 d-flex align-items-center justify-content-center">
-        <div class="text-center p-4 position-relative" style="z-index: 2">
-          <h1 class="display-5 fw-normal mb-2">{{_('Bienvenido a')}}</h1>
-          <h2 class="display-4 fw-bold mb-4">AClimate Admin</h2>
-          <p class="fs-6 mx-auto" style="max-width: 500px; text-wrap: pretty">
-            {{_('Sistema de administración para la gestión de los datos de AClimate.')}}
-          </p>
-        </div>
+      <div class="d-grid">
+        <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-lg">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          {{_('Sign in with Keycloak')}}
+        </a>
       </div>
-    </div>
 
-    <!-- Lado derecho con formulario -->
-    <div
-      class="col-md-4 bg-light d-flex align-items-center justify-content-center"
-    >
-      <div class="w-100 px-3" style="min-width: 250px">
-        <div class="text-center mb-4">
-          <img
-            src="{{ url_for('static', filename='img/logo.png') }}"
-            class="img-fluid mb-3"
-            alt="AClimate Logo"
-            style="max-width: 90px"
-          />
-          <h4 class="fw-bold">AClimate Admin</h4>
-          <p>{{_('Accede al panel de administración')}}</p>
-        </div>
-
-        <form method="POST" action="">
-          {{ form.hidden_tag() }}
-
-          <!-- Username -->
-          <div class="mb-3">
-            <label for="username" class="form-label">
-              <i class="fas fa-user me-2"></i>{{form.username.label.text}}
-            </label>
-            {% if form.username.errors %} {{ form.username(class="form-control is-invalid", id="username") }}
-            <div class="invalid-feedback">
-              {% for error in form.username.errors %}
-              <small>{{ error }}</small>
-              {% endfor %}
-            </div>
-            {% else %} {{ form.username(class="form-control", id="username") }} {%
-            endif %}
-          </div>
-
-          <!-- Password -->
-          <div class="mb-3">
-            <label for="password" class="form-label">
-              <i class="fas fa-lock me-2"></i>{{form.password.label.text}}
-            </label>
-            {% if form.password.errors %} {{ form.password(class="form-control is-invalid", id="password") }}
-            <div class="invalid-feedback">
-              {% for error in form.password.errors %}
-              <small>{{ error }}</small>
-              {% endfor %}
-            </div>
-            {% else %} {{ form.password(class="form-control", id="password") }}
-            {% endif %}
-          </div>
-
-          <!-- Create account -->
-          <!-- <div class="mb-3 text-end">
-            <a href={{ url_for('main.register') }} class="text-decoration-none"
-              >{{_('No tienes una cuenta?')}}</a
-            >
-          </div> -->
-
-          <!-- Submit -->
-          <div class="d-grid">
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-sign-in-alt me-2"></i>
-              {{form.submit.label.text}}
-            </button>
-          </div>
-        </form>
+      <div class="text-center mt-3">
+        <small class="text-muted">
+          {{_('You will be redirected to the secure login page')}}
+        </small>
       </div>
     </div>
   </div>

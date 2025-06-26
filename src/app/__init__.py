@@ -1,11 +1,14 @@
-from flask import Flask, request, session
+from flask import Flask, app, request, session
 from flask_login import LoginManager
 from flask_babel import Babel
 from config import Config
+from app.services.oauth_service import OAuthService
 from aclimate_v3_orm.database.base import create_tables
+import logging
 
 login_manager = LoginManager()
 babel = Babel()
+oauth_service = OAuthService()
 
 def get_locale():
     # 1. Si hay idioma en la sesión, usarlo
@@ -29,14 +32,20 @@ def create_app():
 
     create_tables()
     
+    logging.basicConfig(level=logging.INFO)
+
     # Inicializar extensiones
     login_manager.init_app(app)
+    oauth_service.init_app(app)
+    babel.init_app(app, locale_selector=get_locale)
+
+    # Store OAuth service in app extensions for access in routes
+    app.extensions['oauth_service'] = oauth_service
+
+    # Configure Flask-Login
     login_manager.login_view = 'main.login'
     login_manager.login_message = 'Por favor inicia sesión para acceder a esta página.'
     login_manager.login_message_category = 'info'
-
-    # Inicializar Babel
-    babel.init_app(app, locale_selector=get_locale)
     
     # Hacer get_locale disponible en templates
     @app.context_processor
