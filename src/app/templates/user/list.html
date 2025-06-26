@@ -324,13 +324,13 @@ block content %}
         ></button>
       </div>
       <div class="modal-body">
-        <p class="text-center mb-3">
-          {{_('¿Está seguro de que desea eliminar al usuario')}} <strong id="deleteUserName"></strong>?
+        <p class="text-start mb-3">
+          {{_('¿Está seguro de que desea eliminar al usuario')}} <strong class="deleteUsername"></strong>?
         </p>
         <div class="mb-3">
           <strong>{{_('Información del usuario:')}}</strong>
           <ul class="list-unstyled mt-2">
-            <li><i class="fas fa-user me-2"></i><strong>{{_('Usuario:')}} </strong><span id="deleteUsername"></span></li>
+            <li><i class="fas fa-user me-2"></i><strong>{{_('Usuario:')}} </strong><span class="deleteUsername"></span></li>
             <li><i class="fas fa-id-card me-2"></i><strong>{{_('Nombre:')}} </strong><span id="deleteFullName"></span></li>
           </ul>
         </div>
@@ -344,65 +344,6 @@ block content %}
             <i class="fas fa-trash"></i> {{_('Eliminar Usuario')}}
           </button>
         </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para confirmación de eliminación masiva -->
-<div
-  class="modal fade"
-  id="bulkDeleteModal"
-  tabindex="-1"
-  aria-labelledby="bulkDeleteLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title" id="bulkDeleteLabel">
-          <i class="fas fa-exclamation-triangle me-2"></i>{{_('Confirmar Eliminación Masiva')}}
-        </h5>
-        <button
-          type="button"
-          class="btn-close btn-close-white"
-          data-bs-dismiss="modal"
-          aria-label="Cerrar"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <div class="alert alert-warning">
-          <i class="fas fa-exclamation-triangle me-2"></i>
-          <strong>{{_('¡Atención!')}}</strong> {{_('Esta acción eliminará permanentemente los usuarios seleccionados.')}}
-        </div>
-        
-        <p class="mb-3">
-          {{_('¿Está seguro de que desea eliminar')}} <strong id="bulkDeleteCount">0</strong> {{_('usuarios seleccionados')}}?
-        </p>
-        
-        <div class="mb-3">
-          <strong>{{_('Usuarios que serán eliminados:')}}</strong>
-          <div id="selectedUsersList" class="mt-2 p-3 border rounded bg-light" style="max-height: 200px; overflow-y: auto;">
-            <!-- Lista generada dinámicamente -->
-          </div>
-        </div>
-        
-        <!-- Barra de progreso para la eliminación -->
-        <div id="bulkDeleteProgress" style="display: none;">
-          <p class="mb-2">{{_('Eliminando usuarios...')}}</p>
-          <div class="progress mb-2">
-            <div id="bulkDeleteProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
-          </div>
-          <small id="bulkDeleteStatus" class="text-muted">{{_('Preparando...')}}</small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="bulkDeleteCancelBtn">
-          <i class="fas fa-times"></i> {{_('Cancelar')}}
-        </button>
-        <button type="button" class="btn btn-danger" id="bulkDeleteConfirmBtn">
-          <i class="fas fa-trash"></i> {{_('Eliminar Todos')}}
-        </button>
       </div>
     </div>
   </div>

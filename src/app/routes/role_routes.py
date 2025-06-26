@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from app.forms.role_form import RoleForm
 from app.services.role_service import RoleService
 from app.decorators import token_required
@@ -72,4 +72,28 @@ def delete_role(role_id):
     except Exception as e:
         print(f"Error inesperado eliminando rol: {e}")
         flash(f'Error al eliminar rol: {str(e)}', 'danger')
+    return redirect(url_for('role.list_role'))
+
+@bp.route('/role/bulk_action', methods=['POST'])
+@token_required
+def bulk_action():
+    ids = request.form.getlist('selected_ids')
+    action = request.form.get('action')
+    if not ids:
+        flash('No se seleccionaron roles.', 'warning')
+        return redirect(url_for('role.list_role'))
+
+    count = 0
+    for loc_id in ids:
+        try:
+            if action == 'disable':
+                if role_service.delete(loc_id):
+                    count += 1
+        except Exception:
+            continue
+
+    if action == 'disable':
+        flash(f'{count} roles deshabilitados.', 'warning')
+    else:
+        flash('Acción no reconocida.', 'danger')
     return redirect(url_for('role.list_role'))

@@ -259,6 +259,57 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
+   * Configura el modal de eliminación individual con la información del usuario
+   */
+  function setupDeleteModal() {
+    const deleteModal = document.getElementById("deleteUserModal");
+    const deleteForm = document.getElementById("deleteUserForm");
+    const deleteUsernames = document.querySelectorAll(".deleteUsername");
+    const deleteFullName = document.getElementById("deleteFullName");
+
+    if (!deleteModal) return;
+
+    // Escuchar cuando se abre el modal
+    deleteModal.addEventListener("show.bs.modal", function (event) {
+      const button = event.relatedTarget; // Botón que activó el modal
+
+      if (!button) return;
+
+      // Obtener datos del botón
+      const userId = button.getAttribute("data-user-id");
+      const username = button.getAttribute("data-username");
+      const userFullName = button.getAttribute("data-user-name");
+
+      // Actualizar el contenido del modal
+      deleteUsernames.forEach((deleteUsername) => {
+        deleteUsername.textContent = username || "Usuario";
+      });
+
+      if (deleteFullName) {
+        // Limpiar nombres vacíos y mostrar mensaje apropiado
+        const cleanFullName = userFullName
+          ? userFullName.trim().replace(/\s+/g, " ")
+          : "";
+        deleteFullName.textContent = cleanFullName || "Sin nombre asignado";
+      }
+
+      // Actualizar la acción del formulario
+      if (deleteForm && userId) {
+        deleteForm.action = `/user/delete/${userId}`;
+      }
+    });
+
+    // Limpiar el modal cuando se cierra
+    deleteModal.addEventListener("hidden.bs.modal", function () {
+      deleteUsernames.forEach((deleteUsername) => {
+        deleteUsername.textContent = "";
+      });
+      if (deleteFullName) deleteFullName.textContent = "";
+      if (deleteForm) deleteForm.action = "";
+    });
+  }
+
+  /**
    * Inicializa el sistema
    */
   function init() {
@@ -275,6 +326,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Filtros
     generateFiltersMenu();
     updateFiltersDisplay();
+
+    // Modales de eliminación
+    setupDeleteModal();
 
     // Estado inicial
     applyFilters();

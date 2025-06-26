@@ -47,106 +47,97 @@ block content %}
   </div>
 
   {% if roles %}
-  <div id="rolesTableContainer">
-    <table class="table table-hover align-middle">
-      <thead class="table-light">
-        <tr>
-          <th style="width: 5%">
-            <div class="d-flex align-items-center gap-2">
-              <input type="checkbox" id="selectAllCheckbox" class="form-check-input" />
-              <!-- Botón de eliminación masiva (inicialmente oculto) -->
-              <button 
-                id="bulkDeleteBtn" 
-                class="btn btn-danger btn-sm align-items-baseline" 
-                style="display: none;"
-                title="{{_('Eliminar roles seleccionados')}}"
-                data-bs-toggle="modal"
-                data-bs-target="#bulkDeleteModal"
-              >
-                <i class="fas fa-trash me-2"></i>
-                <span id="selectedCount">0</span>
-              </button>
-            </div>
-          </th>
-          <th>Nombre del Rol</th>
-          <th>Descripción</th>
-          <th class="text-end">Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="rolesTableBody">
-        {% for role in roles %}
-        <tr class="role-row" 
-            data-rolename="{{ role.name|lower }}"
-            data-description="{{ (role.description or '')|lower }}"
-            data-search="{{ (role.name + ' ' + (role.description or ''))|lower }}"
-            data-role-id="{{ role.id }}"
-            data-can-delete="{{ 'true' if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] else 'false' }}">
-          <td>
-            {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
-            <input type="checkbox" class="form-check-input role-checkbox" value="{{ role.id }}" data-rolename="{{ role.name }}" />
-            {% else %}
-            <input type="checkbox" class="form-check-input" disabled title="{{_('No se puede seleccionar este rol del sistema')}}" />
-            {% endif %}
-          </td>
-          <td>
-            <div class="d-flex align-items-center">
-              <div class="role-icon me-2">
-                {% if role.name.lower() in ['admin', 'super-admin'] %}
-                <i class="fas fa-crown text-warning"></i>
-                {% elif role.name.lower() in ['manager', 'supervisor'] %}
-                <i class="fas fa-user-shield text-primary"></i>
-                {% elif role.name.lower() in ['editor', 'moderator'] %}
-                <i class="fas fa-user-edit text-info"></i>
-                {% elif role.name.lower() in ['viewer', 'guest'] %}
-                <i class="fas fa-eye text-secondary"></i>
-                {% else %}
-                <i class="fas fa-user-tag text-dark"></i>
-                {% endif %}
-              </div>
-              <div>
-                <strong class="searchable-rolename">{{ role.display_name }}</strong>
-                <br />
-                <small class="text-muted">ID: {{ role.id[:8] }}...</small>
-              </div>
-            </div>
-          </td>
-          <td>
-            {% if role.description %}
-            <span class="searchable-description">{{ role.description }}</span>
-            {% else %}
-            <span class="text-muted fst-italic">Sin descripción</span>
-            {% endif %}
-          </td>
-          <td class="text-end">
-            {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
-            <button 
-              type="button"
-              class="btn btn-danger btn-sm"
-              title="Eliminar rol"
-              data-bs-toggle="modal"
-              data-bs-target="#deleteRoleModal"
+  <form id="bulk-action-form" method="POST" action="{{ url_for('role.bulk_action') }}">
+    <div class="mb-2">
+      <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+      <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+        <i class="fas fa-trash"></i> {{ _('Eliminar seleccionados') }}
+      </button>
+    </div>
+    <div id="rolesTableContainer">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            <th>Nombre del Rol</th>
+            <th>Descripción</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="rolesTableBody">
+          {% for role in roles %}
+          <tr class="role-row" 
+              data-rolename="{{ role.name|lower }}"
+              data-description="{{ (role.description or '')|lower }}"
+              data-search="{{ (role.name + ' ' + (role.description or ''))|lower }}"
               data-role-id="{{ role.id }}"
-              data-rolename="{{ role.name }}"
-              data-role-description="{{ role.description or 'Sin descripción' }}"
-            >
-              <i class="fas fa-trash"></i>
-            </button>
-            {% else %}
-            <button
-              class="btn btn-secondary btn-sm"
-              disabled
-              title="No se puede eliminar rol del sistema"
-            >
-              <i class="fas fa-shield-alt"></i>
-            </button>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  
+              data-can-delete="{{ 'true' if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] else 'false' }}">
+            <td>
+              {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
+              <input type="checkbox" class="select-row" value="{{ role.id }}" data-rolename="{{ role.name }}" name="selected_ids"/>
+              {% else %}
+              <input type="checkbox" class="form-check-input" disabled title="{{_('No se puede seleccionar este rol del sistema')}}" />
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="role-icon me-2">
+                  {% if role.name.lower() in ['admin', 'super-admin'] %}
+                  <i class="fas fa-crown text-warning"></i>
+                  {% elif role.name.lower() in ['manager', 'supervisor'] %}
+                  <i class="fas fa-user-shield text-primary"></i>
+                  {% elif role.name.lower() in ['editor', 'moderator'] %}
+                  <i class="fas fa-user-edit text-info"></i>
+                  {% elif role.name.lower() in ['viewer', 'guest'] %}
+                  <i class="fas fa-eye text-secondary"></i>
+                  {% else %}
+                  <i class="fas fa-user-tag text-dark"></i>
+                  {% endif %}
+                </div>
+                <div>
+                  <strong class="searchable-rolename">{{ role.display_name }}</strong>
+                  <br />
+                  <small class="text-muted">ID: {{ role.id[:8] }}...</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if role.description %}
+              <span class="searchable-description">{{ role.description }}</span>
+              {% else %}
+              <span class="text-muted fst-italic">Sin descripción</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
+              <button 
+                type="button"
+                class="btn btn-danger btn-sm"
+                title="Eliminar rol"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteRolModal"
+                data-role-id="{{ role.id }}"
+                data-rolename="{{ role.name }}"
+                data-role-description="{{ role.description or 'Sin descripción' }}"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+              {% else %}
+              <button
+                class="btn btn-secondary btn-sm"
+                disabled
+                title="No se puede eliminar rol del sistema"
+              >
+                <i class="fas fa-shield-alt"></i>
+              </button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
   <!-- Mensaje cuando no hay resultados de búsqueda -->
   <div id="noSearchResults" class="alert alert-warning mt-4" style="display: none;">
     <i class="fas fa-search"></i>
@@ -236,15 +227,15 @@ block content %}
 <!-- Modal para confirmar eliminación individual -->
 <div
   class="modal fade"
-  id="deleteRoleModal"
+  id="deleteRolModal"
   tabindex="-1"
-  aria-labelledby="deleteRoleLabel"
+  aria-labelledby="deleteRolLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title" id="deleteUserLabel">
+        <h5 class="modal-title" id="deleteRolLabel">
           <i class="fas fa-exclamation-triangle me-2"></i>{{_('Confirmar Eliminación')}}
         </h5>
         <button
@@ -255,9 +246,16 @@ block content %}
         ></button>
       </div>
       <div class="modal-body">
-        <p class="text-center mb-3">
-          {{_('¿Está seguro de que desea eliminar el rol')}} <strong id="deleteRolName"></strong>?
+        <p class="text-start mb-3">
+          {{_('¿Está seguro de que desea eliminar el rol')}} <strong class="deleteRolName"></strong>?
         </p>
+        <div class="mb-3">
+          <strong>{{_('Información del rol:')}}</strong>
+          <ul class="list-unstyled mt-2">
+            <li><i class="fas fa-user me-2"></i><strong>{{_('Rol:')}} </strong><span class="deleteRolName"></span></li>
+            <li><i class="fas fa-id-card me-2"></i><strong>{{_('Descripcion:')}} </strong><span id="deleteRolDescription"></span></li>
+          </ul>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -344,6 +342,50 @@ block content %}
     background-color: rgba(13, 110, 253, 0.1) !important;
   }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+   // Checkbox select all
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.select-row');
+    const bulkDisable = document.getElementById('bulk-disable');
+    const form = document.getElementById('bulk-action-form');
+
+    function updateBulkButtons() {
+      const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+      if (anyChecked) {
+      bulkDisable.style.visibility = 'visible';
+      } else {
+      bulkDisable.style.visibility = 'hidden';
+      }
+      bulkDisable.disabled = !anyChecked;
+    }
+
+    // Inicializar visibilidad al cargar
+    updateBulkButtons();
+
+    if (selectAll) {
+      selectAll.addEventListener('change', function() {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateBulkButtons();
+      });
+    }
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateBulkButtons);
+    });
+
+    // Opcional: deshabilitar ambos botones al enviar el form
+    form.addEventListener('submit', function() {
+      bulkDisable.disabled = true;
+    });
+
+    bulkDisable.addEventListener('click', function() {
+      document.getElementById('bulk-action-hidden').value = 'disable';
+      form.submit();
+    });
+
+});    
+</script>
 
 <!-- Translations for JavaScript -->
 <script>
