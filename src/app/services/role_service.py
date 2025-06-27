@@ -2,9 +2,10 @@ from typing import List, Dict
 import requests
 from flask import current_app, session
 from config import Config
+from app.config.permissions import RolePermissionMapper, Module
 
 class RoleService:
-    """Servicio para manejar roles desde la API"""
+    """Servicio para manejar roles desde la API y sincronización local"""
     
     def _get_auth_headers(self) -> Dict[str, str]:
         """Obtener headers de autenticación"""
@@ -23,11 +24,13 @@ class RoleService:
             'description': api_role.get('description', ''),
             'composite': api_role.get('composite', False),
             'client_role': api_role.get('clientRole', True),
-            'container_id': api_role.get('containerId', '')
+            'container_id': api_role.get('containerId', ''),
+            'modules': RolePermissionMapper.get_role_modules(role_name),  # Agregar módulos locales
+            'has_local_config': role_name in RolePermissionMapper.get_available_roles()
         }
     
     def get_all(self) -> List[Dict]:
-        """Obtener todos los roles desde la API"""
+        """Obtener todos los roles desde la API con información local"""
         try:
             response = requests.get(
                 f"{Config.API_BASE_URL}/users/get-client-roles",
@@ -40,11 +43,6 @@ class RoleService:
             if response.status_code == 200:
                 api_response = response.json()
                 
-                # Log para ver qué estructura tiene la respuesta
-                current_app.logger.info(f"API Response type: {type(api_response)}")
-                current_app.logger.info(f"API Response keys (if dict): {list(api_response.keys()) if isinstance(api_response, dict) else 'Not a dict'}")
-                current_app.logger.info(f"API Response sample: {str(api_response)[:500]}...")
-                
                 # Manejar diferentes formatos de respuesta
                 roles_data = []
                 
@@ -53,332 +51,178 @@ class RoleService:
                     roles_data = api_response
                 elif isinstance(api_response, dict):
                     # Respuesta como diccionario, buscar la lista de roles
-                    if 'roles' in api_response:
-                        roles_data = api_response['roles']
-                    elif 'data' in api_response:
-                        roles_data = api_response['data']
-                    elif 'items' in api_response:
-                        roles_data = api_response['items']
-                    elif 'results' in api_response:
-                        roles_data = api_response['results']
-                    else:
-                        # Si no encontramos una clave conocida, logeemos todas las claves
-                        current_app.logger.error(f"Could not find roles array in dict response. Available keys: {list(api_response.keys())}")
-                        return []
+                    roles_data = (api_response.get('roles') or 
+                                api_response.get('data') or 
+                                api_response.get('items') or 
+                                [api_response])
                 
-                # Verificar que ahora tenemos una lista
-                if not isinstance(roles_data, list):
-                    current_app.logger.error(f"Expected list but got {type(roles_data)} for roles data")
-                    return []
-                
-                # Normalizar los roles
+                # Normalizar datos y agregar información local
                 normalized_roles = []
-                for api_role in roles_data:
-                    try:
-                        normalized_role = self._normalize_role_data(api_role)
+                for role in roles_data:
+                    if isinstance(role, dict):
+                        normalized_role = self._normalize_role_data(role)
                         normalized_roles.append(normalized_role)
-                    except Exception as e:
-                        current_app.logger.error(f"Error normalizing role {api_role.get('name', 'unknown')}: {e}")
-                        continue
                 
-                current_app.logger.info(f"Successfully loaded {len(normalized_roles)} roles")
+                current_app.logger.info(f"Successfully retrieved {len(normalized_roles)} roles")
                 return normalized_roles
-            
-            elif response.status_code == 401:
-                current_app.logger.error("Unauthorized access to roles API - token may be expired")
-                return []
-            elif response.status_code == 403:
-                current_app.logger.error("Forbidden access to roles API - insufficient permissions")
-                return []
             else:
-                current_app.logger.error(f"Error fetching roles from API: {response.status_code} - {response.text}")
+                current_app.logger.error(f"Error from roles API: {response.status_code} - {response.text}")
                 return []
                 
-        except requests.exceptions.Timeout:
-            current_app.logger.error("Timeout connecting to roles API")
-            return []
-        except requests.exceptions.ConnectionError:
-            current_app.logger.error("Connection error to roles API")
-            return []
         except requests.exceptions.RequestException as e:
-            current_app.logger.error(f"Request error connecting to roles API: {e}")
+            current_app.logger.error(f"Network error getting roles: {e}")
             return []
         except Exception as e:
-            current_app.logger.error(f"Unexpected error in RoleService.get_all: {e}")
+            current_app.logger.error(f"Unexpected error getting roles: {e}")
             return []
 
-    def create(self, name: str, description: str = "", composite: bool = False) -> Dict:
-        """Crear un nuevo rol"""
+    def create(self, name: str, description: str = None, modules: List[str] = None) -> Dict:
+        """Crear rol en Keycloak y en configuración local"""
         try:
-            print(f"Attempting to create role: {name}")
-            
-            # Preparar datos para la API
+            # 1. Crear rol en Keycloak
             role_data = {
-                "name": name,
-                "description": description,
-                "composite": composite
+                'name': name,
+                'description': description or '',
+                'composite': False,
+                'clientRole': True
             }
             
-            print(f"Creating role with data: {role_data}")
-            
-            # Asegurar que Content-Type esté en los headers
-            headers = self._get_auth_headers()
-            headers['Content-Type'] = 'application/json'
-            
             response = requests.post(
-                f"{Config.API_BASE_URL}/roles/create",
-                headers=headers,
+                f"{Config.API_BASE_URL}/users/create-client-role",
+                headers=self._get_auth_headers(),
                 json=role_data,
                 timeout=10
             )
             
-            print(f"Create role response status: {response.status_code}")
-            print(f"Create role response content: {response.text}")
-            
-            if response.status_code == 200:
-                # Rol creado exitosamente
-                print("Rol creado con éxito en la API")
+            if response.status_code in [200, 201]:
+                current_app.logger.info(f"Role '{name}' created successfully in Keycloak")
                 
-                if response.content:
-                    try:
-                        api_response = response.json()
-                        
-                        # Si la respuesta contiene el rol creado, normalizarlo
-                        if isinstance(api_response, dict) and 'id' in api_response:
-                            normalized_role = self._normalize_role_data(api_response)
-                            print(f"Rol normalizado: {normalized_role}")
-                            return normalized_role
-                        
-                        # Si la respuesta tiene un mensaje y ID
-                        elif isinstance(api_response, dict) and 'role_id' in api_response:
-                            role_id = api_response.get('role_id')
-                            message = api_response.get('message', '')
-                            print(f"API Response: {api_response}")
-                            
-                            # Crear respuesta normalizada
-                            return {
-                                'id': role_id,
-                                'name': name,
-                                'display_name': name,
-                                'description': description,
-                                'composite': composite,
-                                'client_role': True,
-                                'container_id': ''
-                            }
-                        
-                        else:
-                            print(f"Unexpected response format: {api_response}")
-                            # Crear respuesta básica
-                            return {
-                                'id': 'temp_id',
-                                'name': name,
-                                'display_name': name,
-                                'description': description,
-                                'composite': composite,
-                                'client_role': True,
-                                'container_id': ''
-                            }
-                            
-                    except Exception as json_error:
-                        print(f"Error parsing create role response: {json_error}")
-                        return {
-                            'id': 'temp_id',
-                            'name': name,
-                            'display_name': name,
-                            'description': description,
-                            'composite': composite,
-                            'client_role': True,
-                            'container_id': ''
-                        }
-                else:
-                    # Sin contenido en la respuesta
-                    return {
-                        'id': 'temp_id',
-                        'name': name,
-                        'display_name': name,
-                        'description': description,
-                        'composite': composite,
-                        'client_role': True,
-                        'container_id': ''
-                    }
+                # 2. Agregar rol a configuración local si se especificaron módulos
+                if modules:
+                    # Convertir strings de módulos a objetos Module
+                    module_objects = []
+                    for module_str in modules:
+                        try:
+                            module_obj = Module(module_str)
+                            module_objects.append(module_obj)
+                        except ValueError:
+                            current_app.logger.warning(f"Invalid module: {module_str}")
                     
-            elif response.status_code == 201:
-                # Rol creado exitosamente (código estándar para creación)
-                print("Rol creado con éxito (201)")
+                    # Agregar a configuración local
+                    if module_objects:
+                        success = RolePermissionMapper.add_role(name, module_objects)
+                        if success:
+                            current_app.logger.info(f"Role '{name}' added to local configuration with modules: {[m.value for m in module_objects]}")
+                        else:
+                            current_app.logger.warning(f"Failed to add role '{name}' to local configuration")
                 
-                if response.content:
-                    try:
-                        api_role = response.json()
-                        normalized_role = self._normalize_role_data(api_role)
-                        print(f"Rol normalizado: {normalized_role}")
-                        return normalized_role
-                    except Exception as json_error:
-                        print(f"Error parsing JSON response: {json_error}")
-                        return {
-                            'id': 'temp_id',
-                            'name': name,
-                            'display_name': name,
-                            'description': description,
-                            'composite': composite,
-                            'client_role': True,
-                            'container_id': ''
-                        }
-            
-            elif response.status_code == 400:
-                # Error de validación
-                try:
-                    error_data = response.json()
-                    error_msg = error_data.get('message', 'Error de validación')
-                    print(f"Error 400 de la API: {error_msg}")
-                    raise ValueError(error_msg)
-                except ValueError:
-                    raise  # Re-lanzar ValueError
-                except:
-                    raise ValueError('Error de validación en los datos del rol')
-            
-            elif response.status_code == 409:
-                # Rol ya existe
-                print("Error 409: Rol ya existe")
-                raise ValueError('Ya existe un rol con ese nombre')
-            
-            elif response.status_code == 403:
-                # Sin permisos
-                print("Error 403: Sin permisos para crear roles")
-                raise ValueError('No tienes permisos para crear roles')
-            
+                return {
+                    'success': True,
+                    'role': self._normalize_role_data({
+                        'name': name,
+                        'description': description,
+                        'id': response.json().get('id') if response.content else None
+                    })
+                }
             else:
-                print(f"Error inesperado de la API: {response.status_code}")
-                raise Exception(f"Error del servidor: {response.status_code} - {response.text}")
+                current_app.logger.error(f"Error creating role in Keycloak: {response.status_code} - {response.text}")
+                return {
+                    'success': False,
+                    'error': f"Error from API: {response.status_code}"
+                }
                 
-        except requests.exceptions.Timeout:
-            print("Error: Timeout en la conexión")
-            current_app.logger.error("Timeout connecting to create role API")
-            raise Exception("Tiempo de espera agotado - intenta nuevamente")
-        
-        except requests.exceptions.ConnectionError:
-            print("Error: Error de conexión")
-            current_app.logger.error("Connection error to create role API")
-            raise Exception("Error de conexión con el servidor")
-        
         except requests.exceptions.RequestException as e:
-            print(f"Error de conexión: {e}")
-            current_app.logger.error(f"Error connecting to create role API: {e}")
-            raise Exception("Error de conexión con el servidor")
-        
-        except ValueError as e:
-            print(f"Error de validación: {e}")
-            raise  # Re-lanzar errores de validación
-        
+            current_app.logger.error(f"Network error creating role: {e}")
+            return {
+                'success': False,
+                'error': f"Network error: {str(e)}"
+            }
         except Exception as e:
-            print(f"Error inesperado en create: {e}")
             current_app.logger.error(f"Unexpected error creating role: {e}")
-            raise Exception(f"Error inesperado: {str(e)}")
+            return {
+                'success': False,
+                'error': f"Unexpected error: {str(e)}"
+            }
         
-    def delete(self, role_id: str) -> bool:
-        """Eliminar un rol"""
+    def update_local_modules(self, role_name: str, modules: List[str]) -> bool:
+        """Actualizar módulos de un rol en la configuración local"""
         try:
-            print(f"Attempting to delete role with ID: {role_id}")
+            # Convertir strings de módulos a objetos Module
+            module_objects = []
+            for module_str in modules:
+                try:
+                    module_obj = Module(module_str)
+                    module_objects.append(module_obj)
+                except ValueError:
+                    current_app.logger.warning(f"Invalid module: {module_str}")
             
-            # Asegurar que Content-Type esté en los headers
-            headers = self._get_auth_headers()
-            headers['Content-Type'] = 'application/json'
+            # Actualizar configuración local
+            success = RolePermissionMapper.update_role(role_name, module_objects)
+            if success:
+                current_app.logger.info(f"Updated local modules for role '{role_name}': {[m.value for m in module_objects]}")
             
+            return success
+            
+        except Exception as e:
+            current_app.logger.error(f"Error updating local modules for role '{role_name}': {e}")
+            return False
+
+    def delete(self, role_id: str, role_name: str = None) -> bool:
+        """Eliminar rol de Keycloak y configuración local"""
+        try:
+            # 1. Eliminar de Keycloak
             response = requests.delete(
-                f"{Config.API_BASE_URL}/roles/delete/{role_id}",
-                headers=headers,
+                f"{Config.API_BASE_URL}/users/delete-client-role/{role_id}",
+                headers=self._get_auth_headers(),
                 timeout=10
             )
             
-            print(f"Delete role response status: {response.status_code}")
-            print(f"Delete role response content: {response.text}")
-            
-            if response.status_code == 200:
-                # Rol eliminado exitosamente
-                print("Rol eliminado con éxito en la API")
-                return True
-            
-            elif response.status_code == 204:
-                # Rol eliminado exitosamente (sin contenido)
-                print("Rol eliminado con éxito en la API (204)")
-                return True
-            
-            elif response.status_code == 404:
-                # Rol no encontrado
-                print("Error 404: Rol no encontrado")
-                try:
-                    error_data = response.json()
-                    error_msg = error_data.get('message', 'Rol no encontrado')
-                    raise ValueError(error_msg)
-                except ValueError:
-                    raise
-                except:
-                    raise ValueError('Rol no encontrado')
-            
-            elif response.status_code == 400:
-                # Error de validación
-                try:
-                    error_data = response.json()
-                    error_msg = error_data.get('message', 'Error de validación en la petición')
-                    print(f"Error 400 de la API: {error_msg}")
-                    raise ValueError(error_msg)
-                except ValueError:
-                    raise  # Re-lanzar ValueError
-                except:
-                    raise ValueError('Error de validación en la petición')
-            
-            elif response.status_code == 403:
-                # Sin permisos
-                print("Error 403: Sin permisos para eliminar roles")
-                raise ValueError('No tienes permisos para eliminar este rol')
-            
-            elif response.status_code == 409:
-                # Conflicto - el rol está siendo usado por usuarios
-                print("Error 409: El rol está siendo utilizado")
-                try:
-                    error_data = response.json()
-                    error_msg = error_data.get('message', 'No se puede eliminar el rol porque está siendo utilizado por usuarios')
-                    raise ValueError(error_msg)
-                except ValueError:
-                    raise
-                except:
-                    raise ValueError('No se puede eliminar el rol porque está siendo utilizado por usuarios')
-            
-            elif response.status_code == 422:
-                # Error de procesamiento - posible caso cuando el rol es crítico del sistema
-                print("Error 422: No se puede procesar la eliminación del rol")
-                try:
-                    error_data = response.json()
-                    error_msg = error_data.get('message', 'No se puede eliminar este rol del sistema')
-                    raise ValueError(error_msg)
-                except ValueError:
-                    raise
-                except:
-                    raise ValueError('No se puede eliminar este rol del sistema')
-            
-            else:
-                print(f"Error inesperado de la API: {response.status_code}")
-                raise Exception(f"Error del servidor: {response.status_code} - {response.text}")
+            if response.status_code in [200, 204]:
+                current_app.logger.info(f"Role '{role_name or role_id}' deleted successfully from Keycloak")
                 
-        except requests.exceptions.Timeout:
-            print("Error: Timeout en la conexión")
-            current_app.logger.error("Timeout connecting to delete role API")
-            raise Exception("Tiempo de espera agotado - intenta nuevamente")
-        
-        except requests.exceptions.ConnectionError:
-            print("Error: Error de conexión")
-            current_app.logger.error("Connection error to delete role API")
-            raise Exception("Error de conexión con el servidor")
-        
+                # 2. Eliminar de configuración local si tenemos el nombre
+                if role_name:
+                    success = RolePermissionMapper.remove_role(role_name)
+                    if success:
+                        current_app.logger.info(f"Role '{role_name}' removed from local configuration")
+                    else:
+                        current_app.logger.warning(f"Role '{role_name}' not found in local configuration")
+                
+                return True
+            else:
+                current_app.logger.error(f"Error deleting role from Keycloak: {response.status_code} - {response.text}")
+                return False
+                
         except requests.exceptions.RequestException as e:
-            print(f"Error de conexión: {e}")
-            current_app.logger.error(f"Error connecting to delete role API: {e}")
-            raise Exception("Error de conexión con el servidor")
-        
-        except ValueError as e:
-            print(f"Error de validación: {e}")
-            raise  # Re-lanzar errores de validación
-        
+            current_app.logger.error(f"Network error deleting role: {e}")
+            return False
         except Exception as e:
-            print(f"Error inesperado en delete: {e}")
             current_app.logger.error(f"Unexpected error deleting role: {e}")
-            raise Exception(f"Error inesperado: {str(e)}")
+            return False
+        
+    def get_role_with_modules(self, role_name: str) -> Dict:
+        """Obtener información completa de un rol incluyendo módulos"""
+        roles = self.get_all()
+        for role in roles:
+            if role['name'] == role_name:
+                return role
+        return None
+    
+    def sync_role_modules(self) -> Dict:
+        """Sincronizar roles entre Keycloak y configuración local"""
+        try:
+            keycloak_roles = self.get_all()
+            sync_result = RolePermissionMapper.sync_with_keycloak_roles(keycloak_roles)
+            
+            current_app.logger.info(f"Role synchronization completed: {sync_result}")
+            return {
+                'success': True,
+                'sync_result': sync_result
+            }
+            
+        except Exception as e:
+            current_app.logger.error(f"Error during role synchronization: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }

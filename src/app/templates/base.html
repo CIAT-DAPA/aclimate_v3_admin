@@ -129,6 +129,7 @@
       id="sidebar"
     >
       <!-- Sección Geográfico -->
+      {% if check_module_access(Module.GEOGRAPHIC)  %}
       <div class="sidebar-section-collapsible mb-1">
         <div
           class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
@@ -168,8 +169,10 @@
           </nav>
         </div>
       </div>
+      {% endif %}
 
       <!-- Sección Cultivos -->
+      {% if check_module_access(Module.CROP_DATA)  %}
       <div class="sidebar-section-collapsible mb-1">
         <div
           class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
@@ -197,8 +200,10 @@
           </nav>
         </div>
       </div>
+      {% endif %}
 
       <!-- Sección Clima -->
+      {% if check_module_access(Module.CLIMATE_DATA)  %}
       <div class="sidebar-section-collapsible mb-1">
         <div
           class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
@@ -223,8 +228,10 @@
           </nav>
         </div>
       </div>
+      {% endif %}
 
       <!-- Sección Usuarios -->
+      {% if check_module_access(Module.USER_MANAGEMENT)  %}
       <div class="sidebar-section-collapsible mb-1">
         <div
           class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
@@ -252,6 +259,7 @@
           </nav>
         </div>
       </div>
+      {% endif %}
     </div>
 
     <!-- Contenido principal -->

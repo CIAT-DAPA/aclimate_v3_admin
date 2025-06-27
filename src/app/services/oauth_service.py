@@ -106,17 +106,18 @@ class OAuthService:
             logger.info("Attempting to get user info")
             logger.debug(f"Token structure: {list(token.keys()) if token else 'None'}")
             
+            user_info = None
+            
             # Método 1: Intentar con userinfo endpoint usando Authlib
             try:
                 user_info = self.keycloak.userinfo(token=token)
                 if user_info:
                     logger.info(f"Successfully retrieved user info via Authlib: {user_info.get('preferred_username', 'unknown')}")
-                    return user_info
             except Exception as e:
                 logger.warning(f"Authlib userinfo failed: {e}")
             
             # Método 2: Intentar con requests directo
-            if 'access_token' in token:
+            if not user_info and 'access_token' in token:
                 userinfo_url = f"{current_app.config['KEYCLOAK_SERVER_URL']}/realms/{current_app.config['KEYCLOAK_REALM']}/protocol/openid-connect/userinfo"
                 
                 response = requests.get(
@@ -128,25 +129,56 @@ class OAuthService:
                 if response.status_code == 200:
                     user_info = response.json()
                     logger.info(f"Successfully retrieved user info from userinfo endpoint: {user_info.get('preferred_username', 'unknown')}")
-                    return user_info
                 else:
                     logger.warning(f"Userinfo endpoint returned status {response.status_code}: {response.text}")
             
             # Método 3: Fallback - parsear ID token
-            if 'id_token' in token:
+            if not user_info and 'id_token' in token:
                 try:
                     user_info = self.keycloak.parse_id_token(token)
                     logger.info(f"Successfully parsed ID token: {user_info.get('preferred_username', 'unknown')}")
-                    return user_info
                 except Exception as e:
                     logger.warning(f"Failed to parse ID token: {e}")
             
-            logger.error("Could not retrieve user info from any method")
-            return None
+            # Si tenemos user_info, intentar enriquecerla con información adicional
+            if user_info and 'access_token' in token:
+                user_info = self._enrich_user_info(user_info, token['access_token'])
+            
+            if not user_info:
+                logger.error("Could not retrieve user info from any method")
+            
+            return user_info
             
         except Exception as e:
             logger.error(f"Error getting user info: {e}")
             return None
+
+    def _enrich_user_info(self, user_info: Dict, access_token: str) -> Dict:
+        """Enriquece la información del usuario con datos adicionales"""
+        try:
+            # Intentar obtener roles específicos del cliente
+            roles_url = f"{current_app.config['KEYCLOAK_SERVER_URL']}/admin/realms/{current_app.config['KEYCLOAK_REALM']}/users/{user_info.get('sub')}/role-mappings"
+            
+            response = requests.get(
+                roles_url,
+                headers={'Authorization': f"Bearer {access_token}"},
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                roles_data = response.json()
+                logger.info(f"Additional roles data: {roles_data}")
+                # Agregar roles adicionales a user_info si están disponibles
+                if 'realmMappings' in roles_data:
+                    realm_roles = [role['name'] for role in roles_data['realmMappings']]
+                    if 'realm_access' not in user_info:
+                        user_info['realm_access'] = {}
+                    user_info['realm_access']['roles'] = realm_roles
+                    
+        except Exception as e:
+            logger.warning(f"Could not enrich user info with additional roles: {e}")
+        
+        return user_info
     
     def validate_token(self, access_token: str) -> bool:
         """Validar que el token siga siendo válido"""

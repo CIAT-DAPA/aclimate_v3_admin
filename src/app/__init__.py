@@ -1,6 +1,8 @@
 from flask import Flask, app, request, session
-from flask_login import LoginManager
-from flask_babel import Babel
+from flask_login import LoginManager, current_user
+from flask_babel import Babel 
+from app.config.permissions import Module
+from app.decorators.permissions import check_module_access
 from config import Config
 from app.services.oauth_service import OAuthService
 from aclimate_v3_orm.database.base import create_tables
@@ -54,8 +56,10 @@ def create_app():
         # Asegurar que el locale actual existe en LANGUAGES
         if current_locale not in Config.LANGUAGES:
             current_locale = Config.BABEL_DEFAULT_LOCALE
-            
+        
         return {
+            'check_module_access': check_module_access,
+            'Module': Module,
             'get_locale': lambda: current_locale,
             'config': Config
         }

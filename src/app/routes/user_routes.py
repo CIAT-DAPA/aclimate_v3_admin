@@ -3,6 +3,8 @@ from app.services.user_service import UserService
 from app.services.role_service import RoleService
 from app.forms.user_form import UserForm, UserEditForm
 from app.decorators import token_required
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module, RolePermissionMapper
 
 bp = Blueprint('user', __name__)
 user_service = UserService()
@@ -11,6 +13,7 @@ role_service = RoleService()
 # Ruta: Listar usuarios
 @bp.route('/user', methods=['GET'])
 @token_required
+@require_module_access(Module.USER_MANAGEMENT)
 def list_user():
     form = UserForm()
     users = user_service.get_all()
@@ -19,6 +22,7 @@ def list_user():
 # Ruta: Solo crear usuario
 @bp.route('/user/create', methods=['POST'])
 @token_required
+@require_module_access(Module.USER_MANAGEMENT)
 def create_user():
     form = UserForm()
     
@@ -59,6 +63,7 @@ def create_user():
 # Ruta: Eliminar usuario
 @bp.route('/user/delete/<string:user_id>', methods=['POST'])
 @token_required
+@require_module_access(Module.USER_MANAGEMENT)
 def delete_user(user_id):
     """Eliminar usuario"""
     try:
@@ -82,6 +87,7 @@ def delete_user(user_id):
 # Ruta: Editar usuario
 @bp.route('/user/edit/<string:user_id>', methods=['GET', 'POST'])
 @token_required
+@require_module_access(Module.USER_MANAGEMENT)
 def edit_user(user_id):
     """Editar usuario - permite cambiar nombre, apellido, email y rol"""
     try:
@@ -263,6 +269,7 @@ def edit_user(user_id):
     
 @bp.route('/users/bulk_action', methods=['POST'])
 @token_required
+@require_module_access(Module.USER_MANAGEMENT)
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')
