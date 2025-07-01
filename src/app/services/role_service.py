@@ -83,12 +83,11 @@ class RoleService:
             role_data = {
                 'name': name,
                 'description': description or '',
-                'composite': False,
-                'clientRole': True
+                'composite': False
             }
             
             response = requests.post(
-                f"{Config.API_BASE_URL}/users/create-client-role",
+                f"{Config.API_BASE_URL}/roles/create",
                 headers=self._get_auth_headers(),
                 json=role_data,
                 timeout=10
