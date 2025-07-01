@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_babel import lazy_gettext as _l
-from wtforms import StringField, TextAreaField, SelectMultipleField, widgets
+from wtforms import StringField, TextAreaField, SelectMultipleField, widgets, SubmitField
 from wtforms.validators import DataRequired, Length
 from app.config.permissions import Module, RolePermissionMapper
 
@@ -42,6 +42,24 @@ class RoleForm(FlaskForm):
             for module_value, info in modules_info.items()
         ]
     
-class RoleEditForm(RoleForm):
-    """Formulario para editar roles existentes"""
-    pass
+class RoleEditForm(FlaskForm):
+    """Formulario para editar roles existentes - solo módulos"""
+    
+    modules = SelectMultipleField(_l('Módulos de Acceso'),
+                                 validators=[
+                                     DataRequired(message=_l('Debe seleccionar al menos un módulo'))
+                                 ],
+                                 choices=[],  # Se llenará dinámicamente
+                                 coerce=str,
+                                 render_kw={"class": "form-control"})
+    
+    submit = SubmitField(_l('Guardar Cambios'))
+    
+    def __init__(self, *args, **kwargs):
+        super(RoleEditForm, self).__init__(*args, **kwargs)
+        # Llenar choices de módulos dinámicamente
+        modules_info = RolePermissionMapper.get_modules_info()
+        self.modules.choices = [
+            (module_value, f"{info['name']} - {info['description']}")
+            for module_value, info in modules_info.items()
+        ]

@@ -79,14 +79,14 @@ def edit_role(role_name):
     form = RoleEditForm()
     
     if request.method == 'GET':
-        # Prellenar formulario con datos existentes
-        form.name.data = role_info['name']
-        form.description.data = role_info['description']
+        # Prellenar formulario con módulos existentes solamente
         form.modules.data = [module.value for module in role_info['modules']]
     
     if form.validate_on_submit():
         try:
-            # Solo actualizar módulos localmente (no cambiar nombre/descripción en Keycloak)
+            print(f"Actualizando módulos del rol: {role_name}")
+            print(f"Módulos seleccionados: {form.modules.data}")
+            
             success = role_service.update_local_modules(role_name, form.modules.data)
             
             if success:
@@ -98,7 +98,14 @@ def edit_role(role_name):
         except Exception as e:
             print(f"Error al actualizar módulos: {e}")
             flash(f'Error al actualizar rol: {str(e)}', 'danger')
-    
+    else:
+        # Mostrar errores de validación si los hay
+        if form.errors:
+            print(f"Errores de formulario: {form.errors}")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f'Error en {field}: {error}', 'danger')
+
     return render_template('role/edit.html', form=form, role=role_info)
 
 # Ruta: Eliminar rol
