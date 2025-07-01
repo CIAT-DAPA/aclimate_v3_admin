@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   // Variables de estado
-  let activeRoleFilters = new Set();
+  let activeModuleFilters = new Set();
 
   /**
    * Actualiza el ícono de búsqueda según el contenido del input
@@ -58,42 +58,83 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Obtiene roles únicos de los usuarios
+   * Obtiene los módulos únicos y su información
    */
-  function getUniqueRoles() {
-    const roles = new Map();
-
-    roleRows.forEach((row) => {
-      const roleElement = row.querySelector(".badge");
-      if (roleElement) {
-        const roleText = roleElement.textContent.trim();
-        const cleanRoleName = roleText.replace(/^\s*\w+\s+/, "").trim();
-
-        if (cleanRoleName && !roles.has(cleanRoleName)) {
-          roles.set(cleanRoleName, roleElement.innerHTML);
-        }
+  function getUniqueModules() {
+    const modules = new Map();
+    
+    // Definir módulos con sus iconos y nombres
+    const moduleInfo = {
+      'geographic': {
+        name: 'Módulo Geográfico',
+        icon: '<i class="fas fa-globe me-2"></i>',
+        description: 'Gestión geográfica'
+      },
+      'climate_data': {
+        name: 'Datos Climáticos', 
+        icon: '<i class="fas fa-cloud-sun me-2"></i>',
+        description: 'Datos climáticos'
+      },
+      'crop_data': {
+        name: 'Datos de Cultivos',
+        icon: '<i class="fas fa-seedling me-2"></i>', 
+        description: 'Datos de cultivos'
+      },
+      'user_management': {
+        name: 'Gestión de Usuarios',
+        icon: '<i class="fas fa-users me-2"></i>',
+        description: 'Administración de usuarios'
       }
+    };
+
+    // Agregar todos los módulos disponibles
+    Object.keys(moduleInfo).forEach(moduleKey => {
+      modules.set(moduleKey, moduleInfo[moduleKey]);
     });
 
-    return roles;
+    return modules;
   }
 
   /**
-   * Genera el menú de filtros
+   * Verifica si un rol tiene acceso a un módulo específico
+   */
+  function roleHasModuleAccess(row, moduleKey) {
+    // Mapear módulos a sus columnas correspondientes
+    const moduleColumnMap = {
+      'geographic': 3,      // Columna 4 (0-indexed = 3)
+      'climate_data': 4,    // Columna 5 (0-indexed = 4) 
+      'crop_data': 5,       // Columna 6 (0-indexed = 5)
+      'user_management': 6  // Columna 7 (0-indexed = 6)
+    };
+
+    const columnIndex = moduleColumnMap[moduleKey];
+    if (columnIndex === undefined) return false;
+
+    const cells = row.querySelectorAll('td');
+    if (cells.length <= columnIndex) return false;
+
+    const moduleCell = cells[columnIndex];
+    const accessIndicator = moduleCell.querySelector('.access-indicator');
+    
+    return accessIndicator && accessIndicator.classList.contains('access-granted');
+  }
+
+  /**
+   * Genera el menú de filtros por módulos
    */
   function generateFiltersMenu() {
-    const uniqueRoles = getUniqueRoles();
-    let menuHTML = `<li><h6 class="dropdown-header">Filtrar por Rol</h6></li>`;
+    const uniqueModules = getUniqueModules();
+    let menuHTML = `<li><h6 class="dropdown-header">Filtrar por Acceso a Módulos</h6></li>`;
 
-    uniqueRoles.forEach((roleHTML, roleName) => {
-      const filterId = `filter-${roleName.toLowerCase().replace(/\s+/g, "-")}`;
+    uniqueModules.forEach((moduleInfo, moduleKey) => {
+      const filterId = `filter-${moduleKey}`;
       menuHTML += `
         <li>
           <div class="dropdown-item-text">
             <div class="form-check">
-              <input class="form-check-input role-filter" type="checkbox" id="${filterId}" value="${roleName}">
+              <input class="form-check-input module-filter" type="checkbox" id="${filterId}" value="${moduleKey}">
               <label class="form-check-label" for="${filterId}">
-                ${roleHTML}
+                ${moduleInfo.icon}${moduleInfo.name}
               </label>
             </div>
           </div>
@@ -113,12 +154,12 @@ document.addEventListener("DOMContentLoaded", function () {
     filtersMenu.innerHTML = menuHTML;
 
     // Inicializar eventos de los filtros
-    document.querySelectorAll(".role-filter").forEach((checkbox) => {
+    document.querySelectorAll(".module-filter").forEach((checkbox) => {
       checkbox.addEventListener("change", function () {
         if (this.checked) {
-          activeRoleFilters.add(this.value);
+          activeModuleFilters.add(this.value);
         } else {
-          activeRoleFilters.delete(this.value);
+          activeModuleFilters.delete(this.value);
         }
         updateFiltersDisplay();
         applyFilters();
@@ -129,9 +170,9 @@ document.addEventListener("DOMContentLoaded", function () {
       .getElementById("clearFilters")
       .addEventListener("click", function (e) {
         e.preventDefault();
-        activeRoleFilters.clear();
+        activeModuleFilters.clear();
         document
-          .querySelectorAll(".role-filter")
+          .querySelectorAll(".module-filter")
           .forEach((cb) => (cb.checked = false));
         updateFiltersDisplay();
         applyFilters();
@@ -142,7 +183,7 @@ document.addEventListener("DOMContentLoaded", function () {
    * Actualiza la visualización de los filtros
    */
   function updateFiltersDisplay() {
-    const filterCount = activeRoleFilters.size;
+    const filterCount = activeModuleFilters.size;
 
     if (filterCount > 0) {
       filtersDropdown.classList.add("btn-primary");
@@ -156,18 +197,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Verifica si una fila coincide con los filtros de rol
+   * Verifica si una fila coincide con los filtros de módulos
    */
-  function matchesRoleFilters(row) {
-    if (activeRoleFilters.size === 0) return true;
+  function matchesModuleFilters(row) {
+    if (activeModuleFilters.size === 0) return true;
 
-    const roleElement = row.querySelector(".badge");
-    if (!roleElement) return false;
-
-    const roleText = roleElement.textContent.trim();
-    const cleanRoleName = roleText.replace(/^\s*\w+\s+/, "").trim();
-
-    return activeRoleFilters.has(cleanRoleName);
+    // El rol debe tener acceso a TODOS los módulos seleccionados (AND logic)
+    // Si quieres OR logic, cambia 'every' por 'some'
+    return Array.from(activeModuleFilters).every(moduleKey => 
+      roleHasModuleAccess(row, moduleKey)
+    );
   }
 
   /**
@@ -180,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Limpiar resaltados previos
     roleRows.forEach((row) => {
       row
-        .querySelectorAll(".searchable-rolename")
+        .querySelectorAll(".searchable-rolename, .searchable-description")
         .forEach((el) => clearHighlight(el));
     });
 
@@ -188,16 +227,16 @@ document.addEventListener("DOMContentLoaded", function () {
     roleRows.forEach((row) => {
       const searchData = row.getAttribute("data-search").toLowerCase();
       const isSearchMatch = !searchText || searchData.includes(searchText);
-      const isRoleMatch = matchesRoleFilters(row);
+      const isModuleMatch = matchesModuleFilters(row);
 
-      if (isSearchMatch && isRoleMatch) {
+      if (isSearchMatch && isModuleMatch) {
         row.style.display = "";
         visibleCount++;
 
         // Resaltar texto de búsqueda
         if (searchText) {
           row
-            .querySelectorAll(".searchable-rolename")
+            .querySelectorAll(".searchable-rolename, .searchable-description")
             .forEach((el) => highlightText(el, searchText));
         }
       } else {
@@ -213,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
    */
   function updateSearchResults(searchText, visibleCount) {
     const hasActiveSearch = searchText.length > 0;
-    const hasActiveFilters = activeRoleFilters.size > 0;
+    const hasActiveFilters = activeModuleFilters.size > 0;
 
     if (visibleCount === 0) {
       rolesTableContainer.style.display = "none";
@@ -221,10 +260,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (hasActiveSearch) {
         searchTerm.textContent = searchText;
+        document.getElementById("noResultsText").textContent = 
+          "No se encontraron roles que coincidan con la búsqueda";
+      } else if (hasActiveFilters) {
+        searchTerm.textContent = "";
+        document.getElementById("noResultsText").textContent =
+          "No se encontraron roles con acceso a los módulos seleccionados";
       } else {
         searchTerm.textContent = "";
         document.getElementById("noResultsText").textContent =
-          "No se encontraron usuarios con los filtros aplicados";
+          "No se encontraron roles";
       }
     } else {
       rolesTableContainer.style.display = "block";
@@ -236,7 +281,7 @@ document.addEventListener("DOMContentLoaded", function () {
       } else if (hasActiveSearch) {
         resultText = `Mostrando ${visibleCount} resultados de búsqueda`;
       } else if (hasActiveFilters) {
-        resultText = `Mostrando ${visibleCount} roles filtrados`;
+        resultText = `Mostrando ${visibleCount} roles con acceso a módulos seleccionados`;
       } else {
         resultText = `Total: ${roleRows.length} roles`;
       }
@@ -255,7 +300,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Configura el modal de eliminación individual con la información del usuario
+   * Configura el modal de eliminación individual con la información del rol
    */
   function setupDeleteModal() {
     const deleteModal = document.getElementById("deleteRolModal");
@@ -283,7 +328,7 @@ document.addEventListener("DOMContentLoaded", function () {
         deleteRoleName.textContent = roleName || "Rol";
       });
 
-      if (roleDescription) {
+      if (deleteRoleDescription) {
         // Limpiar nombres vacíos y mostrar mensaje apropiado
         const cleanRoleDescription = roleDescription
           ? roleDescription.trim().replace(/\s+/g, " ")
