@@ -171,7 +171,7 @@ class RoleService:
         try:
             # 1. Eliminar de Keycloak
             response = requests.delete(
-                f"{Config.API_BASE_URL}/users/delete-client-role/{role_id}",
+                f"{Config.API_BASE_URL}/roles/delete/{role_id}",
                 headers=self._get_auth_headers(),
                 timeout=10
             )

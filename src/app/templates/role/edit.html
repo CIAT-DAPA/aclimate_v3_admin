@@ -1,0 +1,143 @@
+{% extends 'base.html' %} 
+{% block title %}{{_('Editar Rol')}}{% endblock %} 
+
+{% block content %}
+<div class="container-fluid mt-4">
+  
+  <!-- Page Header -->
+  <div class="bg-dark text-white rounded p-3 mb-4">
+    <div class="d-flex align-items-center">
+      <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+        <i class="fas fa-user-tag"></i>
+      </div>
+      <div>
+        <h4 class="mb-1">{{_('Editar Rol')}}</h4>
+        <p class="mb-0">{{_('Modificar información del rol:')}} <strong>{{ role.name }}</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Information & Edit Form -->
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        
+        <!-- Role Information (Read-only) -->
+        <div class="col-md-4">
+          <h5 class="mb-3">{{_('Información del Rol')}}</h5>
+          
+          <div class="bg-light rounded p-3 mb-3">
+            <div class="fw-bold text-muted small mb-1">
+              <i class="fas fa-tag me-2"></i>{{_('Nombre del Rol')}}
+            </div>
+            <p class="mb-0">{{ role.name }}</p>
+            <small class="text-muted">{{_('No se puede modificar')}}</small>
+          </div>
+
+          <div class="bg-light rounded p-3 mb-3">
+            <div class="fw-bold text-muted small mb-1">
+              <i class="fas fa-align-left me-2"></i>{{_('Descripción')}}
+            </div>
+            <p class="mb-0">
+              {% if role.description %}
+                {{ role.description }}
+              {% else %}
+                <span class="text-muted fst-italic">{{_('Sin descripción')}}</span>
+              {% endif %}
+            </p>
+            <small class="text-muted">{{_('Se gestiona desde Keycloak')}}</small>
+          </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="col-md-8">
+          <h5 class="mb-3">{{_('Editar Módulos de Acceso')}}</h5>
+          
+          <form method="POST" action="{{ url_for('role.edit_role', role_name=role.name) }}">
+            {{ form.hidden_tag() }}
+            
+            <!-- Module Selection -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                <i class="fas fa-puzzle-piece me-2"></i>{{_('Módulos de Acceso')}}
+                <span class="badge bg-info ms-2">{{_('Editable')}}</span>
+              </label>
+              
+              {% if form.modules.errors %}
+                <div class="alert alert-danger">
+                  {% for error in form.modules.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+              
+              <!-- Modules Grid -->
+              <div class="row">
+                {% for value, label_info in form.modules.choices %}
+                  {% set parts = label_info.split(' - ') %}
+                  {% set module_name = parts[0] %}
+                  {% set module_description = parts[1] if parts|length > 1 else '' %}
+                  <div class="col-md-6 mb-3">
+                    <div class="border rounded p-3 h-100">
+                      <div class="form-check">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               value="{{ value }}" 
+                               id="module_{{ value }}" 
+                               name="modules"
+                               {% if value in (form.modules.data or []) %}checked{% endif %}>
+                        <label class="form-check-label w-100" for="module_{{ value }}">
+                          <div class="d-flex align-items-start">
+                            <div class="me-3">
+                              {% if value == 'geographic' %}
+                                <i class="fas fa-globe text-primary fs-4"></i>
+                              {% elif value == 'climate_data' %}
+                                <i class="fas fa-cloud-sun text-warning fs-4"></i>
+                              {% elif value == 'crop_data' %}
+                                <i class="fas fa-seedling text-success fs-4"></i>
+                              {% elif value == 'user_management' %}
+                                <i class="fas fa-users text-info fs-4"></i>
+                              {% else %}
+                                <i class="fas fa-puzzle-piece text-secondary fs-4"></i>
+                              {% endif %}
+                            </div>
+                            <div>
+                              <div class="fw-bold mb-1">{{ module_name }}</div>
+                              {% if module_description %}
+                                <small class="text-muted">{{ module_description }}</small>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+              
+              <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>{{_('Selecciona los módulos a los que este rol tendrá acceso.')}}
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i>{{_('Guardar Cambios')}}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <hr class="my-4">
+      <div>
+        <a href="{{ url_for('role.list_role') }}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i>{{_('Volver al Listado')}}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

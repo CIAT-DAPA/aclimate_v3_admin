@@ -66,10 +66,10 @@ def create_role():
     return redirect(url_for('role.list_role'))
 
 # Ruta: Editar módulos de un rol
-@bp.route('/role/<role_name>/edit_modules', methods=['GET', 'POST'])
+@bp.route('/role/edit/<role_name>', methods=['GET', 'POST'])
 @token_required
 @require_module_access(Module.USER_MANAGEMENT)
-def edit_role_modules(role_name):
+def edit_role(role_name):
     role_info = role_service.get_role_with_modules(role_name)
     
     if not role_info:
@@ -99,10 +99,10 @@ def edit_role_modules(role_name):
             print(f"Error al actualizar módulos: {e}")
             flash(f'Error al actualizar rol: {str(e)}', 'danger')
     
-    return render_template('role/edit_modules.html', form=form, role=role_info)
+    return render_template('role/edit.html', form=form, role=role_info)
 
 # Ruta: Eliminar rol
-@bp.route('/role/<role_id>/delete', methods=['POST'])
+@bp.route('/role/delete/<role_id>', methods=['POST'])
 @token_required
 @require_module_access(Module.USER_MANAGEMENT)
 def delete_role(role_id):
