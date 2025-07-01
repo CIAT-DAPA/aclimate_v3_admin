@@ -6,6 +6,18 @@
   
   <!-- Page Header -->
   <div class="bg-dark text-white rounded p-3 mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-2">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('user.list_user') }}" class="text-decoration-none">
+              {{_('Usuarios')}}
+            </a>
+          </li>
+          <li class="breadcrumb-item active text-white" aria-current="page">
+            {{_('Editar Usuario')}}
+          </li>
+        </ol>
+      </nav>
     <div class="d-flex align-items-center">
       <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
         <i class="fas fa-user"></i>

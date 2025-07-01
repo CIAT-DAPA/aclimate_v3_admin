@@ -6,6 +6,18 @@
   
   <!-- Page Header -->
   <div class="bg-dark text-white rounded p-3 mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-2">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('role.list_role') }}" class="text-decoration-none">
+              {{_('Roles')}}
+            </a>
+          </li>
+          <li class="breadcrumb-item active text-white" aria-current="page">
+            {{_('Editar Rol')}}
+          </li>
+        </ol>
+      </nav>
     <div class="d-flex align-items-center">
       <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
         <i class="fas fa-user-tag"></i>
