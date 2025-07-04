@@ -3,7 +3,7 @@ from flask_login import login_required
 from flask_babel import _
 from aclimate_v3_orm.services import MngSourceService
 from aclimate_v3_orm.enums import SourceType
-from aclimate_v3_orm.schemas import MngSourceCreate, MngSourceUpdate
+from aclimate_v3_orm.schemas import SourceCreate, SourceUpdate
 from app.forms.source_form import SourceForm
 
 bp = Blueprint('source', __name__)
@@ -16,7 +16,7 @@ def list_source():
     form.source_type.choices = [(SourceType.MANUAL.value, "Manual"), (SourceType.AUTOMATIC.value, "Automático")]
 
     if form.validate_on_submit():
-        new_source = MngSourceCreate(
+        new_source = SourceCreate(
             name=form.name.data,
             source_type=form.source_type.data,
             enable=form.enable.data
@@ -45,7 +45,7 @@ def edit_source(id):
         form.source_type.data = source.source_type
 
     if form.validate_on_submit():
-        update_data = MngSourceUpdate(
+        update_data = SourceUpdate(
             name=form.name.data,
             source_type=form.source_type.data,
             enable=form.enable.data
