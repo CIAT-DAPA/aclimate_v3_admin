@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
       country: "geograficoSection",
       adm1: "geograficoSection",
       adm2: "geograficoSection",
+      source: "geograficoSection",
       location: "geograficoSection",
       crop: "cultivosSection",
       simulation: "cultivosSection",

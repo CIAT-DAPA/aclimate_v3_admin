@@ -12,11 +12,13 @@ class LocationForm(FlaskForm):
         choices=[('', '---------')] 
     )
 
-    source_id = StringField(
+    source_id = SelectField(
         _l('Id del origen'),
         validators=[
-            DataRequired(message=_l('Debe ingresar un id origen.'))
+            DataRequired(message=_l('Seleccione un id origen.'))
         ],
+        choices=[('', '---------')],
+        coerce=int
     )
 
     admin_1_id = SelectField(

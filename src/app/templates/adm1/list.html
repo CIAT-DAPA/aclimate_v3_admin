@@ -13,17 +13,31 @@
   </div>
 
   <!-- Barra de búsqueda (estática) -->
-  <div class="d-flex align-items-center mb-3">
+  <div class="d-flex align-items-center mb-3 gap-3">
     <input
       type="text"
       class="form-control me-2"
       placeholder="{{ _('Buscar...') }}"
       style="max-width: 300px"
-      disabled
+      id="adm1-search"
     />
-    <button class="btn btn-secondary" disabled>
-      <i class="fas fa-filter"></i> {{ _('Filtros') }}
-    </button>
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="adm1FiltersDropdown" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+      >
+        <i class="fas fa-filter"></i> {{_('Filtros')}}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adm1FiltersDropdown" style="min-width: 250px;">
+        <!-- Se llenará dinámicamente -->
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> Cargando filtros...</div></li>
+      </ul>
+    </div>
+    <span id="adm1SearchResults" class="text-muted small"></span>
   </div>
 
   {% if adm1 %}
@@ -37,7 +51,7 @@
         <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
       </button>
     </div>
-  <table class="table table-hover align-middle">
+  <table class="table table-hover align-middle" id="adm1-table">
     <thead class="table-light">
       <tr>
         <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
@@ -51,9 +65,9 @@
       {% for adm in adm1 %}
       <tr>
         <td><input type="checkbox" name="selected_ids" value="{{ adm.id }}" class="select-row" /></td>
-        <td>{{ adm.name }}</td>
-        <td>{{ adm.country.name }}</td>
-        <td>{{ _('Habilitado') if adm.enable else _('Deshabilitado') }}</td>
+        <td class="searchable-name">{{ adm.name }}</td>
+        <td class="searchable-country">{{ adm.country.name }}</td>
+        <td class="searchable-state">{{ _('Habilitado') if adm.enable else _('Deshabilitado') }}</td>
         <td class="text-end">
           <a
             href="{{ url_for('adm1.edit_adm1', id=adm.id) }}"
@@ -194,6 +208,182 @@
       form.submit();
     });
 
+    // --- Filtros tipo dropdown como en users ---
+    const searchInput = document.getElementById('adm1-search');
+    const table = document.getElementById('adm1-table');
+    const filtersDropdown = document.getElementById('adm1FiltersDropdown');
+    const filtersMenu = document.querySelector('#adm1FiltersDropdown + .dropdown-menu');
+    const searchResults = document.getElementById('adm1SearchResults');
+    const rows = table ? table.querySelectorAll('tbody tr') : [];
+
+    let activeCountryFilters = new Set();
+    let activeStateFilters = new Set();
+
+    // Obtiene valores únicos de país y estado
+    function getUniqueValues(className) {
+      const values = new Set();
+      rows.forEach(row => {
+        const cell = row.querySelector(className);
+        if (cell) values.add(cell.textContent.trim());
+      });
+      return Array.from(values).sort();
+    }
+
+    // Genera el menú de filtros
+    function generateFiltersMenu() {
+      if (!filtersMenu) return;
+      const countries = getUniqueValues('.searchable-country');
+      const states = getUniqueValues('.searchable-state');
+
+      let menuHTML = `<li><h6 class="dropdown-header">Filtrar por País</h6></li>`;
+      countries.forEach(country => {
+        const filterId = `filter-country-${country.replace(/\s+/g, '-')}`;
+        menuHTML += `
+          <li>
+            <div class="dropdown-item-text">
+              <div class="form-check">
+                <input class="form-check-input country-filter" type="checkbox" id="${filterId}" value="${country}">
+                <label class="form-check-label" for="${filterId}">
+                  ${country}
+                </label>
+              </div>
+            </div>
+          </li>
+        `;
+      });
+
+      menuHTML += `<li><hr class="dropdown-divider"></li>
+        <li><h6 class="dropdown-header">Filtrar por Estado</h6></li>`;
+      states.forEach(state => {
+        const filterId = `filter-state-${state.replace(/\s+/g, '-')}`;
+        menuHTML += `
+          <li>
+            <div class="dropdown-item-text">
+              <div class="form-check">
+                <input class="form-check-input state-filter" type="checkbox" id="${filterId}" value="${state}">
+                <label class="form-check-label" for="${filterId}">
+                  ${state}
+                </label>
+              </div>
+            </div>
+          </li>
+        `;
+      });
+
+      menuHTML += `
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <a class="dropdown-item text-primary" href="#" id="clearAdm1Filters">
+            <i class="fas fa-times me-2"></i>Limpiar filtros
+          </a>
+        </li>
+      `;
+
+      filtersMenu.innerHTML = menuHTML;
+      initializeFilterEventListeners();
+    }
+
+    function initializeFilterEventListeners() {
+      document.querySelectorAll('.country-filter').forEach(cb => {
+        cb.addEventListener('change', function() {
+          if (this.checked) activeCountryFilters.add(this.value);
+          else activeCountryFilters.delete(this.value);
+          updateFiltersDisplay();
+          applyFilters();
+        });
+      });
+      document.querySelectorAll('.state-filter').forEach(cb => {
+        cb.addEventListener('change', function() {
+          if (this.checked) activeStateFilters.add(this.value);
+          else activeStateFilters.delete(this.value);
+          updateFiltersDisplay();
+          applyFilters();
+        });
+      });
+      const clearBtn = document.getElementById('clearAdm1Filters');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          activeCountryFilters.clear();
+          activeStateFilters.clear();
+          document.querySelectorAll('.country-filter, .state-filter').forEach(cb => cb.checked = false);
+          updateFiltersDisplay();
+          applyFilters();
+        });
+      }
+    }
+
+    function updateFiltersDisplay() {
+      const count = activeCountryFilters.size + activeStateFilters.size;
+      if (filtersDropdown) {
+        if (count > 0) {
+          filtersDropdown.classList.remove("btn-outline-secondary");
+          filtersDropdown.classList.add("btn-primary");
+          filtersDropdown.innerHTML = `<i class="fas fa-filter me-2"></i>Filtros (${count})`;
+        } else {
+          filtersDropdown.classList.remove("btn-primary");
+          filtersDropdown.classList.add("btn-outline-secondary");
+          filtersDropdown.innerHTML = '<i class="fas fa-filter"></i> Filtros';
+        }
+      }
+    }
+
+    // Resaltado de búsqueda
+    function clearHighlight(element) {
+      if (!element) return;
+      element.innerHTML = element.textContent;
+    }
+    function highlightText(element, searchText) {
+      if (!element || !searchText) return;
+      const originalText = element.textContent;
+      const regex = new RegExp(`(${searchText})`, "gi");
+      element.innerHTML = originalText.replace(regex, '<mark>$1</mark>');
+    }
+
+    // Aplica búsqueda y filtros
+    function applyFilters() {
+      const filter = searchInput.value.toLowerCase();
+      let visibleCount = 0;
+      rows.forEach(row => {
+        const nameCell = row.querySelector('.searchable-name');
+        const countryCell = row.querySelector('.searchable-country');
+        const stateCell = row.querySelector('.searchable-state');
+        clearHighlight(nameCell);
+        clearHighlight(countryCell);
+
+        let matches = true;
+        // Filtro de texto
+        if (filter) {
+          const rowText = (nameCell?.textContent + ' ' + countryCell?.textContent).toLowerCase();
+          matches = matches && rowText.includes(filter);
+          if (matches) {
+            highlightText(nameCell, filter);
+            highlightText(countryCell, filter);
+          }
+        }
+        // Filtro por país
+        if (activeCountryFilters.size > 0) {
+          matches = matches && activeCountryFilters.has(countryCell?.textContent);
+        }
+        // Filtro por estado
+        if (activeStateFilters.size > 0) {
+          matches = matches && activeStateFilters.has(stateCell?.textContent);
+        }
+        row.style.display = matches ? '' : 'none';
+        if (matches) visibleCount++;
+      });
+      if (searchResults) {
+        if (filter || activeCountryFilters.size > 0 || activeStateFilters.size > 0) {
+          searchResults.textContent = `Mostrando ${visibleCount}`;
+        } else {
+          searchResults.textContent = '';
+        }
+      }
+    }
+
+    // Inicialización
+    if (filtersMenu) generateFiltersMenu();
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
 });    
 </script>
 {% endblock %}

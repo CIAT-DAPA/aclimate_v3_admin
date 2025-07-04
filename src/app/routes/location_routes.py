@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required
-from aclimate_v3_orm.services import MngAdmin2Service, MngAdmin1Service, MngLocationService, MngCountryService
+from aclimate_v3_orm.services import MngAdmin2Service, MngAdmin1Service, MngLocationService, MngCountryService, MngSourceService
 from aclimate_v3_orm.schemas import LocationCreate, LocationUpdate
 from app.forms.location_form import LocationForm
 
@@ -9,6 +9,7 @@ country_service = MngCountryService()
 location_service = MngLocationService()
 adm2_service = MngAdmin2Service()
 adm1_service = MngAdmin1Service()
+source_service = MngSourceService()
 
 
 # Ruta: Listar y agregar con modal
@@ -20,7 +21,8 @@ def list_location():
     # Solo la opción vacía para selects dependientes
     form.admin_1_id.choices = [(0, '---------')]
     form.admin_2_id.choices = [(0, '---------')]
-    
+    form.source_id.choices = [(0, '---------')] + [(s.id, s.name) for s in source_service.get_all()]
+
     # Si es POST, se poblan los choices según lo enviado (para que WTForms valide correctamente)
     if form.country.data:
         form.admin_1_id.choices = [(0, '---------')] + [(a.id, a.name) for a in adm1_service.get_by_country_id(form.country.data)]
@@ -82,6 +84,7 @@ def edit_location(id):
     # Solo la opción vacía para selects dependientes
     form.admin_1_id.choices = [(0, '---------')]
     form.admin_2_id.choices = [(0, '---------')]
+    form.source_id.choices = [(0, '---------')] + [(s.id, s.name) for s in source_service.get_all()]
     
     # Si es POST, se poblan los choices según lo enviado (para que WTForms valide correctamente)
     if form.country.data:
