@@ -13,6 +13,7 @@ class Module(Enum):
     CLIMATE_DATA = "climate_data"  # Datos climáticos 
     CROP_DATA = "crop_data"  # Datos de cultivos 
     USER_MANAGEMENT = "user_management"  # Usuarios y roles
+    CONFIGURATION = "configuration"  # Configuración del sistema
 
 class RolePermissionMapper:
     """Mapea roles de Keycloak con módulos accesibles en la aplicación"""
@@ -27,6 +28,7 @@ class RolePermissionMapper:
             Module.USER_MANAGEMENT.value,
             Module.CROP_DATA.value,
             Module.CLIMATE_DATA.value,
+            Module.CONFIGURATION.value,
         ],
         
         "admin": [
@@ -34,6 +36,7 @@ class RolePermissionMapper:
             Module.USER_MANAGEMENT.value,
             Module.CROP_DATA.value,
             Module.CLIMATE_DATA.value,
+            Module.CONFIGURATION.value,
         ],
         
         "webadminsimple": [
@@ -278,6 +281,7 @@ class RolePermissionMapper:
             Module.CLIMATE_DATA: "Datos Climáticos",
             Module.CROP_DATA: "Datos de Cultivos",
             Module.USER_MANAGEMENT: "Gestión de Usuarios",
+            Module.CONFIGURATION: "Configuración",
         }
         return friendly_names.get(module, module.value)
     
@@ -291,5 +295,6 @@ class RolePermissionMapper:
             Module.CLIMATE_DATA: "Gestión de datos climáticos",
             Module.CROP_DATA: "Gestión de datos de cultivos",
             Module.USER_MANAGEMENT: "Administración de usuarios y roles del sistema",
+            Module.CONFIGURATION: "Configuración de fuentes de datos",
         }
         return descriptions.get(module, module.value)

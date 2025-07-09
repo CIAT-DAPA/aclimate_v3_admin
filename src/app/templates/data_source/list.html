@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Fuentes de datos') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Fuentes de datos') }}</h2>
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addDataSourceModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+  </div>
+
+  <!-- Filtros (deshabilitados por ahora) -->
+  <div class="d-flex align-items-center mb-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      placeholder="Buscar..."
+      style="max-width: 300px"
+      disabled
+    />
+    <button class="btn btn-secondary" disabled>
+      <i class="fas fa-filter"></i> {{ _('Filtros') }}
+    </button>
+  </div>
+
+  {% if data_sources %}
+  <table class="table table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>{{ _('Nombre') }}</th>
+        <th>{{ _('Tipo de fuente') }}</th>
+        <th>{{ _('País') }}</th>
+        <th>{{ _('Estado') }}</th>
+        <th class="text-end">{{ _('Acciones') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for data_source in data_sources %}
+      <tr>
+        <td>{{ data_source.name }}</td>
+        <td>{{ data_source.type }}</td>
+        <td>{{ data_source.country.name }}</td>
+        <td>{{ 'Habilitado' if data_source.enable else 'Deshabilitado' }}</td>
+        <td class="text-end">
+          <a
+            href="{{ url_for('data_source.edit_data_source', id=data_source.id) }}"
+            class="btn btn-warning btn-sm me-2"
+            title="Editar"
+          >
+            <i class="fas fa-pen"></i>
+          </a>
+          {% if data_source.enable %}
+          <a
+            href="{{ url_for('data_source.delete_data_source', id=data_source.id) }}"
+            class="btn btn-danger btn-sm"
+            title="Deshabilitar"
+          >
+            <i class="fas fa-trash"></i>
+          </a>
+          {% else %}
+          <a
+            href="{{ url_for('data_source.reset_data_source', id=data_source.id) }}"
+            class="btn btn-success btn-sm"
+            title="Recuperar"
+          >
+            <i class="fas fa-undo"></i>
+          </a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay fuentes registradas.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Fuente -->
+<div
+  class="modal fade"
+  id="addDataSourceModal"
+  tabindex="-1"
+  aria-labelledby="addDataSourceLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addDataSourceLabel">
+          {{ _('Agregar fuente') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control") }}
+          {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.type.label(class="form-label") }}
+          {{ form.type(class="form-control") }}
+          {% for error in form.type.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.country_id.label(class="form-label") }}
+          {{ form.country_id(class="form-select") }}
+          {% for error in form.country_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-control") }}
+          {% for error in form.description.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.content.label(class="form-label") }}
+          {{ form.content(class="form-control", rows="3") }}
+          {% for error in form.content.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="form-check mb-2">
+          {{ form.enable(class="form-check-input") }}
+          {{ form.enable.label(class="form-check-label") }}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

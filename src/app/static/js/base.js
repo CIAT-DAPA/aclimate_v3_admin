@@ -83,7 +83,6 @@ document.addEventListener("DOMContentLoaded", function () {
       country: "geograficoSection",
       adm1: "geograficoSection",
       adm2: "geograficoSection",
-      source: "geograficoSection",
       location: "geograficoSection",
       crop: "cultivosSection",
       simulation: "cultivosSection",
@@ -92,6 +91,8 @@ document.addEventListener("DOMContentLoaded", function () {
       climate: "climaSection",
       user: "usuariosSection",
       role: "usuariosSection",
+      source: "configuracionSection",
+      data_source: "configuracionSection",
     };
 
     for (const [route, section] of Object.entries(routeSectionMap)) {

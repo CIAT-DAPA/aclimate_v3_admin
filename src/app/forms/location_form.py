@@ -36,9 +36,9 @@ class LocationForm(FlaskForm):
     )
 
     ubi = StringField(
-        _l('Ubicación'),
+        _l('Nombre ubicación'),
         validators=[
-            DataRequired(message=_l('La ubicacion es obligatoria.')),
+            DataRequired(message=_l('El nombre de la ubicación es obligatorio.')),
             Length(max=255, message=_l('Máximo 255 caracteres.'))
         ]
     )

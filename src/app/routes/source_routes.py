@@ -26,7 +26,6 @@ def list_source():
         return redirect(url_for('source.list_source'))
 
     source_list = source_service.get_all()
-    print(f"Source list: {source_list}")
     return render_template('source/list.html', sources=source_list, form=form)
 
 

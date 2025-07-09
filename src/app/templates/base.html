@@ -160,12 +160,6 @@
             >
               <span>{{ _('Adm 2') }}</span>
             </a>
-            <a
-              class="nav-link d-flex align-items-center text-dark"
-              href="{{ url_for('source.list_source') }}"
-            >
-              <span>{{ _('Sources') }}</span>
-            </a>
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('location.list_location') }}">
               <span>{{ _('Locations') }}</span>
             </a>
@@ -258,6 +252,40 @@
               href="{{ url_for('role.list_role') }}"
             >
               <span>{{ _('Roles') }}</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Sección Configuration -->
+      {% if check_module_access(Module.CONFIGURATION)  %}
+      <div class="sidebar-section-collapsible mb-1">
+        <div
+          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
+          data-bs-toggle="collapse"
+          data-bs-target="#configurationSection"
+          aria-expanded="false"
+        >
+          <i class="fas fa-cogs section-icon me-2 text-center"></i>
+          <span class="section-title fw-semibold text-uppercase flex-grow-1"
+            >{{ _('Configuration') }}</span
+          >
+          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
+        </div>
+        <div class="collapse" id="configurationSection">
+          <nav class="nav flex-column">
+            <a
+              class="nav-link d-flex align-items-center text-dark"
+              href="{{ url_for('source.list_source') }}"
+            >
+              <span>{{ _('Sources') }}</span>
+            </a>
+            <a
+              class="nav-link d-flex align-items-center text-dark"
+              href="{{ url_for('data_source.list_data_source') }}"
+            >
+              <span>{{ _('Data sources') }}</span>
             </a>
           </nav>
         </div>

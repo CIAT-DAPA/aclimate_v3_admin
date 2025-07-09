@@ -12,87 +12,117 @@
     </button>
   </div>
 
-  <!-- Barra de búsqueda (estática) -->
-  <div class="d-flex align-items-center mb-3">
+ <!-- Barra de búsqueda mejorada -->
+  <div class="d-flex align-items-center mb-3 gap-3">
     <input
       type="text"
       class="form-control me-2"
+      id="locationSearchInput"
       placeholder="{{ _('Buscar...') }}"
       style="max-width: 300px"
-      disabled
     />
-    <button class="btn btn-secondary" disabled>
-      <i class="fas fa-filter"></i> {{ _('Filtros') }}
-    </button>
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="locationFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="locationSearchResults" class="text-muted small"></span>
+  </div>
+
+
+  <!-- Contenedor para mensajes -->
+  <div id="noLocationResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
   </div>
 
   {% if location %}
-  <form id="bulk-action-form" method="POST" action="{{ url_for('location.bulk_action') }}">
-    <div class="mb-2">
-      <input type="hidden" name="action" id="bulk-action-hidden" value="" />
-      <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
-        <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
-      </button>
-      <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
-        <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
-      </button>
-    </div>
-    <table class="table table-hover align-middle">
-      <thead class="table-light">
-        <tr>
-          <th style="width: 5%">
-            <input type="checkbox" id="select-all" />
-          </th>
-          <th>{{ _('Locación') }}</th>
-          <th>{{ _('División administrativa 1') }}</th>
-          <th>{{ _('División administrativa 2') }}</th>
-          <th>{{ _('País') }}</th>
-          <th>{{_('Estado')}}</th>
-          <th class="text-end">{{ _('Acciones') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for loc in location %}
-        <tr>
-          <td>
-            <input type="checkbox" name="selected_ids" value="{{ loc.id }}" class="select-row" />
-          </td>
-          <td>{{ loc.name }}</td>
-          <td>{{ loc.admin_2.admin_1.name }}</td>
-          <td>{{ loc.admin_2.name }}</td>
-          <td>{{ loc.admin_2.admin_1.country.name }}</td>
-          <td>{{ _('Habilitado') if loc.enable else _('Deshabilitado') }}</td>
-          <td class="text-end">
-            <a
-              href="{{ url_for('location.edit_location', id=loc.id) }}"
-              class="btn btn-warning btn-sm me-2"
-              title="{{ _('Editar') }}"
-            >
-              <i class="fas fa-pen"></i>
-            </a>
-            {% if loc.enable %}
-            <a
-              href="{{ url_for('location.delete_location', id=loc.id) }}"
-              class="btn btn-danger btn-sm"
-              title="{{ _('Deshabilitar') }}"
-            >
-              <i class="fas fa-trash"></i>
-            </a>
-            {% else %}
-            <a
-              href="{{ url_for('location.reset_location', id=loc.id) }}"
-              class="btn btn-success btn-sm"
-              title="{{ _('Recuperar') }}"
-            >
-              <i class="fas fa-undo"></i>
-            </a>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </form>
+  <div id="locationsTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('location.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+        </button>
+        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+        </button>
+      </div>
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%">
+              <input type="checkbox" id="select-all" />
+            </th>
+            <th>{{ _('Locación') }}</th>
+            <th>{{ _('División administrativa 1') }}</th>
+            <th>{{ _('División administrativa 2') }}</th>
+            <th>{{ _('País') }}</th>
+            <th>{{_('Estado')}}</th>
+            <th class="text-end">{{ _('Acciones') }}</th>
+          </tr>
+        </thead>
+        <tbody id="locationsTableBody">
+          {% for loc in location %}
+          <tr data-country="{{ loc.admin_2.admin_1.country.name }}"
+            data-admin1="{{ loc.admin_2.admin_1.name }}"
+            data-admin2="{{ loc.admin_2.name }}"
+            data-status="{% if loc.enable %}active{% else %}inactive{% endif %}">
+            <td>
+              <input type="checkbox" name="selected_ids" value="{{ loc.id }}" class="select-row" />
+            </td>
+            <td class="searchable">{{ loc.name }}</td>
+            <td class="searchable">{{ loc.admin_2.admin_1.name }}</td>
+            <td class="searchable">{{ loc.admin_2.name }}</td>
+            <td class="searchable">{{ loc.admin_2.admin_1.country.name }}</td>
+            <td>{{ _('Habilitado') if loc.enable else _('Deshabilitado') }}</td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('location.edit_location', id=loc.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="{{ _('Editar') }}"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% if loc.enable %}
+              <a
+                href="{{ url_for('location.delete_location', id=loc.id) }}"
+                class="btn btn-danger btn-sm"
+                title="{{ _('Deshabilitar') }}"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% else %}
+              <a
+                href="{{ url_for('location.reset_location', id=loc.id) }}"
+                class="btn btn-success btn-sm"
+                title="{{ _('Recuperar') }}"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="locationResultsCount"></span> {{ _('resultado (s)') }}
+  </div>
   {% else %}
   <div class="alert alert-info mt-4">
     {{ _('No hay locaciones registradas.') }}
@@ -122,7 +152,7 @@
           aria-label="{{ _('Cerrar') }}"
         ></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style=>
         <div class="row mb-3">
           <div class="col-6">
             {{ form.country.label(class="form-label") }}
@@ -155,28 +185,34 @@
             {% endfor %}
           </div>
         </div>
-        <div class="mb-3">
-          {{ form.ubi.label(class="form-label") }}
-          {{ form.ubi(class="form-control", id="ubi") }}
-          {% for error in form.ubi.errors %}
-          <div class="text-danger">{{ error }}</div>
-          {% endfor %}
-        </div>
+        
         <div class="row mb-3">
           <div class="col-6">
+            {{ form.ubi.label(class="form-label") }}
+            {{ form.ubi(class="form-control", id="ubi") }}
+            {% for error in form.ubi.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-3">
             {{ form.latitude.label(class="form-label") }}
-            {{ form.latitude(class="form-control", id="latitude") }}
+            {{ form.latitude(class="form-control", id="latitude", type="number", step="any") }}
             {% for error in form.latitude.errors %}
             <div class="text-danger">{{ error }}</div>
             {% endfor %}
           </div>
-          <div class="col-6">
+          <div class="col-3">
             {{ form.longitude.label(class="form-label") }}
-            {{ form.longitude(class="form-control", id="longitude") }}
+            {{ form.longitude(class="form-control", id="longitude", type="number", step="any") }}
             {% for error in form.longitude.errors %}
             <div class="text-danger">{{ error }}</div>
             {% endfor %}
           </div>
+        </div>
+        <!-- Mapa para mostrar coordenadas -->
+        <div class="mb-3">
+          <label class="form-label">{{ _('Ubicación en el mapa') }}</label>
+          <div id="map" style="height: 300px; width: 100%; border: 1px solid #ccc;"></div>
         </div>
         <div class="row mb-3">
           <div class="col-6">
@@ -186,11 +222,6 @@
             <div class="text-danger">{{ error }}</div>
             {% endfor %}
           </div>
-          
-        </div>
-        <div class="form-check mb-2">
-          {{ form.visible(class="form-check-input") }} {{
-          form.visible.label(class="form-check-label") }}
         </div>
       </div>
       <div class="modal-footer d-flex justify-content-between">
@@ -303,6 +334,91 @@ document.addEventListener('DOMContentLoaded', function() {
       form.submit();
     });
 
+    // Mapa Leaflet - Inicialización diferida
+    const addLocationModal = document.getElementById('addLocationModal');
+    
+    if (addLocationModal) {
+        addLocationModal.addEventListener('shown.bs.modal', function() {
+            // Inicializar mapa cuando el modal se muestra
+            initLocationMap();
+            
+            // Ajustar tamaño del mapa
+            if (window.map) {
+                window.map.invalidateSize();
+            }
+        });
+
+        // Si el modal se abre con errores de validación
+        //{% if show_modal %}
+        const modal = new bootstrap.Modal(addLocationModal);
+        modal.show();
+        //{% endif %}
+    }
+
+    
+
 });    
 </script>
+
+<!-- Al final del archivo -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/tableSearch.js') }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración específica para locaciones
+    initTableSearch({
+      searchInputId: 'locationSearchInput',
+      filtersButtonId: 'locationFiltersButton',
+      tableContainerId: 'locationsTableContainer',
+      noResultsId: 'noLocationResults',
+      resultsCountId: 'locationResultsCount',
+      tableBodyId: 'locationsTableBody',
+      
+      searchColumns: [
+        { selector: '.searchable' } // Buscar en todas las celdas con clase 'searchable'
+      ],
+      
+      filterConfigs: [
+        {
+          name: 'country',
+          label: '{{ _("País") }}',
+          getValue: row => row.dataset.country,
+          getDisplayValue: row => row.dataset.country
+        },
+        {
+          name: 'admin1',
+          label: '{{ _("División administrativa 1") }}',
+          getValue: row => row.dataset.admin1,
+          getDisplayValue: row => row.dataset.admin1
+        },
+        {
+          name: 'admin2',
+          label: '{{ _("División administrativa 2") }}',
+          getValue: row => row.dataset.admin2,
+          getDisplayValue: row => row.dataset.admin2
+        },
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active' 
+              ? '{{ _("Habilitado") }}' 
+              : '{{ _("Deshabilitado") }}';
+          }
+        }
+      ]
+    });
+
+    // ... (resto de tu código específico para locaciones) ...
+  });
+</script>
+<!-- Incluye Leaflet.js -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/location/location.js') }}"></script>
 {% endblock %}
