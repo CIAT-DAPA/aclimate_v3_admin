@@ -5,7 +5,6 @@
  * @param {Object} config - Configuración específica de la tabla
  */
 export function initTableSearch(config) {
-    console.log('Initializing table search with config:', config);
     const {
         searchInputId,
         filtersButtonId,

@@ -185,8 +185,11 @@
         </div>
         <div class="collapse" id="cultivosSection">
           <nav class="nav flex-column">
-            <a class="nav-link d-flex align-items-center text-dark" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('crop.list_crop') }}">
               <span>{{ _('Crops') }}</span>
+            </a>
+            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('stress.list_stress') }}">
+              <span>{{ _('Stresses') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="#">
               <span>{{ _('Simulations') }}</span>

@@ -12,6 +12,7 @@ class Module(Enum):
     GEOGRAPHIC = "geographic"  # Países, ADM1, ADM2, Localizaciones
     CLIMATE_DATA = "climate_data"  # Datos climáticos 
     CROP_DATA = "crop_data"  # Datos de cultivos 
+    STRESS_DATA = "stress_data"  # Datos de estreses 
     USER_MANAGEMENT = "user_management"  # Usuarios y roles
     CONFIGURATION = "configuration"  # Configuración del sistema
 
@@ -27,6 +28,7 @@ class RolePermissionMapper:
             Module.GEOGRAPHIC.value,
             Module.USER_MANAGEMENT.value,
             Module.CROP_DATA.value,
+            Module.STRESS_DATA.value,
             Module.CLIMATE_DATA.value,
             Module.CONFIGURATION.value,
         ],
@@ -35,6 +37,7 @@ class RolePermissionMapper:
             Module.GEOGRAPHIC.value,
             Module.USER_MANAGEMENT.value,
             Module.CROP_DATA.value,
+            Module.STRESS_DATA.value,
             Module.CLIMATE_DATA.value,
             Module.CONFIGURATION.value,
         ],
@@ -280,6 +283,7 @@ class RolePermissionMapper:
             Module.GEOGRAPHIC: "Módulo Geográfico",
             Module.CLIMATE_DATA: "Datos Climáticos",
             Module.CROP_DATA: "Datos de Cultivos",
+            Module.STRESS_DATA: "Datos de Estreses",
             Module.USER_MANAGEMENT: "Gestión de Usuarios",
             Module.CONFIGURATION: "Configuración",
         }
@@ -294,6 +298,7 @@ class RolePermissionMapper:
             Module.GEOGRAPHIC: "Gestión de países, estados, municipios y localizaciones",
             Module.CLIMATE_DATA: "Gestión de datos climáticos",
             Module.CROP_DATA: "Gestión de datos de cultivos",
+            Module.STRESS_DATA: "Gestión de datos de estreses",
             Module.USER_MANAGEMENT: "Administración de usuarios y roles del sistema",
             Module.CONFIGURATION: "Configuración de fuentes de datos",
         }

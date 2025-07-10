@@ -75,6 +75,8 @@ def create_app():
     from app.routes.role_routes import bp as role_bp
     from app.routes.user_routes import bp as user_bp
     from app.routes.language_routes import bp as language_bp
+    from app.routes.crop_routes import bp as crop_bp
+    from app.routes.stress_routes import bp as stress_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(country_bp)
@@ -86,5 +88,7 @@ def create_app():
     app.register_blueprint(role_bp)
     app.register_blueprint(user_bp)
     app.register_blueprint(language_bp)
+    app.register_blueprint(crop_bp)
+    app.register_blueprint(stress_bp)
 
     return app

@@ -12,7 +12,7 @@
     </button>
   </div>
 
- <!-- Barra de búsqueda mejorada -->
+ <!-- Barra de búsqueda -->
   <div class="d-flex align-items-center mb-3 gap-3">
     <input
       type="text"
@@ -237,6 +237,7 @@
 </div>
 
 <script>
+// Script para manejar la carga dinámica de divisiones administrativas
 document.addEventListener('DOMContentLoaded', function() {
     const countrySelect = document.getElementById('country');
     const admin1Select = document.getElementById('admin_1_id');
@@ -280,60 +281,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Mostrar el modal si hay errores de validación
-    //{% if show_modal %}
-    //var addLocationModal = new bootstrap.Modal(document.getElementById('addLocationModal'));
-    //addLocationModal.show();
-    //{% endif %}
-
-    // Checkbox select all
-    const selectAll = document.getElementById('select-all');
-    const checkboxes = document.querySelectorAll('.select-row');
-    const bulkDisable = document.getElementById('bulk-disable');
-    const bulkRecover = document.getElementById('bulk-recover');
-    const form = document.getElementById('bulk-action-form');
-
-    function updateBulkButtons() {
-      const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-      if (anyChecked) {
-      bulkDisable.style.visibility = 'visible';
-      bulkRecover.style.visibility = 'visible';
-      } else {
-      bulkDisable.style.visibility = 'hidden';
-      bulkRecover.style.visibility = 'hidden';
-      }
-      bulkDisable.disabled = !anyChecked;
-      bulkRecover.disabled = !anyChecked;
-    }
-
-    // Inicializar visibilidad al cargar
-    updateBulkButtons();
-
-    if (selectAll) {
-      selectAll.addEventListener('change', function() {
-      checkboxes.forEach(cb => cb.checked = selectAll.checked);
-      updateBulkButtons();
-      });
-    }
-    checkboxes.forEach(cb => {
-      cb.addEventListener('change', updateBulkButtons);
-    });
-
-    // Opcional: deshabilitar ambos botones al enviar el form
-    form.addEventListener('submit', function() {
-      bulkDisable.disabled = true;
-      bulkRecover.disabled = true;
-    });
-
-    bulkDisable.addEventListener('click', function() {
-      document.getElementById('bulk-action-hidden').value = 'disable';
-      form.submit();
-    });
-    bulkRecover.addEventListener('click', function() {
-      document.getElementById('bulk-action-hidden').value = 'recover';
-      form.submit();
-    });
-
     // Mapa Leaflet - Inicialización diferida
     const addLocationModal = document.getElementById('addLocationModal');
     
@@ -360,9 +307,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });    
 </script>
 
-<!-- Al final del archivo -->
+<!-- Script para llamar la búsqueda y acciones masivas -->
 <script type="module">
-  import { initTableSearch } from "{{ url_for('static', filename='js/tableSearch.js') }}";
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
 
   document.addEventListener('DOMContentLoaded', function() {
     // Configuración específica para locaciones
@@ -409,8 +358,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       ]
     });
-
-    // ... (resto de tu código específico para locaciones) ...
+    // Configuración para bulk actions
+    setupBulkActions({
+      // Puedes personalizar los IDs si son diferentes en otras páginas
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
   });
 </script>
 <!-- Incluye Leaflet.js -->

@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Fuentes de datos') }}{% endblock %}
+{% block title %}{{ _('Cultivos') }}{% endblock %}
 {% block content %}
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ _('Fuentes de datos') }}</h2>
+    <h2>{{ _('Cultivos') }}</h2>
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
-      data-bs-target="#addDataSourceModal"
+      data-bs-target="#addCropModal"
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
@@ -18,7 +18,7 @@
     <input
       type="text"
       class="form-control me-2"
-      id="dataSourceSearchInput"
+      id="cropSearchInput"
       placeholder="{{ _('Buscar...') }}"
       style="max-width: 300px"
     />
@@ -26,7 +26,7 @@
       <button 
         class="btn btn-outline-secondary dropdown-toggle" 
         type="button" 
-        id="dataSourceFiltersButton" 
+        id="cropFiltersButton" 
         data-bs-toggle="dropdown" 
         data-bs-auto-close="outside"
         aria-expanded="false"
@@ -35,22 +35,21 @@
       >
         <i class="fas fa-filter"></i> {{ _('Filtros') }}
       </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dataSourceFiltersButton" style="min-width: 250px;">
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="cropFiltersButton" style="min-width: 250px;">
         <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
       </ul>
     </div>
-    <span id="dataSourceSearchResults" class="text-muted small"></span>
+    <span id="cropSearchResults" class="text-muted small"></span>
   </div>
 
-
   <!-- Contenedor para mensajes -->
-  <div id="noDataSourceResults" class="alert alert-info mt-4" style="display: none;">
+  <div id="noCropResults" class="alert alert-info mt-4" style="display: none;">
     {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
   </div>
 
-  {% if data_sources %}
-  <div id="dataSourceTableContainer">
-    <form id="bulk-action-form" method="POST" action="{{ url_for('data_source.bulk_action') }}">
+  {% if crops %}
+  <div id="cropTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('crop.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
@@ -65,33 +64,29 @@
           <tr>
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
             <th>{{ _('Nombre') }}</th>
-            <th>{{ _('Tipo de fuente') }}</th>
-            <th>{{ _('País') }}</th>
             <th>{{ _('Estado') }}</th>
             <th class="text-end">{{ _('Acciones') }}</th>
           </tr>
         </thead>
-        <tbody id="dataSourceTableBody">
-          {% for data_source in data_sources %}
-          <tr data-type="{{ data_source.type }}"
-              data-country="{{ data_source.country.name }}"
-              data-status="{% if data_source.enable %}active{% else %}inactive{% endif %}">
-            <td><input type="checkbox" name="selected_ids" value="{{ data_source.id }}" class="select-row" /></td>
-            <td class="searchable">{{ data_source.name }}</td>
-            <td class="searchable">{{ data_source.type }}</td>
-            <td class="searchable">{{ data_source.country.name }}</td>
-            <td>{{ 'Habilitado' if data_source.enable else 'Deshabilitado' }}</td>
+        <tbody id="cropTableBody">
+          {% for crop in crops %}
+          <tr data-status="{% if crop.enable %}active{% else %}inactive{% endif %}">
+            <td><input type="checkbox" name="selected_ids" value="{{ crop.id }}" class="select-row" /></td>
+            <td class="searchable">{{ crop.name }}</td>
+            <td>
+              {{ 'Habilitado' if crop.enable else 'Deshabilitado' }}
+            </td>
             <td class="text-end">
               <a
-                href="{{ url_for('data_source.edit_data_source', id=data_source.id) }}"
+                href="{{ url_for('crop.edit_crop', id=crop.id) }}"
                 class="btn btn-warning btn-sm me-2"
                 title="Editar"
               >
                 <i class="fas fa-pen"></i>
               </a>
-              {% if data_source.enable %}
+              {% if crop.enable %}
               <a
-                href="{{ url_for('data_source.delete_data_source', id=data_source.id) }}"
+                href="{{ url_for('crop.delete_crop', id=crop.id) }}"
                 class="btn btn-danger btn-sm"
                 title="Deshabilitar"
               >
@@ -99,7 +94,7 @@
               </a>
               {% else %}
               <a
-                href="{{ url_for('data_source.reset_data_source', id=data_source.id) }}"
+                href="{{ url_for('crop.reset_crop', id=crop.id) }}"
                 class="btn btn-success btn-sm"
                 title="Recuperar"
               >
@@ -115,29 +110,29 @@
   </div>
   <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">
-    {{ _('Mostrando') }} <span id="dataSourceResultsCount"></span> {{ _('resultado (s)') }}
+    {{ _('Mostrando') }} <span id="cropResultsCount"></span> {{ _('resultados') }}
   </div>
   {% else %}
   <div class="alert alert-info mt-4">
-    {{ _('No hay fuentes de datos registradas.') }}
+    {{ _('No hay cultivos registrados.') }}
   </div>
   {% endif %}
 </div>
 
-<!-- Modal para agregar Fuente -->
+<!-- Modal para agregar Cultivo -->
 <div
   class="modal fade"
-  id="addDataSourceModal"
+  id="addCropModal"
   tabindex="-1"
-  aria-labelledby="addDataSourceLabel"
+  aria-labelledby="addCropLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <form method="POST" class="modal-content">
       {{ form.hidden_tag() }}
       <div class="modal-header">
-        <h5 class="modal-title" id="addDataSourceLabel">
-          {{ _('Agregar fuente') }}
+        <h5 class="modal-title" id="addCropLabel">
+          {{ _('Agregar cultivo') }}
         </h5>
         <button
           type="button"
@@ -151,34 +146,6 @@
           {{ form.name.label(class="form-label") }}
           {{ form.name(class="form-control") }}
           {% for error in form.name.errors %}
-          <div class="text-danger">{{ error }}</div>
-          {% endfor %}
-        </div>
-        <div class="mb-3">
-          {{ form.type.label(class="form-label") }}
-          {{ form.type(class="form-control") }}
-          {% for error in form.type.errors %}
-          <div class="text-danger">{{ error }}</div>
-          {% endfor %}
-        </div>
-        <div class="mb-3">
-          {{ form.country_id.label(class="form-label") }}
-          {{ form.country_id(class="form-select") }}
-          {% for error in form.country_id.errors %}
-          <div class="text-danger">{{ error }}</div>
-          {% endfor %}
-        </div>
-        <div class="mb-3">
-          {{ form.description.label(class="form-label") }}
-          {{ form.description(class="form-control") }}
-          {% for error in form.description.errors %}
-          <div class="text-danger">{{ error }}</div>
-          {% endfor %}
-        </div>
-        <div class="mb-3">
-          {{ form.content.label(class="form-label") }}
-          {{ form.content(class="form-control", rows="3") }}
-          {% for error in form.content.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
@@ -197,54 +164,39 @@
   </div>
 </div>
 
-<!-- Script para llamar la búsqueda y acciones masivas -->
+<!-- Script para búsqueda y acciones masivas -->
 <script type="module">
   import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
   import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
 
-
   document.addEventListener('DOMContentLoaded', function() {
-    // Configuración específica para locaciones
+    // Configuración para búsqueda en cultivos
     initTableSearch({
-      searchInputId: 'dataSourceSearchInput',
-      filtersButtonId: 'dataSourceFiltersButton',
-      tableContainerId: 'dataSourceTableContainer',
-      noResultsId: 'noDataSourceResults',
-      resultsCountId: 'dataSourceResultsCount',
-      tableBodyId: 'dataSourceTableBody',
-      
+      searchInputId: 'cropSearchInput',
+      filtersButtonId: 'cropFiltersButton',
+      tableContainerId: 'cropTableContainer',
+      noResultsId: 'noCropResults',
+      resultsCountId: 'cropResultsCount',
+      tableBodyId: 'cropTableBody',
+
       searchColumns: [
-        { selector: '.searchable' } // Buscar en todas las celdas con clase 'searchable'
+        { selector: '.searchable' }
       ],
-      
       filterConfigs: [
-        {
-          name: 'country',
-          label: '{{ _("País") }}',
-          getValue: row => row.dataset.country,
-          getDisplayValue: row => row.dataset.country
-        },
-        {
-          name: 'type',
-          label: '{{ _("Tipo de fuente") }}',
-          getValue: row => row.dataset.type,
-          getDisplayValue: row => row.dataset.type
-        },
         {
           name: 'status',
           label: '{{ _("Estado") }}',
           getValue: row => row.dataset.status,
           getDisplayValue: row => {
-            return row.dataset.status === 'active' 
-              ? '{{ _("Habilitado") }}' 
+            return row.dataset.status === 'active'
+              ? '{{ _("Habilitado") }}'
               : '{{ _("Deshabilitado") }}';
           }
         }
       ]
     });
-    // Configuración para bulk actions
+    // Configuración para acciones masivas
     setupBulkActions({
-      // Puedes personalizar los IDs si son diferentes en otras páginas
       selectAllId: 'select-all',
       rowCheckboxClass: 'select-row',
       disableBtnId: 'bulk-disable',
@@ -255,4 +207,5 @@
   });
 </script>
 {% endblock %}
+
 

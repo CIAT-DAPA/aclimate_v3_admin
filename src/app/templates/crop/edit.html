@@ -1,0 +1,39 @@
+{% extends 'base.html' %} {% block title %}Editar Cultivo{% endblock %} {%
+block content %}
+<div class="container">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('crop.list_crop') }}">Cultivos</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ crop.name if crop else '' }}</li>
+    </ol>
+  </nav>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Editar Cultivo</h2>
+    <a href="{{ url_for('crop.list_crop') }}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Volver al listado
+    </a>
+  </div>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.name.label(class="form-label") }}
+      {{ form.name(class="form-control") }}
+      {% for error in form.name.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="form-check mb-4">
+      {{ form.enable(class="form-check-input") }}
+      {{ form.enable.label(class="form-check-label") }}
+    </div>
+
+    {{ form.submit(class="btn btn-success") }}
+    <a href="{{ url_for('crop.list_crop') }}" class="btn btn-outline-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}
