@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
       role: "usuariosSection",
       source: "configuracionSection",
       data_source: "configuracionSection",
+      indicator: "configurationSection",
     };
 
     for (const [route, section] of Object.entries(routeSectionMap)) {
