@@ -50,6 +50,7 @@ def edit_stress(id):
             short_name=form.short_name.data,
             category=StressCategory[form.category.data],
             description=form.description.data,
+            enable=form.enable.data
         )
         stress_service.update(id=id, obj_in=update_data)
         flash(_('Estrés actualizado.'), 'success')

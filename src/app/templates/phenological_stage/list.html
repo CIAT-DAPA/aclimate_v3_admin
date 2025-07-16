@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Fuentes') }}{% endblock %}
+{% block title %}{{ _('Etapas Fenológicas') }}{% endblock %}
 {% block content %}
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ _('Fuentes') }}</h2>
+    <h2>{{ _('Etapas Fenológicas') }}</h2>
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
-      data-bs-target="#addSourceModal"
+      data-bs-target="#addStageModal"
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
@@ -18,7 +18,7 @@
     <input
       type="text"
       class="form-control me-2"
-      id="sourceSearchInput"
+      id="stageSearchInput"
       placeholder="{{ _('Buscar...') }}"
       style="max-width: 300px"
     />
@@ -26,7 +26,7 @@
       <button 
         class="btn btn-outline-secondary dropdown-toggle" 
         type="button" 
-        id="sourceFiltersButton" 
+        id="stageFiltersButton" 
         data-bs-toggle="dropdown" 
         data-bs-auto-close="outside"
         aria-expanded="false"
@@ -35,22 +35,21 @@
       >
         <i class="fas fa-filter"></i> {{ _('Filtros') }}
       </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sourceFiltersButton" style="min-width: 250px;">
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="stageFiltersButton" style="min-width: 250px;">
         <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
       </ul>
     </div>
-    <span id="sourceSearchResults" class="text-muted small"></span>
+    <span id="stageSearchResults" class="text-muted small"></span>
   </div>
 
-
   <!-- Contenedor para mensajes -->
-  <div id="noSourceResults" class="alert alert-info mt-4" style="display: none;">
+  <div id="noStageResults" class="alert alert-info mt-4" style="display: none;">
     {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
   </div>
 
-  {% if sources %}
-  <div id="sourceTableContainer">
-    <form id="bulk-action-form" method="POST" action="{{ url_for('data_source.bulk_action') }}">
+  {% if stages %}
+  <div id="stageTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('phenological_stage.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
@@ -65,46 +64,52 @@
           <tr>
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
             <th>{{ _('Nombre') }}</th>
-            <th>{{ _('Tipo de fuente') }}</th>
+            <th>{{ _('Nombre corto') }}</th>
+            <th>{{ _('Cultivo') }}</th>
+            <th>{{ _('Orden') }}</th>
+            <th>{{ _('Duración (días)') }}</th>
             <th>{{ _('Estado') }}</th>
             <th class="text-end">{{ _('Acciones') }}</th>
           </tr>
         </thead>
-        <tbody id="sourceTableBody">
-          {% for source in sources %}
-          <tr data-type="{% if source.source_type == 'AU' %}Automático{% else %}Manual{% endif %}"
-              data-status="{% if source.enable %}active{% else %}inactive{% endif %}">
-            <td><input type="checkbox" name="selected_ids" value="{{ source.id }}" class="select-row" /></td>
-            <td class="searchable">{{ source.name }}</td>
-            <td class="searchable">
-              {% if source.source_type == 'AU' %}
-                Automático
-              {% else %}
-                Manual
-              {% endif %}
+        <tbody id="stageTableBody">
+          {% for stage in stages %}
+          <tr 
+            data-crop="{{ stage.crop.name }}"
+            data-order="{{ stage.order_stage }}"
+            data-duration="{{ stage.duration_avg_day }}"
+            data-status="{% if stage.enable %}active{% else %}inactive{% endif %}"
+          >
+            <td><input type="checkbox" name="selected_ids" value="{{ stage.id }}" class="select-row" /></td>
+            <td class="searchable">{{ stage.name }}</td>
+            <td class="searchable">{{ stage.short_name }}</td>
+            <td class="searchable">{{ stage.crop.name }}</td>
+            <td>{{ stage.order_stage }}</td>
+            <td>{{ stage.duration_avg_day }}</td>
+            <td>
+              {{ _('Habilitado') if stage.enable else _('Deshabilitado') }}
             </td>
-            <td>{{ 'Habilitado' if source.enable else 'Deshabilitado' }}</td>
             <td class="text-end">
               <a
-                href="{{ url_for('source.edit_source', id=source.id) }}"
+                href="{{ url_for('phenological_stage.edit_phenological_stage', id=stage.id) }}"
                 class="btn btn-warning btn-sm me-2"
-                title="Editar"
+                title="{{ _('Editar') }}"
               >
                 <i class="fas fa-pen"></i>
               </a>
-              {% if source.enable %}
+              {% if stage.enable %}
               <a
-                href="{{ url_for('source.delete_source', id=source.id) }}"
+                href="{{ url_for('phenological_stage.delete_phenological_stage', id=stage.id) }}"
                 class="btn btn-danger btn-sm"
-                title="Deshabilitar"
+                title="{{ _('Deshabilitar') }}"
               >
                 <i class="fas fa-trash"></i>
               </a>
               {% else %}
               <a
-                href="{{ url_for('source.reset_source', id=source.id) }}"
+                href="{{ url_for('phenological_stage.reset_phenological_stage', id=stage.id) }}"
                 class="btn btn-success btn-sm"
-                title="Recuperar"
+                title="{{ _('Recuperar') }}"
               >
                 <i class="fas fa-undo"></i>
               </a>
@@ -116,37 +121,37 @@
       </table>
     </form>
   </div>
- <!-- Mensaje de contador de resultados -->
+  <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">
-    {{ _('Mostrando') }} <span id="sourceResultsCount"></span> {{ _('resultado (s)') }}
+    {{ _('Mostrando') }} <span id="stageResultsCount"></span> {{ _('resultados') }}
   </div>
   {% else %}
   <div class="alert alert-info mt-4">
-    {{ _('No hay fuentes de datos registradas.') }}
+    {{ _('No hay etapas fenológicas registradas.') }}
   </div>
   {% endif %}
 </div>
 
-<!-- Modal para agregar Fuente -->
+<!-- Modal para agregar Etapa Fenológica -->
 <div
   class="modal fade"
-  id="addSourceModal"
+  id="addStageModal"
   tabindex="-1"
-  aria-labelledby="addSourceLabel"
+  aria-labelledby="addStageLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <form method="POST" class="modal-content">
       {{ form.hidden_tag() }}
       <div class="modal-header">
-        <h5 class="modal-title" id="addSourceLabel">
-          {{ _('Agregar fuente') }}
+        <h5 class="modal-title" id="addStageLabel">
+          {{ _('Agregar etapa fenológica') }}
         </h5>
         <button
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Cerrar"
+          aria-label="{{ _('Cerrar') }}"
         ></button>
       </div>
       <div class="modal-body">
@@ -158,9 +163,39 @@
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.source_type.label(class="form-label") }}
-          {{ form.source_type(class="form-select") }}
-          {% for error in form.source_type.errors %}
+          {{ form.short_name.label(class="form-label") }}
+          {{ form.short_name(class="form-control") }}
+          {% for error in form.short_name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.crop.label(class="form-label") }}
+          {{ form.crop(class="form-select") }}
+          {% for error in form.crop.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            {{ form.order_stage.label(class="form-label") }}
+            {{ form.order_stage(class="form-control") }}
+            {% for error in form.order_stage.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-6">
+            {{ form.duration_avg_day.label(class="form-label") }}
+            {{ form.duration_avg_day(class="form-control") }}
+            {% for error in form.duration_avg_day.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-control", rows="3") }}
+          {% for error in form.description.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
@@ -178,32 +213,43 @@
     </form>
   </div>
 </div>
-<!-- Script para llamar la búsqueda y acciones masivas -->
+
+<!-- Script para búsqueda y acciones masivas -->
 <script type="module">
   import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
   import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
 
-
   document.addEventListener('DOMContentLoaded', function() {
-    // Configuración específica para locaciones
+    // Configuración para búsqueda en etapas fenológicas
     initTableSearch({
-      searchInputId: 'sourceSearchInput',
-      filtersButtonId: 'sourceFiltersButton',
-      tableContainerId: 'sourceTableContainer',
-      noResultsId: 'noSourceResults',
-      resultsCountId: 'sourceResultsCount',
-      tableBodyId: 'sourceTableBody',
+      searchInputId: 'stageSearchInput',
+      filtersButtonId: 'stageFiltersButton',
+      tableContainerId: 'stageTableContainer',
+      noResultsId: 'noStageResults',
+      resultsCountId: 'stageResultsCount',
+      tableBodyId: 'stageTableBody',
 
       searchColumns: [
         { selector: '.searchable' } // Buscar en todas las celdas con clase 'searchable'
       ],
-      
       filterConfigs: [
         {
-          name: 'type',
-          label: '{{ _("Tipo de fuente") }}',
-          getValue: row => row.dataset.type,
-          getDisplayValue: row => row.dataset.type
+          name: 'crop',
+          label: '{{ _("Cultivo") }}',
+          getValue: row => row.dataset.crop,
+          getDisplayValue: row => row.dataset.crop || '{{ _("Sin cultivo") }}'
+        },
+        {
+          name: 'order',
+          label: '{{ _("Orden") }}',
+          getValue: row => row.dataset.order,
+          getDisplayValue: row => row.dataset.order || '{{ _("Sin orden") }}'
+        },
+        {
+          name: 'duration',
+          label: '{{ _("Duración") }}',
+          getValue: row => row.dataset.duration,
+          getDisplayValue: row => (row.dataset.duration ? `${row.dataset.duration} días` : '{{ _("Sin duración") }}')
         },
         {
           name: 'status',
@@ -217,9 +263,9 @@
         }
       ]
     });
-    // Configuración para bulk actions
+    
+    // Configuración para acciones masivas
     setupBulkActions({
-      // Puedes personalizar los IDs si son diferentes en otras páginas
       selectAllId: 'select-all',
       rowCheckboxClass: 'select-row',
       disableBtnId: 'bulk-disable',
@@ -230,5 +276,3 @@
   });
 </script>
 {% endblock %}
-
-

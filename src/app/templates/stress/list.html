@@ -73,8 +73,11 @@
         </thead>
         <tbody id="stressTableBody">
           {% for stress in stresses %}
-          <tr data-category="{{ stress.category.value}}" 
-            data-status="{% if stress.enable %}active{% else %}inactive{% endif %}">
+          <tr 
+            data-short_name="{{ stress.short_name }}"
+            data-category="{{ stress.category.value}}"
+            data-status="{% if stress.enable %}active{% else %}inactive{% endif %}"
+            >
             <td><input type="checkbox" name="selected_ids" value="{{ stress.id }}" class="select-row" /></td>
             <td class="searchable">{{ stress.name }}</td>
             <td class="searchable">{{ stress.short_name }}</td>
@@ -197,7 +200,7 @@
     // Configuración para búsqueda en estreses
     initTableSearch({
       searchInputId: 'stressSearchInput',
-      filterButtonId: 'stressFiltersButton',
+      filtersButtonId: 'stressFiltersButton',
       tableContainerId: 'stressTableContainer',
       noResultsId: 'noStressResults',
       resultsCountId: 'stressResultsCount',
@@ -207,6 +210,12 @@
         { selector: '.searchable' }
       ],
       filterConfigs: [
+        {
+          name: 'short_name',
+          label: '{{ _("Nombre corto") }}',
+          getValue: row => row.dataset.short_name,
+          getDisplayValue: row => row.dataset.short_name || '{{ _("Sin nombre corto") }}'
+        },
         {
           name: 'category',
           label: '{{ _("Categoría") }}',

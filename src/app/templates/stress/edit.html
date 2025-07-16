@@ -1,17 +1,18 @@
-{% extends 'base.html' %} {% block title %}Editar Fuente{% endblock %} {%
-block content %}
+{% extends 'base.html' %}
+{% block title %}Editar Estrés{% endblock %}
+{% block content %}
 <div class="container">
   <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
       <li class="breadcrumb-item">
-        <a href="{{ url_for('source.list_source') }}">Fuentes</a>
+        <a href="{{ url_for('stress.list_stress') }}">Estreses</a>
       </li>
-      <li class="breadcrumb-item active" aria-current="page">{{ source.name if source else '' }}</li>
+      <li class="breadcrumb-item active" aria-current="page">{{ stress.name if stress else '' }}</li>
     </ol>
   </nav>
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Editar Fuente</h2>
-    <a href="{{ url_for('source.list_source') }}" class="btn btn-secondary">
+    <h2>Editar Estrés</h2>
+    <a href="{{ url_for('stress.list_stress') }}" class="btn btn-secondary">
       <i class="fas fa-arrow-left"></i> Volver al listado
     </a>
   </div>
@@ -28,9 +29,25 @@ block content %}
     </div>
 
     <div class="mb-3">
-      {{ form.source_type.label(class="form-label") }}
-      {{ form.source_type(class="form-select") }}
-      {% for error in form.source_type.errors %}
+      {{ form.short_name.label(class="form-label") }}
+      {{ form.short_name(class="form-control") }}
+      {% for error in form.short_name.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.category.label(class="form-label") }}
+      {{ form.category(class="form-select") }}
+      {% for error in form.category.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.description.label(class="form-label") }}
+      {{ form.description(class="form-control") }}
+      {% for error in form.description.errors %}
         <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
@@ -41,7 +58,7 @@ block content %}
     </div>
 
     {{ form.submit(class="btn btn-success") }}
-    <a href="{{ url_for('source.list_source') }}" class="btn btn-outline-secondary">Cancelar</a>
+    <a href="{{ url_for('stress.list_stress') }}" class="btn btn-outline-secondary">Cancelar</a>
   </form>
 </div>
 {% endblock %}

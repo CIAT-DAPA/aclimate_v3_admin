@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Fuentes') }}{% endblock %}
+{% block title %}{{ _('Estreses') }}{% endblock %}
 {% block content %}
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ _('Fuentes') }}</h2>
+    <h2>{{ _('Estreses') }}</h2>
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
-      data-bs-target="#addSourceModal"
+      data-bs-target="#addStressModal"
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
@@ -18,7 +18,7 @@
     <input
       type="text"
       class="form-control me-2"
-      id="sourceSearchInput"
+      id="stressSearchInput"
       placeholder="{{ _('Buscar...') }}"
       style="max-width: 300px"
     />
@@ -26,7 +26,7 @@
       <button 
         class="btn btn-outline-secondary dropdown-toggle" 
         type="button" 
-        id="sourceFiltersButton" 
+        id="stressFiltersButton" 
         data-bs-toggle="dropdown" 
         data-bs-auto-close="outside"
         aria-expanded="false"
@@ -35,22 +35,21 @@
       >
         <i class="fas fa-filter"></i> {{ _('Filtros') }}
       </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sourceFiltersButton" style="min-width: 250px;">
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="stressFiltersButton" style="min-width: 250px;">
         <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
       </ul>
     </div>
-    <span id="sourceSearchResults" class="text-muted small"></span>
+    <span id="stressSearchResults" class="text-muted small"></span>
   </div>
 
-
   <!-- Contenedor para mensajes -->
-  <div id="noSourceResults" class="alert alert-info mt-4" style="display: none;">
+  <div id="noStressResults" class="alert alert-info mt-4" style="display: none;">
     {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
   </div>
 
-  {% if sources %}
-  <div id="sourceTableContainer">
-    <form id="bulk-action-form" method="POST" action="{{ url_for('data_source.bulk_action') }}">
+  {% if stresses %}
+  <div id="stressTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('stress.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
@@ -65,36 +64,40 @@
           <tr>
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
             <th>{{ _('Nombre') }}</th>
-            <th>{{ _('Tipo de fuente') }}</th>
+            <th>{{ _('Nombre corto') }}</th>
+            <th>{{ _('Categoría') }}</th>
+            <th>{{ _('Descripción') }}</th>
             <th>{{ _('Estado') }}</th>
             <th class="text-end">{{ _('Acciones') }}</th>
           </tr>
         </thead>
-        <tbody id="sourceTableBody">
-          {% for source in sources %}
-          <tr data-type="{% if source.source_type == 'AU' %}Automático{% else %}Manual{% endif %}"
-              data-status="{% if source.enable %}active{% else %}inactive{% endif %}">
-            <td><input type="checkbox" name="selected_ids" value="{{ source.id }}" class="select-row" /></td>
-            <td class="searchable">{{ source.name }}</td>
-            <td class="searchable">
-              {% if source.source_type == 'AU' %}
-                Automático
-              {% else %}
-                Manual
-              {% endif %}
+        <tbody id="stressTableBody">
+          {% for stress in stresses %}
+          <tr 
+            data-short_name="{{ stress.short_name }}"
+            data-category="{{ stress.category.value}}"
+            data-description="{{ stress.description or '' }}"
+            data-status="{% if stress.enable %}active{% else %}inactive{% endif %}"
+            >
+            <td><input type="checkbox" name="selected_ids" value="{{ stress.id }}" class="select-row" /></td>
+            <td class="searchable">{{ stress.name }}</td>
+            <td class="searchable">{{ stress.short_name }}</td>
+            <td class="searchable">{{ stress.category.value if stress.category else '' }}</td>
+            <td class="searchable">{{ stress.description or '' }}</td>
+            <td>
+              {{ 'Habilitado' if stress.enable else 'Deshabilitado' }}
             </td>
-            <td>{{ 'Habilitado' if source.enable else 'Deshabilitado' }}</td>
             <td class="text-end">
               <a
-                href="{{ url_for('source.edit_source', id=source.id) }}"
+                href="{{ url_for('stress.edit_stress', id=stress.id) }}"
                 class="btn btn-warning btn-sm me-2"
                 title="Editar"
               >
                 <i class="fas fa-pen"></i>
               </a>
-              {% if source.enable %}
+              {% if stress.enable %}
               <a
-                href="{{ url_for('source.delete_source', id=source.id) }}"
+                href="{{ url_for('stress.delete_stress', id=stress.id) }}"
                 class="btn btn-danger btn-sm"
                 title="Deshabilitar"
               >
@@ -102,7 +105,7 @@
               </a>
               {% else %}
               <a
-                href="{{ url_for('source.reset_source', id=source.id) }}"
+                href="{{ url_for('stress.reset_stress', id=stress.id) }}"
                 class="btn btn-success btn-sm"
                 title="Recuperar"
               >
@@ -116,31 +119,31 @@
       </table>
     </form>
   </div>
- <!-- Mensaje de contador de resultados -->
+  <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">
-    {{ _('Mostrando') }} <span id="sourceResultsCount"></span> {{ _('resultado (s)') }}
+    {{ _('Mostrando') }} <span id="stressResultsCount"></span> {{ _('resultados') }}
   </div>
   {% else %}
   <div class="alert alert-info mt-4">
-    {{ _('No hay fuentes de datos registradas.') }}
+    {{ _('No hay estreses registrados.') }}
   </div>
   {% endif %}
 </div>
 
-<!-- Modal para agregar Fuente -->
+<!-- Modal para agregar Estrés -->
 <div
   class="modal fade"
-  id="addSourceModal"
+  id="addStressModal"
   tabindex="-1"
-  aria-labelledby="addSourceLabel"
+  aria-labelledby="addStressLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <form method="POST" class="modal-content">
       {{ form.hidden_tag() }}
       <div class="modal-header">
-        <h5 class="modal-title" id="addSourceLabel">
-          {{ _('Agregar fuente') }}
+        <h5 class="modal-title" id="addStressLabel">
+          {{ _('Agregar estrés') }}
         </h5>
         <button
           type="button"
@@ -158,15 +161,25 @@
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.source_type.label(class="form-label") }}
-          {{ form.source_type(class="form-select") }}
-          {% for error in form.source_type.errors %}
+          {{ form.short_name.label(class="form-label") }}
+          {{ form.short_name(class="form-control") }}
+          {% for error in form.short_name.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
-        <div class="form-check mb-2">
-          {{ form.enable(class="form-check-input") }}
-          {{ form.enable.label(class="form-check-label") }}
+        <div class="mb-3">
+          {{ form.category.label(class="form-label") }}
+          {{ form.category(class="form-select") }}
+          {% for error in form.category.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-control") }}
+          {% for error in form.description.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
         </div>
       </div>
       <div class="modal-footer">
@@ -178,48 +191,60 @@
     </form>
   </div>
 </div>
-<!-- Script para llamar la búsqueda y acciones masivas -->
+
+<!-- Script para búsqueda y acciones masivas -->
 <script type="module">
   import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
   import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
 
-
   document.addEventListener('DOMContentLoaded', function() {
-    // Configuración específica para locaciones
+    // Configuración para búsqueda en estreses
     initTableSearch({
-      searchInputId: 'sourceSearchInput',
-      filtersButtonId: 'sourceFiltersButton',
-      tableContainerId: 'sourceTableContainer',
-      noResultsId: 'noSourceResults',
-      resultsCountId: 'sourceResultsCount',
-      tableBodyId: 'sourceTableBody',
+      searchInputId: 'stressSearchInput',
+      filterButtonId: 'stressFiltersButton',
+      tableContainerId: 'stressTableContainer',
+      noResultsId: 'noStressResults',
+      resultsCountId: 'stressResultsCount',
+      tableBodyId: 'stressTableBody',
 
       searchColumns: [
-        { selector: '.searchable' } // Buscar en todas las celdas con clase 'searchable'
+        { selector: '.searchable' }
       ],
-      
       filterConfigs: [
         {
-          name: 'type',
-          label: '{{ _("Tipo de fuente") }}',
-          getValue: row => row.dataset.type,
-          getDisplayValue: row => row.dataset.type
+          name: 'short_name',
+          label: '{{ _("Nombre corto") }}',
+          getValue: row => row.dataset.short_name,
+          getDisplayValue: row => row.dataset.short_name || '{{ _("Sin nombre corto") }}'
+        },
+        {
+          name: 'category',
+          label: '{{ _("Categoría") }}',
+          getValue: row => row.dataset.category,
+          getDisplayValue: row => {
+            return row.dataset.category || '{{ _("Sin categoría") }}';
+          }
+        },
+        {
+          name: 'description',
+          label: '{{ _("Descripción") }}',
+          getValue: row => row.dataset.description,
+          getDisplayValue: row => row.dataset.description || '{{ _("Sin descripción") }}'
         },
         {
           name: 'status',
           label: '{{ _("Estado") }}',
           getValue: row => row.dataset.status,
           getDisplayValue: row => {
-            return row.dataset.status === 'active' 
-              ? '{{ _("Habilitado") }}' 
+            return row.dataset.status === 'active'
+              ? '{{ _("Habilitado") }}'
               : '{{ _("Deshabilitado") }}';
           }
         }
       ]
     });
-    // Configuración para bulk actions
+    // Configuración para acciones masivas
     setupBulkActions({
-      // Puedes personalizar los IDs si son diferentes en otras páginas
       selectAllId: 'select-all',
       rowCheckboxClass: 'select-row',
       disableBtnId: 'bulk-disable',

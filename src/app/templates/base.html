@@ -125,6 +125,69 @@
       style="z-index: 1000"
       id="sidebar"
     >
+
+      <!-- Sección Clima -->
+      {% if check_module_access(Module.CLIMATE_DATA)  %}
+      <div class="sidebar-section-collapsible mb-1">
+        <div
+          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
+          data-bs-toggle="collapse"
+          data-bs-target="#climaSection"
+          aria-expanded="false"
+        >
+          <i class="fas fa-cloud-sun section-icon me-2 text-center"></i>
+          <span class="section-title fw-semibold text-uppercase flex-grow-1"
+            >{{ _('Clima') }}</span
+          >
+          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
+        </div>
+        <div class="collapse" id="climaSection">
+          <nav class="nav flex-column">
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
+              <span>{{ _('Weather') }}</span>
+            </a>
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
+              <span>{{ _('Parameters') }}</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Sección Cultivos -->
+      {% if check_module_access(Module.CROP_DATA)  %}
+      <div class="sidebar-section-collapsible mb-1">
+        <div
+          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
+          data-bs-toggle="collapse"
+          data-bs-target="#cultivosSection"
+          aria-expanded="false"
+        >
+          <i class="fas fa-seedling section-icon me-2 text-center"></i>
+          <span class="section-title fw-semibold text-uppercase flex-grow-1"
+            >{{ _('Cultivos') }}</span
+          >
+          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
+        </div>
+        <div class="collapse" id="cultivosSection">
+          <nav class="nav flex-column">
+            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('crop.list_crop') }}">
+              <span>{{ _('Crops') }}</span>
+            </a>
+            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('stress.list_stress') }}">
+              <span>{{ _('Stresses') }}</span>
+            </a>
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
+              <span>{{ _('Setup simulations crops') }}</span>
+            </a>
+            <a class="nav-link d-flex align-items-center text-dark" href="#">
+              <span>{{ _('Stress parameters') }}</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+      {% endif %}
+
       <!-- Sección Geográfico -->
       {% if check_module_access(Module.GEOGRAPHIC)  %}
       <div class="sidebar-section-collapsible mb-1">
@@ -168,67 +231,7 @@
       </div>
       {% endif %}
 
-      <!-- Sección Cultivos -->
-      {% if check_module_access(Module.CROP_DATA)  %}
-      <div class="sidebar-section-collapsible mb-1">
-        <div
-          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
-          data-bs-toggle="collapse"
-          data-bs-target="#cultivosSection"
-          aria-expanded="false"
-        >
-          <i class="fas fa-seedling section-icon me-2 text-center"></i>
-          <span class="section-title fw-semibold text-uppercase flex-grow-1"
-            >{{ _('Cultivos') }}</span
-          >
-          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
-        </div>
-        <div class="collapse" id="cultivosSection">
-          <nav class="nav flex-column">
-            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('crop.list_crop') }}">
-              <span>{{ _('Crops') }}</span>
-            </a>
-            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('stress.list_stress') }}">
-              <span>{{ _('Stresses') }}</span>
-            </a>
-            <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>{{ _('Simulations') }}</span>
-            </a>
-            <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>{{ _('Parameters') }}</span>
-            </a>
-          </nav>
-        </div>
-      </div>
-      {% endif %}
 
-      <!-- Sección Clima -->
-      {% if check_module_access(Module.CLIMATE_DATA)  %}
-      <div class="sidebar-section-collapsible mb-1">
-        <div
-          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
-          data-bs-toggle="collapse"
-          data-bs-target="#climaSection"
-          aria-expanded="false"
-        >
-          <i class="fas fa-cloud-sun section-icon me-2 text-center"></i>
-          <span class="section-title fw-semibold text-uppercase flex-grow-1"
-            >{{ _('Clima') }}</span
-          >
-          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
-        </div>
-        <div class="collapse" id="climaSection">
-          <nav class="nav flex-column">
-            <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>{{ _('Weather') }}</span>
-            </a>
-            <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>{{ _('Parameters') }}</span>
-            </a>
-          </nav>
-        </div>
-      </div>
-      {% endif %}
 
       <!-- Sección Usuarios -->
       {% if check_module_access(Module.USER_MANAGEMENT)  %}
@@ -288,7 +291,7 @@
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('data_source.list_data_source') }}"
             >
-              <span>{{ _('Data sources') }}</span>
+              <span>{{ _('Client parameters') }}</span>
             </a>
           </nav>
         </div>

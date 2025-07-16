@@ -12,7 +12,8 @@ class Module(Enum):
     GEOGRAPHIC = "geographic"  # Países, ADM1, ADM2, Localizaciones
     CLIMATE_DATA = "climate_data"  # Datos climáticos 
     CROP_DATA = "crop_data"  # Datos de cultivos 
-    STRESS_DATA = "stress_data"  # Datos de estreses 
+    STRESS_DATA = "stress_data"  # Datos de estreses
+    PHENOLOGICAL_STAGE = "phenological_stage"  # Etapas fenológicas 
     USER_MANAGEMENT = "user_management"  # Usuarios y roles
     CONFIGURATION = "configuration"  # Configuración del sistema
 
@@ -29,6 +30,7 @@ class RolePermissionMapper:
             Module.USER_MANAGEMENT.value,
             Module.CROP_DATA.value,
             Module.STRESS_DATA.value,
+            Module.PHENOLOGICAL_STAGE.value,
             Module.CLIMATE_DATA.value,
             Module.CONFIGURATION.value,
         ],
@@ -38,6 +40,7 @@ class RolePermissionMapper:
             Module.USER_MANAGEMENT.value,
             Module.CROP_DATA.value,
             Module.STRESS_DATA.value,
+            Module.PHENOLOGICAL_STAGE.value,
             Module.CLIMATE_DATA.value,
             Module.CONFIGURATION.value,
         ],
@@ -284,6 +287,7 @@ class RolePermissionMapper:
             Module.CLIMATE_DATA: "Datos Climáticos",
             Module.CROP_DATA: "Datos de Cultivos",
             Module.STRESS_DATA: "Datos de Estreses",
+            Module.PHENOLOGICAL_STAGE: "Etapas Fenológicas",
             Module.USER_MANAGEMENT: "Gestión de Usuarios",
             Module.CONFIGURATION: "Configuración",
         }
@@ -299,6 +303,7 @@ class RolePermissionMapper:
             Module.CLIMATE_DATA: "Gestión de datos climáticos",
             Module.CROP_DATA: "Gestión de datos de cultivos",
             Module.STRESS_DATA: "Gestión de datos de estreses",
+            Module.PHENOLOGICAL_STAGE: "Gestión de etapas fenológicas",
             Module.USER_MANAGEMENT: "Administración de usuarios y roles del sistema",
             Module.CONFIGURATION: "Configuración de fuentes de datos",
         }

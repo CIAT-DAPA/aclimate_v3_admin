@@ -77,6 +77,7 @@ def create_app():
     from app.routes.language_routes import bp as language_bp
     from app.routes.crop_routes import bp as crop_bp
     from app.routes.stress_routes import bp as stress_bp
+    from app.routes.phenological_stage_routes import bp as phenological_stage_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(country_bp)
@@ -90,5 +91,6 @@ def create_app():
     app.register_blueprint(language_bp)
     app.register_blueprint(crop_bp)
     app.register_blueprint(stress_bp)
+    app.register_blueprint(phenological_stage_bp)
 
     return app
