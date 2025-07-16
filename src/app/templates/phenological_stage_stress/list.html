@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Parámetros de Estrés por Etapa Fenológica') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Parámetros de Estrés por Etapa Fenológica') }}</h2>
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addPSSModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="pssSearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="pssFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pssFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="pssSearchResults" class="text-muted small"></span>
+  </div>
+
+  <!-- Contenedor para mensajes -->
+  <div id="noPSSResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if pss_list %}
+  <div id="pssTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('phenological_stage_stress.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+        </button>
+        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+        </button>
+      </div>
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            <th>{{ _('Estrés') }}</th>
+            <th>{{ _('Etapa fenológica') }}</th>
+            <th>{{ _('Valor mínimo') }}</th>
+            <th>{{ _('Valor máximo') }}</th>
+            <th>{{ _('Estado') }}</th>
+            <th class="text-end">{{ _('Acciones') }}</th>
+          </tr>
+        </thead>
+        <tbody id="pssTableBody">
+          {% for pss in pss_list %}
+          <tr 
+            data-stress="{{ pss.stress.name if pss.stress else '' }}"
+            data-stage="{{ pss.phenological_stage.name if pss.phenological_stage else '' }}"
+            data-status="{% if pss.enable %}active{% else %}inactive{% endif %}"
+          >
+            <td><input type="checkbox" name="selected_ids" value="{{ pss.id }}" class="select-row" /></td>
+            <td class="searchable">{{ pss.stress.name if pss.stress else '' }}</td>
+            <td class="searchable">{{ pss.phenological_stage.name if pss.phenological_stage else '' }}</td>
+            <td class="searchable">{{ pss.min }}</td>
+            <td class="searchable">{{ pss.max }}</td>
+            <td>
+              {{ _('Habilitado') if pss.enable else _('Deshabilitado') }}
+            </td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('phenological_stage_stress.edit_phenological_stage_stress', id=pss.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="{{ _('Editar') }}"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% if pss.enable %}
+              <a
+                href="{{ url_for('phenological_stage_stress.delete_phenological_stage_stress', id=pss.id) }}"
+                class="btn btn-danger btn-sm"
+                title="{{ _('Deshabilitar') }}"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% else %}
+              <a
+                href="{{ url_for('phenological_stage_stress.reset_phenological_stage_stress', id=pss.id) }}"
+                class="btn btn-success btn-sm"
+                title="{{ _('Recuperar') }}"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="pssResultsCount"></span> {{ _('resultados') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay parámetros registrados.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Parámetro de Estrés por Etapa Fenológica -->
+<div
+  class="modal fade"
+  id="addPSSModal"
+  tabindex="-1"
+  aria-labelledby="addPSSLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addPSSLabel">
+          {{ _('Agregar parámetro de estrés por etapa') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Cerrar') }}"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.stress_id.label(class="form-label") }}
+          {{ form.stress_id(class="form-select") }}
+          {% for error in form.stress_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.phenological_stage_id.label(class="form-label") }}
+          {{ form.phenological_stage_id(class="form-select") }}
+          {% for error in form.phenological_stage_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            {{ form.min.label(class="form-label") }}
+            {{ form.min(class="form-control") }}
+            {% for error in form.min.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-6">
+            {{ form.max.label(class="form-label") }}
+            {{ form.max(class="form-control") }}
+            {% for error in form.max.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Script para búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración para búsqueda en parámetros de estrés por etapa
+    initTableSearch({
+      searchInputId: 'pssSearchInput',
+      filtersButtonId: 'pssFiltersButton',
+      tableContainerId: 'pssTableContainer',
+      noResultsId: 'noPSSResults',
+      resultsCountId: 'pssResultsCount',
+      tableBodyId: 'pssTableBody',
+
+      searchColumns: [
+        { selector: '.searchable' }
+      ],
+      filterConfigs: [
+        {
+          name: 'stress',
+          label: '{{ _("Estrés") }}',
+          getValue: row => row.dataset.stress,
+          getDisplayValue: row => row.dataset.stress || '{{ _("Sin estrés") }}'
+        },
+        {
+          name: 'stage',
+          label: '{{ _("Etapa fenológica") }}',
+          getValue: row => row.dataset.stage,
+          getDisplayValue: row => row.dataset.stage || '{{ _("Sin etapa") }}'
+        },
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active'
+              ? '{{ _("Habilitado") }}'
+              : '{{ _("Deshabilitado") }}';
+          }
+        }
+      ]
+    });
+    // Configuración para acciones masivas
+    setupBulkActions({
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+{% endblock %}

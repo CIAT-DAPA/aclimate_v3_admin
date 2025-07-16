@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Estreses') }}{% endblock %}
+{% block title %}{{ _('Configuraciones de Simulación') }}{% endblock %}
 {% block content %}
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ _('Estreses') }}</h2>
+    <h2>{{ _('Configuraciones de Simulación') }}</h2>
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
-      data-bs-target="#addStressModal"
+      data-bs-target="#addSetupModal"
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
@@ -18,7 +18,7 @@
     <input
       type="text"
       class="form-control me-2"
-      id="stressSearchInput"
+      id="setupSearchInput"
       placeholder="{{ _('Buscar...') }}"
       style="max-width: 300px"
     />
@@ -26,7 +26,7 @@
       <button 
         class="btn btn-outline-secondary dropdown-toggle" 
         type="button" 
-        id="stressFiltersButton" 
+        id="setupFiltersButton" 
         data-bs-toggle="dropdown" 
         data-bs-auto-close="outside"
         aria-expanded="false"
@@ -35,21 +35,21 @@
       >
         <i class="fas fa-filter"></i> {{ _('Filtros') }}
       </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="stressFiltersButton" style="min-width: 250px;">
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="setupFiltersButton" style="min-width: 250px;">
         <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
       </ul>
     </div>
-    <span id="stressSearchResults" class="text-muted small"></span>
+    <span id="setupSearchResults" class="text-muted small"></span>
   </div>
 
   <!-- Contenedor para mensajes -->
-  <div id="noStressResults" class="alert alert-info mt-4" style="display: none;">
+  <div id="noSetupResults" class="alert alert-info mt-4" style="display: none;">
     {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
   </div>
 
-  {% if stresses %}
-  <div id="stressTableContainer">
-    <form id="bulk-action-form" method="POST" action="{{ url_for('stress.bulk_action') }}">
+  {% if setup_list %}
+  <div id="setupTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('setup.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
@@ -63,51 +63,52 @@
         <thead class="table-light">
           <tr>
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
-            <th>{{ _('Nombre') }}</th>
-            <th>{{ _('Nombre corto') }}</th>
-            <th>{{ _('Categoría') }}</th>
-            <th>{{ _('Descripción') }}</th>
+            <th>{{ _('Cultivar') }}</th>
+            <th>{{ _('Suelo') }}</th>
+            <th>{{ _('Temporada') }}</th>
+            <th>{{ _('Frecuencia') }}</th>
             <th>{{ _('Estado') }}</th>
             <th class="text-end">{{ _('Acciones') }}</th>
           </tr>
         </thead>
-        <tbody id="stressTableBody">
-          {% for stress in stresses %}
+        <tbody id="setupTableBody">
+          {% for setup in setup_list %}
           <tr 
-            data-short_name="{{ stress.short_name }}"
-            data-category="{{ stress.category.value}}"
-            data-description="{{ stress.description or '' }}"
-            data-status="{% if stress.enable %}active{% else %}inactive{% endif %}"
-            >
-            <td><input type="checkbox" name="selected_ids" value="{{ stress.id }}" class="select-row" /></td>
-            <td class="searchable">{{ stress.name }}</td>
-            <td class="searchable">{{ stress.short_name }}</td>
-            <td class="searchable">{{ stress.category.value if stress.category else '' }}</td>
-            <td class="searchable">{{ stress.description or '' }}</td>
+            data-cultivar="{{ setup.cultivar.name if setup.cultivar else '' }}"
+            data-soil="{{ setup.soil.name if setup.soil else '' }}"
+            data-season="{{ setup.season.name if setup.season else '' }}"
+            data-frequency="{{ setup.frequency }}"
+            data-status="{% if setup.enable %}active{% else %}inactive{% endif %}"
+          >
+            <td><input type="checkbox" name="selected_ids" value="{{ setup.id }}" class="select-row" /></td>
+            <td class="searchable">{{ setup.cultivar.name if setup.cultivar else '' }}</td>
+            <td class="searchable">{{ setup.soil.name if setup.soil else '' }}</td>
+            <td class="searchable">{{ setup.season.name if setup.season else '' }}</td>
+            <td>{{ setup.frequency }}</td>
             <td>
-              {{ 'Habilitado' if stress.enable else 'Deshabilitado' }}
+              {{ _('Habilitado') if setup.enable else _('Deshabilitado') }}
             </td>
             <td class="text-end">
               <a
-                href="{{ url_for('stress.edit_stress', id=stress.id) }}"
+                href="{{ url_for('setup.edit_setup', id=setup.id) }}"
                 class="btn btn-warning btn-sm me-2"
-                title="Editar"
+                title="{{ _('Editar') }}"
               >
                 <i class="fas fa-pen"></i>
               </a>
-              {% if stress.enable %}
+              {% if setup.enable %}
               <a
-                href="{{ url_for('stress.delete_stress', id=stress.id) }}"
+                href="{{ url_for('setup.delete_setup', id=setup.id) }}"
                 class="btn btn-danger btn-sm"
-                title="Deshabilitar"
+                title="{{ _('Deshabilitar') }}"
               >
                 <i class="fas fa-trash"></i>
               </a>
               {% else %}
               <a
-                href="{{ url_for('stress.reset_stress', id=stress.id) }}"
+                href="{{ url_for('setup.reset_setup', id=setup.id) }}"
                 class="btn btn-success btn-sm"
-                title="Recuperar"
+                title="{{ _('Recuperar') }}"
               >
                 <i class="fas fa-undo"></i>
               </a>
@@ -121,65 +122,69 @@
   </div>
   <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">
-    {{ _('Mostrando') }} <span id="stressResultsCount"></span> {{ _('resultados') }}
+    {{ _('Mostrando') }} <span id="setupResultsCount"></span> {{ _('resultados') }}
   </div>
   {% else %}
   <div class="alert alert-info mt-4">
-    {{ _('No hay estreses registrados.') }}
+    {{ _('No hay configuraciones registradas.') }}
   </div>
   {% endif %}
 </div>
 
-<!-- Modal para agregar Estrés -->
+<!-- Modal para agregar Configuración de Simulación -->
 <div
   class="modal fade"
-  id="addStressModal"
+  id="addSetupModal"
   tabindex="-1"
-  aria-labelledby="addStressLabel"
+  aria-labelledby="addSetupLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <form method="POST" class="modal-content">
       {{ form.hidden_tag() }}
       <div class="modal-header">
-        <h5 class="modal-title" id="addStressLabel">
-          {{ _('Agregar estrés') }}
+        <h5 class="modal-title" id="addSetupLabel">
+          {{ _('Agregar configuración de simulación') }}
         </h5>
         <button
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Cerrar"
+          aria-label="{{ _('Cerrar') }}"
         ></button>
       </div>
       <div class="modal-body">
         <div class="mb-3">
-          {{ form.name.label(class="form-label") }}
-          {{ form.name(class="form-control") }}
-          {% for error in form.name.errors %}
+          {{ form.cultivar_id.label(class="form-label") }}
+          {{ form.cultivar_id(class="form-select") }}
+          {% for error in form.cultivar_id.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.short_name.label(class="form-label") }}
-          {{ form.short_name(class="form-control") }}
-          {% for error in form.short_name.errors %}
+          {{ form.soil_id.label(class="form-label") }}
+          {{ form.soil_id(class="form-select") }}
+          {% for error in form.soil_id.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.category.label(class="form-label") }}
-          {{ form.category(class="form-select") }}
-          {% for error in form.category.errors %}
+          {{ form.season_id.label(class="form-label") }}
+          {{ form.season_id(class="form-select") }}
+          {% for error in form.season_id.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.description.label(class="form-label") }}
-          {{ form.description(class="form-control") }}
-          {% for error in form.description.errors %}
+          {{ form.frequency.label(class="form-label") }}
+          {{ form.frequency(class="form-control") }}
+          {% for error in form.frequency.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
+        </div>
+        <div class="form-check mb-2">
+          {{ form.enable(class="form-check-input") }}
+          {{ form.enable.label(class="form-check-label") }}
         </div>
       </div>
       <div class="modal-footer">
@@ -198,38 +203,36 @@
   import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
 
   document.addEventListener('DOMContentLoaded', function() {
-    // Configuración para búsqueda en estreses
+    // Configuración para búsqueda en configuraciones de simulación
     initTableSearch({
-      searchInputId: 'stressSearchInput',
-      filterButtonId: 'stressFiltersButton',
-      tableContainerId: 'stressTableContainer',
-      noResultsId: 'noStressResults',
-      resultsCountId: 'stressResultsCount',
-      tableBodyId: 'stressTableBody',
+      searchInputId: 'setupSearchInput',
+      filtersButtonId: 'setupFiltersButton',
+      tableContainerId: 'setupTableContainer',
+      noResultsId: 'noSetupResults',
+      resultsCountId: 'setupResultsCount',
+      tableBodyId: 'setupTableBody',
 
       searchColumns: [
         { selector: '.searchable' }
       ],
       filterConfigs: [
         {
-          name: 'short_name',
-          label: '{{ _("Nombre corto") }}',
-          getValue: row => row.dataset.short_name,
-          getDisplayValue: row => row.dataset.short_name || '{{ _("Sin nombre corto") }}'
+          name: 'cultivar',
+          label: '{{ _("Cultivar") }}',
+          getValue: row => row.dataset.cultivar,
+          getDisplayValue: row => row.dataset.cultivar || '{{ _("Sin cultivar") }}'
         },
         {
-          name: 'category',
-          label: '{{ _("Categoría") }}',
-          getValue: row => row.dataset.category,
-          getDisplayValue: row => {
-            return row.dataset.category || '{{ _("Sin categoría") }}';
-          }
+          name: 'soil',
+          label: '{{ _("Suelo") }}',
+          getValue: row => row.dataset.soil,
+          getDisplayValue: row => row.dataset.soil || '{{ _("Sin suelo") }}'
         },
         {
-          name: 'description',
-          label: '{{ _("Descripción") }}',
-          getValue: row => row.dataset.description,
-          getDisplayValue: row => row.dataset.description || '{{ _("Sin descripción") }}'
+          name: 'season',
+          label: '{{ _("Temporada") }}',
+          getValue: row => row.dataset.season,
+          getDisplayValue: row => row.dataset.season || '{{ _("Sin temporada") }}'
         },
         {
           name: 'status',
@@ -255,5 +258,3 @@
   });
 </script>
 {% endblock %}
-
-

@@ -177,10 +177,13 @@
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('stress.list_stress') }}">
               <span>{{ _('Stresses') }}</span>
             </a>
-            <a class="nav-link d-flex align-items-center text-dark" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('phenological_stage.list_phenological_stages') }}">
+              <span>{{ _('Phenological stages') }}</span>
+            </a>
+            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('setup.list_setup') }}">
               <span>{{ _('Setup simulations crops') }}</span>
             </a>
-            <a class="nav-link d-flex align-items-center text-dark" href="#">
+            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('phenological_stage_stress.list_phenological_stage_stress') }}">
               <span>{{ _('Stress parameters') }}</span>
             </a>
           </nav>
