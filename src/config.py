@@ -49,3 +49,9 @@ class Config:
     @property
     def KEYCLOAK_LOGOUT_URL(self):
         return f"{self.KEYCLOAK_SERVER_URL}/realms/{self.KEYCLOAK_REALM}/protocol/openid-connect/logout"
+    
+    # Define which models are compatible with which crops
+    MODELS_AND_CROPS = {
+        'DSSAT': {"Maize", "Wheat"},
+        'ORYZA': {"Rice"}
+    }

@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Configuraciones de Simulación') }}{% endblock %}
+{% block title %}{{ _('Temporadas') }}{% endblock %}
 {% block content %}
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ _('Configuraciones de Simulación') }}</h2>
+    <h2>{{ _('Temporadas') }}</h2>
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
-      data-bs-target="#addSetupModal"
+      data-bs-target="#addSeasonModal"
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
@@ -18,7 +18,7 @@
     <input
       type="text"
       class="form-control me-2"
-      id="setupSearchInput"
+      id="seasonSearchInput"
       placeholder="{{ _('Buscar...') }}"
       style="max-width: 300px"
     />
@@ -26,7 +26,7 @@
       <button 
         class="btn btn-outline-secondary dropdown-toggle" 
         type="button" 
-        id="setupFiltersButton" 
+        id="seasonFiltersButton" 
         data-bs-toggle="dropdown" 
         data-bs-auto-close="outside"
         aria-expanded="false"
@@ -35,21 +35,21 @@
       >
         <i class="fas fa-filter"></i> {{ _('Filtros') }}
       </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="setupFiltersButton" style="min-width: 250px;">
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="seasonFiltersButton" style="min-width: 250px;">
         <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
       </ul>
     </div>
-    <span id="setupSearchResults" class="text-muted small"></span>
+    <span id="seasonSearchResults" class="text-muted small"></span>
   </div>
 
   <!-- Contenedor para mensajes -->
-  <div id="noSetupResults" class="alert alert-info mt-4" style="display: none;">
+  <div id="noSeasonResults" class="alert alert-info mt-4" style="display: none;">
     {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
   </div>
 
-  {% if setup_list %}
-  <div id="setupTableContainer">
-    <form id="bulk-action-form" method="POST" action="{{ url_for('setup.bulk_action') }}">
+  {% if seasons %}
+  <div id="seasonTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('season.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
@@ -63,42 +63,48 @@
         <thead class="table-light">
           <tr>
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
-            <th>{{ _('Cultivar') }}</th>
-            <th>{{ _('Suelo') }}</th>
-            <th>{{ _('Temporada') }}</th>
-            <th>{{ _('Frecuencia') }}</th>
+            <th>{{ _('Localidad') }}</th>
+            <th>{{ _('Cultivo') }}</th>
+            <th>{{ _('Inicio de siembra') }}</th>
+            <th>{{ _('Fin de siembra') }}</th>
+            <th>{{ _('Inicio de temporada') }}</th>
+            <th>{{ _('Fin de temporada') }}</th>
             <th>{{ _('Estado') }}</th>
             <th class="text-end">{{ _('Acciones') }}</th>
           </tr>
         </thead>
-        <tbody id="setupTableBody">
-          {% for setup in setup_list %}
+        <tbody id="seasonTableBody">
+          {% for season in seasons %}
           <tr 
-            data-cultivar="{{ setup.cultivar.name if setup.cultivar else '' }}"
-            data-soil="{{ setup.soil.name if setup.soil else '' }}"
-            data-season="{{ setup.season.name if setup.season else '' }}"
-            data-frequency="{{ setup.frequency }}"
-            data-status="{% if setup.enable %}active{% else %}inactive{% endif %}"
+            data-location="{{ season.location.name if season.location else '' }}"
+            data-crop="{{ season.crop.name if season.crop else '' }}"
+            data-planting_start="{{ season.planting_start }}"
+            data-planting_end="{{ season.planting_end }}"
+            data-season_start="{{ season.season_start }}"
+            data-season_end="{{ season.season_end }}"
+            data-status="{% if season.enable %}active{% else %}inactive{% endif %}"
           >
-            <td><input type="checkbox" name="selected_ids" value="{{ setup.id }}" class="select-row" /></td>
-            <td class="searchable">{{ setup.cultivar.name if setup.cultivar else '' }}</td>
-            <td class="searchable">{{ setup.soil.name if setup.soil else '' }}</td>
-            <td class="searchable">{{ setup.season.id if setup.season else '' }}</td>
-            <td>{{ setup.frequency }}</td>
+            <td><input type="checkbox" name="selected_ids" value="{{ season.id }}" class="select-row" /></td>
+            <td class="searchable">{{ season.location.name if season.location else '' }}</td>
+            <td class="searchable">{{ season.crop.name if season.crop else '' }}</td>
+            <td>{{ season.planting_start }}</td>
+            <td>{{ season.planting_end }}</td>
+            <td>{{ season.season_start }}</td>
+            <td>{{ season.season_end }}</td>
             <td>
-              {{ _('Habilitado') if setup.enable else _('Deshabilitado') }}
+              {{ _('Habilitado') if season.enable else _('Deshabilitado') }}
             </td>
             <td class="text-end">
               <a
-                href="{{ url_for('setup.edit_setup', id=setup.id) }}"
+                href="{{ url_for('season.edit_season', id=season.id) }}"
                 class="btn btn-warning btn-sm me-2"
                 title="{{ _('Editar') }}"
               >
                 <i class="fas fa-pen"></i>
               </a>
-              {% if setup.enable %}
+              {% if season.enable %}
               <a
-                href="{{ url_for('setup.delete_setup', id=setup.id) }}"
+                href="{{ url_for('season.delete_season', id=season.id) }}"
                 class="btn btn-danger btn-sm"
                 title="{{ _('Deshabilitar') }}"
               >
@@ -106,7 +112,7 @@
               </a>
               {% else %}
               <a
-                href="{{ url_for('setup.reset_setup', id=setup.id) }}"
+                href="{{ url_for('season.reset_season', id=season.id) }}"
                 class="btn btn-success btn-sm"
                 title="{{ _('Recuperar') }}"
               >
@@ -122,29 +128,29 @@
   </div>
   <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">
-    {{ _('Mostrando') }} <span id="setupResultsCount"></span> {{ _('resultados') }}
+    {{ _('Mostrando') }} <span id="seasonResultsCount"></span> {{ _('resultado(s)') }}
   </div>
   {% else %}
   <div class="alert alert-info mt-4">
-    {{ _('No hay configuraciones registradas.') }}
+    {{ _('No hay temporadas registradas.') }}
   </div>
   {% endif %}
 </div>
 
-<!-- Modal para agregar Configuración de Simulación -->
+<!-- Modal para agregar Temporada -->
 <div
   class="modal fade"
-  id="addSetupModal"
+  id="addSeasonModal"
   tabindex="-1"
-  aria-labelledby="addSetupLabel"
+  aria-labelledby="addSeasonLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <form method="POST" class="modal-content">
       {{ form.hidden_tag() }}
       <div class="modal-header">
-        <h5 class="modal-title" id="addSetupLabel">
-          {{ _('Agregar configuración de simulación') }}
+        <h5 class="modal-title" id="addSeasonLabel">
+          {{ _('Agregar temporada') }}
         </h5>
         <button
           type="button"
@@ -155,30 +161,44 @@
       </div>
       <div class="modal-body">
         <div class="mb-3">
-          {{ form.cultivar_id.label(class="form-label") }}
-          {{ form.cultivar_id(class="form-select") }}
-          {% for error in form.cultivar_id.errors %}
+          {{ form.location_id.label(class="form-label") }}
+          {{ form.location_id(class="form-select") }}
+          {% for error in form.location_id.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.soil_id.label(class="form-label") }}
-          {{ form.soil_id(class="form-select") }}
-          {% for error in form.soil_id.errors %}
+          {{ form.crop_id.label(class="form-label") }}
+          {{ form.crop_id(class="form-select") }}
+          {% for error in form.crop_id.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.season_id.label(class="form-label") }}
-          {{ form.season_id(class="form-select") }}
-          {% for error in form.season_id.errors %}
+          {{ form.planting_start.label(class="form-label") }}
+          {{ form.planting_start(class="form-control") }}
+          {% for error in form.planting_start.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.frequency.label(class="form-label") }}
-          {{ form.frequency(class="form-control") }}
-          {% for error in form.frequency.errors %}
+          {{ form.planting_end.label(class="form-label") }}
+          {{ form.planting_end(class="form-control") }}
+          {% for error in form.planting_end.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.season_start.label(class="form-label") }}
+          {{ form.season_start(class="form-control") }}
+          {% for error in form.season_start.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.season_end.label(class="form-label") }}
+          {{ form.season_end(class="form-control") }}
+          {% for error in form.season_end.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
@@ -199,36 +219,54 @@
   import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
 
   document.addEventListener('DOMContentLoaded', function() {
-    // Configuración para búsqueda en configuraciones de simulación
+    // Configuración para búsqueda en temporadas
     initTableSearch({
-      searchInputId: 'setupSearchInput',
-      filtersButtonId: 'setupFiltersButton',
-      tableContainerId: 'setupTableContainer',
-      noResultsId: 'noSetupResults',
-      resultsCountId: 'setupResultsCount',
-      tableBodyId: 'setupTableBody',
+      searchInputId: 'seasonSearchInput',
+      filtersButtonId: 'seasonFiltersButton',
+      tableContainerId: 'seasonTableContainer',
+      noResultsId: 'noSeasonResults',
+      resultsCountId: 'seasonResultsCount',
+      tableBodyId: 'seasonTableBody',
 
       searchColumns: [
         { selector: '.searchable' }
       ],
       filterConfigs: [
         {
-          name: 'cultivar',
-          label: '{{ _("Cultivar") }}',
-          getValue: row => row.dataset.cultivar,
-          getDisplayValue: row => row.dataset.cultivar || '{{ _("Sin cultivar") }}'
+          name: 'location',
+          label: '{{ _("Localidad") }}',
+          getValue: row => row.dataset.location,
+          getDisplayValue: row => row.dataset.location || '{{ _("Sin localidad") }}'
         },
         {
-          name: 'soil',
-          label: '{{ _("Suelo") }}',
-          getValue: row => row.dataset.soil,
-          getDisplayValue: row => row.dataset.soil || '{{ _("Sin suelo") }}'
+          name: 'crop',
+          label: '{{ _("Cultivo") }}',
+          getValue: row => row.dataset.crop,
+          getDisplayValue: row => row.dataset.crop || '{{ _("Sin cultivo") }}'
         },
         {
-          name: 'season',
-          label: '{{ _("Temporada") }}',
-          getValue: row => row.dataset.season,
-          getDisplayValue: row => row.dataset.season || '{{ _("Sin temporada") }}'
+          name: 'planting_start',
+          label: '{{ _("Inicio de siembra") }}',
+          getValue: row => row.dataset.planting_start,
+          getDisplayValue: row => row.dataset.planting_start || '-'
+        },
+        {
+          name: 'planting_end',
+          label: '{{ _("Fin de siembra") }}',
+          getValue: row => row.dataset.planting_end,
+          getDisplayValue: row => row.dataset.planting_end || '-'
+        },
+        {
+          name: 'season_start',
+          label: '{{ _("Inicio de temporada") }}',
+          getValue: row => row.dataset.season_start,
+          getDisplayValue: row => row.dataset.season_start || '-'
+        },
+        {
+          name: 'season_end',
+          label: '{{ _("Fin de temporada") }}',
+          getValue: row => row.dataset.season_end,
+          getDisplayValue: row => row.dataset.season_end || '-'
         },
         {
           name: 'status',
@@ -254,3 +292,5 @@
   });
 </script>
 {% endblock %}
+
+

@@ -18,7 +18,7 @@ def list_setup():
     # Llenar dinámicamente las opciones de los select
     form.cultivar_id.choices = [(c.id, c.name) for c in cultivar_service.get_all_enable()]
     form.soil_id.choices = [(s.id, s.name) for s in soil_service.get_all_enable()]
-    form.season_id.choices = [(se.id, se.name) for se in season_service.get_all_enable()]
+    form.season_id.choices = [(se.id) for se in season_service.get_all_enable()]
 
     if form.validate_on_submit():
         new_setup = SetupCreate(

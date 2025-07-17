@@ -81,6 +81,9 @@ def create_app():
     from app.routes.indicators_routes import bp as indicator_bp
     from app.routes.phenological_stage_stress_routes import bp as phenological_stage_stress_bp
     from app.routes.setup_routes import bp as setup_bp
+    from app.routes.soil_routes import bp as soil_bp
+    from app.routes.cultivar_routes import bp as cultivar_bp
+    from app.routes.season_routes import bp as season_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(country_bp)
@@ -98,5 +101,8 @@ def create_app():
     app.register_blueprint(indicator_bp)
     app.register_blueprint(phenological_stage_stress_bp)
     app.register_blueprint(setup_bp)
+    app.register_blueprint(soil_bp)
+    app.register_blueprint(cultivar_bp)
+    app.register_blueprint(season_bp)
 
     return app
