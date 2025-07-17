@@ -42,9 +42,6 @@ def edit_indicator(id):
     form = IndicatorForm(obj=indicator)
     # Llenar dinámicamente los tipos desde el Enum
     form.type.choices = [(cat.value, _(cat.value)) for cat in IndicatorsType]
-    print(indicator)
-    if request.method == 'GET':
-        form.type.data = indicator.type
 
     if form.validate_on_submit():
         update_data = IndicatorUpdate(
