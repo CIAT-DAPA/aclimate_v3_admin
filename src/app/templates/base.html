@@ -312,41 +312,55 @@
     <div class="main-content" id="mainContent">
       {% endif %}
 
-      <!-- Mensajes flash -->
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if
-      messages %} {% for category, message in messages %}
-      <div
-        class="alert {% if category == 'error' %}alert-danger {% elif category == 'success' %}alert-success {% elif category == 'info' %}alert-info {% elif category == 'warning' %}alert-warning {% else %}alert-primary {% endif %} alert-dismissible fade show position-fixed bottom-0 end-0 p-3 auto-dismiss-alert me-3"
-        role="alert"
-        style="max-width: 300px; z-index: 1050"
-      >
+      <!-- Contenedor para agrupar alertas y apilarlas -->
+<div
+  class="position-fixed bottom-0 end-0 p-3"
+  style="z-index: 1050"
+>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
         <div
-          class="pe-4"
-          style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+          class="alert 
+            {% if category == 'error' %}alert-danger 
+            {% elif category == 'success' %}alert-success 
+            {% elif category == 'info' %}alert-info 
+            {% elif category == 'warning' %}alert-warning 
+            {% else %}alert-primary{% endif %} 
+            alert-dismissible fade show auto-dismiss-alert mb-2" 
+          role="alert"
+          style="max-width: 300px;"
         >
-          {% if category == 'error' %}
-          <i class="fas fa-exclamation-triangle me-2 flex-shrink-0"></i>
-          {% elif category == 'success' %}
-          <i class="fas fa-check-circle me-2 flex-shrink-0"></i>
-          {% elif category == 'info' %}
-          <i class="fas fa-info-circle me-2 flex-shrink-0"></i>
-          {% elif category == 'warning' %}
-          <i class="fas fa-exclamation-circle me-2 flex-shrink-0"></i>
-          {% else %}
-          <i class="fas fa-bell me-2 flex-shrink-0"></i>
-          {% endif %}
-          <span style="overflow: hidden; text-overflow: ellipsis"
-            >{{ message }}</span
+          <div
+            class="pe-4"
+            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
           >
+            {% if category == 'error' %}
+              <i class="fas fa-exclamation-triangle me-2 flex-shrink-0"></i>
+            {% elif category == 'success' %}
+              <i class="fas fa-check-circle me-2 flex-shrink-0"></i>
+            {% elif category == 'info' %}
+              <i class="fas fa-info-circle me-2 flex-shrink-0"></i>
+            {% elif category == 'warning' %}
+              <i class="fas fa-exclamation-circle me-2 flex-shrink-0"></i>
+            {% else %}
+              <i class="fas fa-bell me-2 flex-shrink-0"></i>
+            {% endif %}
+            <span style="overflow: hidden; text-overflow: ellipsis">
+              {{ message }}
+            </span>
+          </div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="{{ _('Close') }}"
+          ></button>
         </div>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="{{ _('Close') }}"
-        ></button>
-      </div>
-      {% endfor %} {% endif %} {% endwith %}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
 
       <!-- Main Content -->
       <main
