@@ -14,14 +14,14 @@ indicator_service = MngIndicatorService()
 def list_indicator():
     form = IndicatorForm()
     # Llenar dinámicamente los tipos desde el Enum
-    form.type.choices = [(cat.name, _(cat.value)) for cat in IndicatorsType]
+    form.type.choices = [(cat.value, _(cat.value)) for cat in IndicatorsType]
 
     if form.validate_on_submit():
         new_indicator = IndicatorCreate(
             name=form.name.data,
             short_name=form.short_name.data,
             unit=form.unit.data,
-            type=IndicatorsType[form.type.data],
+            type=form.type.data,
             description=form.description.data,
         )
         indicator_service.create(new_indicator)
@@ -41,7 +41,7 @@ def edit_indicator(id):
 
     form = IndicatorForm(obj=indicator)
     # Llenar dinámicamente los tipos desde el Enum
-    form.type.choices = [(cat.name, _(cat.value)) for cat in IndicatorsType]
+    form.type.choices = [(cat.value, _(cat.value)) for cat in IndicatorsType]
     print(indicator)
     if request.method == 'GET':
         form.type.data = indicator.type
@@ -50,7 +50,7 @@ def edit_indicator(id):
         update_data = IndicatorUpdate(
             name=form.name.data,
             short_name=form.short_name.data,
-            type=IndicatorsType[form.type.data],
+            type=form.type.data,
             unit=form.unit.data,
             description=form.description.data,
             enable=form.enable.data
