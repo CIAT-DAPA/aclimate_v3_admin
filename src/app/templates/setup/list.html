@@ -50,15 +50,7 @@
   {% if setup_list %}
   <div id="setupTableContainer">
     <form id="bulk-action-form" method="POST" action="{{ url_for('setup.bulk_action') }}">
-      <div class="mb-2">
-        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
-        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
-          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
-        </button>
-        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
-          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
-        </button>
-      </div>
+      <!-- ... (código existente) ... -->
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
@@ -67,6 +59,7 @@
             <th>{{ _('Suelo') }}</th>
             <th>{{ _('Temporada') }}</th>
             <th>{{ _('Frecuencia') }}</th>
+            <th>{{ _('Archivos') }}</th> <!-- Nueva columna -->
             <th>{{ _('Estado') }}</th>
             <th class="text-end">{{ _('Acciones') }}</th>
           </tr>
@@ -85,6 +78,15 @@
             <td class="searchable">{{ setup.soil.name if setup.soil else '' }}</td>
             <td class="searchable">{{ setup.season.id if setup.season else '' }}</td>
             <td>{{ setup.frequency }}</td>
+            <td>
+              {% if setup.configuration_files %}
+                <span class="badge bg-primary">
+                  {{ setup.configuration_files|length }} {{ _('archivos') }}
+                </span>
+              {% else %}
+                <span class="badge bg-secondary">{{ _('Sin archivos') }}</span>
+              {% endif %}
+            </td>
             <td>
               {{ _('Habilitado') if setup.enable else _('Deshabilitado') }}
             </td>
@@ -140,7 +142,7 @@
   aria-hidden="true"
 >
   <div class="modal-dialog">
-    <form method="POST" class="modal-content">
+    <form method="POST" class="modal-content" enctype="multipart/form-data">
       {{ form.hidden_tag() }}
       <div class="modal-header">
         <h5 class="modal-title" id="addSetupLabel">
@@ -182,6 +184,21 @@
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
+        <!-- Sección de archivos de configuración -->
+        <div class="dropzone mb-3 p-4 border rounded text-center">
+          {{ form.config_files.label(class="form-label") }}
+          {{ form.config_files(class="d-none", id="file-input-modal") }}
+          <div class="dropzone-placeholder">
+            <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
+            <p>{{ _('Arrastra tus archivos aquí o haz clic para seleccionar') }}</p>
+            <p class="small text-muted">{{ _('Formatos permitidos: .crp, .exp, .sol, .csv, .cul, .eco, .spe') }}</p>
+          </div>
+          <div class="dropzone-preview mt-3 d-none"></div>
+          <div class="form-text">{{ _('Selecciona uno o más archivos para cargar.') }}</div>
+        </div>
+        {% for error in form.config_files.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -253,4 +270,71 @@
     });
   });
 </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Dropzone para el modal de agregar configuración
+    const dropZone = document.querySelector('#addSetupModal .dropzone');
+    const fileInput = document.getElementById('file-input-modal');
+    const placeholder = dropZone ? dropZone.querySelector('.dropzone-placeholder') : null;
+    const preview = dropZone ? dropZone.querySelector('.dropzone-preview') : null;
+
+    if (dropZone && fileInput && placeholder && preview) {
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-primary');
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-primary');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-primary');
+        fileInput.files = e.dataTransfer.files;
+        updatePreview();
+      });
+
+      fileInput.addEventListener('change', updatePreview);
+
+      function updatePreview() {
+        preview.innerHTML = '';
+        if (fileInput.files.length > 0) {
+          placeholder.classList.add('d-none');
+          preview.classList.remove('d-none');
+
+          for (const file of fileInput.files) {
+            const filePreview = document.createElement('div');
+            filePreview.className = 'd-flex justify-content-between align-items-center mb-2';
+            filePreview.innerHTML = `
+              <div>
+                <i class="fas fa-file me-2"></i>
+                <span>${file.name}</span>
+                <small class="text-muted ms-2">(${(file.size/1024).toFixed(1)} KB)</small>
+              </div>
+            `;
+            preview.appendChild(filePreview);
+          }
+        } else {
+          placeholder.classList.remove('d-none');
+          preview.classList.add('d-none');
+        }
+      }
+    }
+  });
+</script>
+
+<style>
+  .dropzone {
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .dropzone:hover {
+    background-color: #e9ecef;
+  }
+</style>
 {% endblock %}

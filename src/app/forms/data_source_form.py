@@ -42,6 +42,23 @@ class DataSourceForm(FlaskForm):
 
     enable = BooleanField(_l('¿Está habilitado?'), default=True)
 
+    template = SelectField(
+        _l('Plantilla JSON'),
+        choices=[
+            ('', _l('Seleccionar plantilla...')),
+            ('sst_iridl', _l('SST - IRIDL')),
+            ('copernicus', _l('Copernicus')),
+            ('chirps', _l('CHIRPS - Precipitación')),
+            ('era5_single', _l('ERA5 - Temperatura Máxima')),
+            ('era5_full', _l('ERA5 - Todas las variables')),
+            ('climatology', _l('Generación de Climatología')),
+            ('full_workflow', _l('Flujo completo CHIRPS+ERA5')),
+            ('custom', _l('Personalizado'))
+        ],
+        default='',
+        render_kw={"onchange": "loadTemplate(this)"}
+    )
+
     content = TextAreaField(
         _l('Contenido en formato JSON'),
         validators=[Optional(), json_validator]

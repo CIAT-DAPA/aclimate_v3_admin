@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Fuentes de datos') }}{% endblock %}
+{% block title %}{{ _('Configuración de parámetros de clientes') }}{% endblock %}
 {% block content %}
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ _('Fuentes de datos') }}</h2>
+    <h2>{{ _('Configuración de parámetros de clientes') }}</h2>
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
@@ -176,15 +176,15 @@
           {% endfor %}
         </div>
         <div class="mb-3">
+          {{ form.template.label(class="form-label") }}
+          {{ form.template(class="form-select") }}
+        </div>
+        <div class="mb-3">
           {{ form.content.label(class="form-label") }}
-          {{ form.content(class="form-control", rows="3") }}
+          {{ form.content(class="form-control", rows="8", id="json-content") }}
           {% for error in form.content.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
-        </div>
-        <div class="form-check mb-2">
-          {{ form.enable(class="form-check-input") }}
-          {{ form.enable.label(class="form-check-label") }}
         </div>
       </div>
       <div class="modal-footer">
@@ -197,6 +197,16 @@
   </div>
 </div>
 
+<!-- Incluir archivo de plantillas -->
+<script src="{{ url_for('static', filename='js/utils/dataSourceTemplates.js') }}"></script>
+
+<style>
+#json-content {
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+    tab-size: 4;
+}
+</style>
 <!-- Script para llamar la búsqueda y acciones masivas -->
 <script type="module">
   import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";

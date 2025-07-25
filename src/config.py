@@ -55,3 +55,6 @@ class Config:
         'DSSAT': {"Maize", "Wheat"},
         'ORYZA': {"Rice"}
     }
+
+    # Configurar carpeta para subidas
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'conf_files')

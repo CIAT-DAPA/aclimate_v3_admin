@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_babel import lazy_gettext as _l
+from flask_wtf.file import FileAllowed, MultipleFileField
 from wtforms import SelectField, IntegerField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, NumberRange
 
@@ -32,6 +33,14 @@ class SetupForm(FlaskForm):
             NumberRange(min=1, message=_l('La frecuencia debe ser mayor a 0.'))
         ]
     )
+
+    config_files = MultipleFileField(
+        _l('Archivos de configuración'),
+        validators=[FileAllowed(['crp', 'exp', 'sol', 'csv', 'cul', 'eco', 'spe'], 
+                  _l('Solo se permiten archivos de configuración con las extensiones: crp, exp, sol, csv, cul, eco, spe'))],
+        render_kw={"multiple": True}
+    )
+    
 
     enable = BooleanField(_l('¿Está habilitado?'), default=True)
 

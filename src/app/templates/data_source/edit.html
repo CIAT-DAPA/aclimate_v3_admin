@@ -48,19 +48,30 @@ block content %}
       {% endfor %}
     </div>
     <div class="mb-3">
-      {{ form.content.label(class="form-label") }}
-      {{ form.content(class="form-control", rows="3") }}
-      {% for error in form.content.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
+      {{ form.template.label(class="form-label") }}
+      {{ form.template(class="form-select") }}
     </div>
-    <div class="form-check mb-4">
-      {{ form.enable(class="form-check-input") }}
-      {{ form.enable.label(class="form-check-label") }}
+    <div class="mb-3">
+      {{ form.content.label(class="form-label") }}
+      {{ form.content(class="form-control", rows="8", id="json-content") }}
+      {% for error in form.content.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
 
     {{ form.submit(class="btn btn-success") }}
     <a href="{{ url_for('data_source.list_data_source') }}" class="btn btn-outline-secondary">Cancelar</a>
   </form>
 </div>
+<!-- Incluir archivo de plantillas -->
+<script src="{{ url_for('static', filename='js/dataSourceTemplates.js') }}"></script>
+
+<style>
+#json-content {
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+    tab-size: 4;
+}
+</style>
 {% endblock %}
+

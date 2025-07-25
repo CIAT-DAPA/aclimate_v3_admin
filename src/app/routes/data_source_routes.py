@@ -26,6 +26,7 @@ def list_data_source():
             content=form.content.data
         )
         data_source_service.create(new_source)
+        form.template.data = ''
         flash(_('Fuente de datos agregada correctamente.'), 'success')
         return redirect(url_for('data_source.list_data_source'))
 
@@ -43,6 +44,7 @@ def edit_data_source(id):
 
     form = DataSourceForm(obj=data_source)
     form.country_id.choices = [(c.id, c.name) for c in country_service.get_all_enable()]
+    form.template.data = ''
 
     if request.method == 'GET':
         form.type.data = data_source.type

@@ -1,3 +1,4 @@
+import os
 from flask import Flask, app, request, session
 from flask_login import LoginManager, current_user
 from flask_babel import Babel 
@@ -29,6 +30,10 @@ def get_locale():
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    # Crear directorio de subidas si no existe
+    if not os.path.exists(Config.UPLOAD_FOLDER):
+        os.makedirs(Config.UPLOAD_FOLDER)
 
     print(f"App config DATABASE_URL: {app.config.get('SQLALCHEMY_DATABASE_URI')}")
 
