@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-05-30 15:30-0500\n"
-"PO-Revision-Date: 2025-05-30 15:31-0500\n"
+"POT-Creation-Date: 2025-08-05 10:11-0500\n"
+"PO-Revision-Date: 2025-08-05 10:12-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
 "Language-Team: en_US <LL@li.org>\n"
@@ -18,243 +18,1072 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/forms/adm1_form.py:8 app/forms/adm2_form.py:8
-#: app/templates/adm1/list.html:34 app/templates/adm2/list.html:34
-#: app/templates/country/list.html:35
+#: app/decorators/auth.py:12 app/decorators/auth.py:31
+#: app/decorators/permissions.py:18
+msgid "Please log in to access this page."
+msgstr "Please log in to access this page."
+
+#: app/decorators/auth.py:20
+msgid "Session expired. Please login again."
+msgstr "Session expired. Please log in again."
+
+#: app/decorators/permissions.py:27
+msgid "You do not have access to this module."
+msgstr "You do not have access to this module."
+
+#: app/forms/adm1_form.py:8 app/forms/adm2_form.py:8 app/forms/crop_form.py:8
+#: app/forms/cultivar_form.py:22 app/forms/data_source_form.py:23
+#: app/forms/indicator_form.py:8 app/forms/phenological_stage_form.py:16
+#: app/forms/register_form.py:21 app/forms/soil_form.py:22
+#: app/forms/source_form.py:8 app/forms/stress_form.py:8
+#: app/forms/user_form.py:25 app/forms/user_form.py:52
+#: app/templates/adm1/list.html:66 app/templates/adm2/list.html:66
+#: app/templates/country/list.html:67 app/templates/crop/crop_list.html:66
+#: app/templates/crop/list.html:66 app/templates/cultivar/list.html:66
+#: app/templates/data_source/list.html:67 app/templates/indicator/list.html:66
+#: app/templates/phenological_stage/list.html:66
+#: app/templates/soil/list.html:66 app/templates/source/list.html:67
+#: app/templates/stress/list.html:66
 msgid "Nombre"
-msgstr ""
+msgstr "Name"
 
 #: app/forms/adm1_form.py:10 app/forms/adm2_form.py:10
-#: app/forms/country_form.py:10
+#: app/forms/country_form.py:10 app/forms/crop_form.py:10
+#: app/forms/cultivar_form.py:24 app/forms/data_source_form.py:25
+#: app/forms/indicator_form.py:10 app/forms/phenological_stage_form.py:18
+#: app/forms/soil_form.py:24 app/forms/source_form.py:10
+#: app/forms/stress_form.py:10 app/forms/user_form.py:27
 msgid "El nombre es obligatorio."
-msgstr ""
+msgstr "Name is required."
 
 #: app/forms/adm1_form.py:11 app/forms/adm2_form.py:11
-#: app/forms/country_form.py:11
+#: app/forms/country_form.py:11 app/forms/crop_form.py:11
+#: app/forms/cultivar_form.py:25 app/forms/data_source_form.py:26
+#: app/forms/location_form.py:42 app/forms/phenological_stage_form.py:19
+#: app/forms/soil_form.py:25 app/forms/source_form.py:11
+#: app/forms/stress_form.py:11 app/forms/user_form.py:20
+#: app/forms/user_form.py:72
 msgid "Máximo 255 caracteres."
-msgstr ""
+msgstr "Maximum 255 characters."
 
-#: app/forms/adm1_form.py:16 app/templates/adm1/list.html:35
+#: app/forms/adm1_form.py:16 app/forms/cultivar_form.py:8
+#: app/forms/data_source_form.py:16 app/forms/location_form.py:8
+#: app/forms/soil_form.py:8 app/templates/adm1/list.html:67
+#: app/templates/adm1/list.html:199 app/templates/cultivar/list.html:67
+#: app/templates/cultivar/list.html:223 app/templates/data_source/list.html:69
+#: app/templates/data_source/list.html:233 app/templates/location/list.html:70
+#: app/templates/location/list.html:332 app/templates/soil/list.html:67
+#: app/templates/soil/list.html:216
 msgid "País"
-msgstr ""
+msgstr "Country"
 
-#: app/forms/adm1_form.py:18
+#: app/forms/adm1_form.py:18 app/forms/cultivar_form.py:10
+#: app/forms/data_source_form.py:18 app/forms/location_form.py:10
+#: app/forms/soil_form.py:10
 msgid "Debe seleccionar un país."
-msgstr ""
+msgstr "You must select a country."
 
 #: app/forms/adm1_form.py:22 app/forms/adm2_form.py:23
-#: app/forms/country_form.py:24
+#: app/forms/country_form.py:24 app/forms/crop_form.py:15
+#: app/forms/cultivar_form.py:38 app/forms/data_source_form.py:43
+#: app/forms/indicator_form.py:43 app/forms/phenological_stage_form.py:46
+#: app/forms/phenological_stage_stress_form.py:35 app/forms/season_form.py:45
+#: app/forms/setup_form.py:45 app/forms/soil_form.py:37
+#: app/forms/source_form.py:22 app/forms/stress_form.py:34
 msgid "¿Está habilitado?"
-msgstr ""
+msgstr "Is enabled?"
 
 #: app/forms/adm1_form.py:24 app/forms/adm2_form.py:25
-#: app/forms/country_form.py:26
+#: app/forms/country_form.py:26 app/forms/crop_form.py:17
+#: app/forms/cultivar_form.py:40 app/forms/data_source_form.py:67
+#: app/forms/indicator_form.py:45 app/forms/location_form.py:73
+#: app/forms/phenological_stage_form.py:48
+#: app/forms/phenological_stage_stress_form.py:37 app/forms/season_form.py:47
+#: app/forms/setup_form.py:47 app/forms/soil_form.py:39
+#: app/forms/source_form.py:24 app/forms/stress_form.py:36
 msgid "Guardar"
-msgstr ""
+msgstr "Save"
 
 #: app/forms/adm2_form.py:16
 msgid "División Adm1 asociada"
-msgstr ""
+msgstr "Associated Adm1 Division"
 
-#: app/forms/adm2_form.py:18
+#: app/forms/adm2_form.py:18 app/forms/location_form.py:27
 msgid "Debe seleccionar una división de nivel 1."
-msgstr ""
+msgstr "You must select a level 1 division."
 
-#: app/forms/adm2_form.py:22
+#: app/forms/adm2_form.py:22 app/forms/location_form.py:70
 msgid "¿Es visible?"
-msgstr ""
+msgstr "Is visible?"
 
 #: app/forms/country_form.py:8
 msgid "Nombre del país"
-msgstr ""
+msgstr "Country name"
 
 #: app/forms/country_form.py:16
 msgid "Código ISO2"
-msgstr ""
+msgstr "ISO2 Code"
 
 #: app/forms/country_form.py:18
 msgid "El código ISO2 es obligatorio."
-msgstr ""
+msgstr "ISO2 code is required."
 
 #: app/forms/country_form.py:19
 msgid "Debe tener exactamente 2 letras."
-msgstr ""
+msgstr "Must be exactly 2 letters."
 
 #: app/forms/country_form.py:20
 msgid "Debe contener solo letras mayúsculas."
-msgstr ""
+msgstr "Must contain only uppercase letters."
 
-#: app/forms/login_form.py:7
-msgid "Email"
-msgstr ""
+#: app/forms/cultivar_form.py:15 app/forms/phenological_stage_form.py:9
+#: app/forms/season_form.py:15 app/forms/soil_form.py:15
+#: app/templates/cultivar/list.html:68 app/templates/cultivar/list.html:229
+#: app/templates/phenological_stage/list.html:68
+#: app/templates/phenological_stage/list.html:238
+#: app/templates/season/list.html:67 app/templates/season/list.html:243
+#: app/templates/soil/list.html:68 app/templates/soil/list.html:222
+msgid "Cultivo"
+msgstr "Crop"
 
-#: app/forms/login_form.py:10
-msgid "Ingresa un email válido"
-msgstr ""
+#: app/forms/cultivar_form.py:17 app/forms/phenological_stage_form.py:11
+#: app/forms/season_form.py:17 app/forms/soil_form.py:17
+msgid "Debe seleccionar un cultivo."
+msgstr "You must select a crop."
 
-#: app/forms/login_form.py:14
+#: app/forms/cultivar_form.py:30 app/forms/soil_form.py:30
+#: app/templates/cultivar/list.html:69 app/templates/cultivar/list.html:235
+#: app/templates/phenological_stage/list.html:69
+#: app/templates/phenological_stage/list.html:244
+#: app/templates/soil/list.html:69 app/templates/soil/list.html:228
+msgid "Orden"
+msgstr "Order"
+
+#: app/forms/cultivar_form.py:32 app/forms/soil_form.py:32
+msgid "Debe ingresar el orden."
+msgstr "You must enter the order."
+
+#: app/forms/cultivar_form.py:33 app/forms/soil_form.py:33
+msgid "El orden debe ser mayor a 0."
+msgstr "The order must be greater than 0."
+
+#: app/forms/cultivar_form.py:37
+msgid "¿Es de secano?"
+msgstr "Is it rainfed?"
+
+#: app/forms/data_source_form.py:12
+msgid "El contenido debe estar en formato JSON válido."
+msgstr "The content must be in valid JSON format."
+
+#: app/forms/data_source_form.py:31 app/forms/indicator_form.py:38
+#: app/forms/phenological_stage_form.py:32 app/forms/role_form.py:20
+#: app/forms/stress_form.py:30 app/templates/indicator/list.html:70
+#: app/templates/role/edit.html:51 app/templates/role/list.html:63
+#: app/templates/stress/list.html:69
+msgid "Descripción"
+msgstr "Description"
+
+#: app/forms/data_source_form.py:32
+msgid "Máximo 1000 caracteres."
+msgstr "Maximum 1000 characters."
+
+#: app/forms/data_source_form.py:36 app/forms/source_form.py:16
+#: app/templates/data_source/list.html:68
+#: app/templates/data_source/list.html:239 app/templates/source/list.html:68
+#: app/templates/source/list.html:204
+msgid "Tipo de fuente"
+msgstr "Source type"
+
+#: app/forms/data_source_form.py:38
+msgid "El tipo de fuente es obligatorio."
+msgstr "The source type is required."
+
+#: app/forms/data_source_form.py:39 app/forms/phenological_stage_form.py:27
+#: app/forms/stress_form.py:19
+msgid "Máximo 100 caracteres."
+msgstr "Maximum 100 characters."
+
+#: app/forms/data_source_form.py:46
+msgid "Plantilla JSON"
+msgstr "JSON Template"
+
+#: app/forms/data_source_form.py:48
+msgid "Seleccionar plantilla..."
+msgstr "Select template..."
+
+#: app/forms/data_source_form.py:49
+msgid "SST - IRIDL"
+msgstr "SST - IRIDL"
+
+#: app/forms/data_source_form.py:50
+msgid "Copernicus"
+msgstr "Copernicus"
+
+#: app/forms/data_source_form.py:51
+msgid "CHIRPS - Precipitación"
+msgstr "CHIRPS - Precipitation"
+
+#: app/forms/data_source_form.py:52
+msgid "ERA5 - Temperatura Máxima"
+msgstr "ERA5 - Maximum Temperature"
+
+#: app/forms/data_source_form.py:53
+msgid "ERA5 - Todas las variables"
+msgstr "ERA5 - All variables"
+
+#: app/forms/data_source_form.py:54
+msgid "Generación de Climatología"
+msgstr "Climatology Generation"
+
+#: app/forms/data_source_form.py:55
+msgid "Flujo completo CHIRPS+ERA5"
+msgstr "Complete CHIRPS+ERA5 flow"
+
+#: app/forms/data_source_form.py:56
+msgid "Personalizado"
+msgstr "Custom"
+
+#: app/forms/data_source_form.py:63
+msgid "Contenido en formato JSON"
+msgstr "Content in JSON format"
+
+#: app/forms/indicator_form.py:11
+msgid "Máximo 150 caracteres."
+msgstr "Maximum 150 characters."
+
+#: app/forms/indicator_form.py:16 app/forms/phenological_stage_form.py:24
+#: app/forms/stress_form.py:16 app/templates/indicator/list.html:67
+#: app/templates/phenological_stage/list.html:67
+#: app/templates/stress/list.html:67 app/templates/stress/list.html:215
+msgid "Nombre corto"
+msgstr "Short name"
+
+#: app/forms/indicator_form.py:18 app/forms/phenological_stage_form.py:26
+#: app/forms/stress_form.py:18
+msgid "El nombre corto es obligatorio."
+msgstr "Short name is required."
+
+#: app/forms/indicator_form.py:19 app/forms/user_form.py:28
+#: app/forms/user_form.py:36 app/forms/user_form.py:55
+#: app/forms/user_form.py:63
+msgid "Máximo 50 caracteres."
+msgstr "Maximum 50 characters."
+
+#: app/forms/indicator_form.py:24 app/templates/indicator/list.html:68
+msgid "Unidad"
+msgstr "Unit"
+
+#: app/forms/indicator_form.py:26
+msgid "La unidad es obligatorio."
+msgstr "Unit is required."
+
+#: app/forms/indicator_form.py:27
+msgid "Máximo 25 caracteres."
+msgstr "Maximum 25 characters."
+
+#: app/forms/indicator_form.py:32 app/templates/indicator/list.html:69
+#: app/templates/indicator/list.html:223
+msgid "Tipo"
+msgstr "Type"
+
+#: app/forms/indicator_form.py:34
+msgid "Debe seleccionar un tipo."
+msgstr "You must select a type."
+
+#: app/forms/location_form.py:16
+msgid "Id del origen"
+msgstr "Source ID"
+
+#: app/forms/location_form.py:18
+msgid "Seleccione un id origen."
+msgstr "Select a source ID."
+
+#: app/forms/location_form.py:25 app/templates/adm1/edit.html:7
+#: app/templates/adm2/list.html:199
+msgid "Nivel administrativo 1"
+msgstr "Administrative level 1"
+
+#: app/forms/location_form.py:32 app/templates/adm2/edit.html:7
+msgid "Nivel administrativo 2"
+msgstr "Administrative level 2"
+
+#: app/forms/location_form.py:34
+msgid "Debe seleccionar una división de nivel 2."
+msgstr "You must select a level 2 division."
+
+#: app/forms/location_form.py:39
+msgid "Nombre ubicación"
+msgstr "Location name"
+
+#: app/forms/location_form.py:41
+msgid "El nombre de la ubicación es obligatorio."
+msgstr "Location name is required."
+
+#: app/forms/location_form.py:47
+msgid "Latitud"
+msgstr "Latitude"
+
+#: app/forms/location_form.py:49
+msgid "La latitud es obligatoria."
+msgstr "Latitude is required."
+
+#: app/forms/location_form.py:50 app/forms/location_form.py:58
+#: app/forms/location_form.py:65
+msgid "Máximo 20 caracteres."
+msgstr "Maximum 20 characters."
+
+#: app/forms/location_form.py:55
+msgid "Longitud"
+msgstr "Longitude"
+
+#: app/forms/location_form.py:57
+msgid "La longitud es obligatoria."
+msgstr "Longitude is required."
+
+#: app/forms/location_form.py:63
+msgid "Altitud"
+msgstr "Altitude"
+
+#: app/forms/login_form.py:7 app/forms/register_form.py:7
+msgid "Usuario"
+msgstr "Username"
+
+#: app/forms/login_form.py:10 app/forms/register_form.py:10
+msgid "El usuario debe tener entre 3 y 50 caracteres"
+msgstr "Username must be between 3 and 50 characters"
+
+#: app/forms/login_form.py:12 app/forms/register_form.py:12
+msgid "Ingresa tu usuario"
+msgstr "Enter your username"
+
+#: app/forms/login_form.py:14 app/forms/register_form.py:35
+#: app/forms/user_form.py:41
 msgid "Contraseña"
-msgstr ""
+msgstr "Password"
 
-#: app/forms/login_form.py:18
+#: app/forms/login_form.py:18 app/forms/register_form.py:39
 msgid "Ingresa tu contraseña"
-msgstr ""
+msgstr "Enter your password"
 
 #: app/forms/login_form.py:20
 msgid "Iniciar Sesión"
-msgstr ""
+msgstr "Log In"
 
-#: app/forms/role_form.py:13
+#: app/forms/phenological_stage_form.py:37
+msgid "Orden de aparición en la secuencia fenológica"
+msgstr "Order of appearance in the phenological sequence"
+
+#: app/forms/phenological_stage_form.py:38
+msgid "Debe ingresar un orden de aparición."
+msgstr "You must enter an order of appearance."
+
+#: app/forms/phenological_stage_form.py:42
+msgid "Duración promedio en días de la fase)"
+msgstr "Average duration in days of the phase)"
+
+#: app/forms/phenological_stage_form.py:43
+msgid "Debe ingresar una duración promedio."
+msgstr "You must enter an average duration."
+
+#: app/forms/phenological_stage_stress_form.py:8
+#: app/templates/phenological_stage_stress/list.html:66
+#: app/templates/phenological_stage_stress/list.html:217
+msgid "Estrés"
+msgstr "Stress"
+
+#: app/forms/phenological_stage_stress_form.py:10
+msgid "Debe seleccionar un estrés."
+msgstr "You must select a stress."
+
+#: app/forms/phenological_stage_stress_form.py:15
+#: app/templates/phenological_stage_stress/list.html:67
+#: app/templates/phenological_stage_stress/list.html:223
+msgid "Etapa fenológica"
+msgstr "Phenological stage"
+
+#: app/forms/phenological_stage_stress_form.py:17
+msgid "Debe seleccionar una etapa fenológica."
+msgstr "You must select a phenological stage."
+
+#: app/forms/phenological_stage_stress_form.py:22
+#: app/templates/phenological_stage_stress/list.html:69
+msgid "Valor máximo"
+msgstr "Maximum value"
+
+#: app/forms/phenological_stage_stress_form.py:24
+msgid "Debe ingresar el valor máximo."
+msgstr "You must enter the maximum value."
+
+#: app/forms/phenological_stage_stress_form.py:29
+#: app/templates/phenological_stage_stress/list.html:68
+msgid "Valor mínimo"
+msgstr "Minimum value"
+
+#: app/forms/phenological_stage_stress_form.py:31
+msgid "Debe ingresar el valor mínimo."
+msgstr "You must enter the minimum value."
+
+#: app/forms/register_form.py:14
+msgid "Correo Electrónico"
+msgstr "Email"
+
+#: app/forms/register_form.py:17
+msgid "El correo electrónico debe tener entre 5 y 100 caracteres"
+msgstr "Email must be between 5 and 100 characters"
+
+#: app/forms/register_form.py:19
+msgid "Ingresa tu correo electrónico"
+msgstr "Enter your email"
+
+#: app/forms/register_form.py:24 app/forms/role_form.py:16
+msgid "El nombre debe tener entre 2 y 50 caracteres"
+msgstr "Name must be between 2 and 50 characters"
+
+#: app/forms/register_form.py:26 app/templates/register.html:60
+#: app/templates/register.html:67
+msgid "Ingresa tu nombre"
+msgstr "Enter your name"
+
+#: app/forms/register_form.py:28 app/forms/user_form.py:33
+#: app/forms/user_form.py:60
+msgid "Apellido"
+msgstr "Last name"
+
+#: app/forms/register_form.py:31
+msgid "El apellido debe tener entre 2 y 50 caracteres"
+msgstr "Last name must be between 2 and 50 characters"
+
+#: app/forms/register_form.py:33 app/templates/register.html:77
+#: app/templates/register.html:84
+msgid "Ingresa tu apellido"
+msgstr "Enter your last name"
+
+#: app/forms/register_form.py:41
+msgid "Crear Cuenta"
+msgstr "Create Account"
+
+#: app/forms/role_form.py:13 app/templates/role/edit.html:43
+#: app/templates/role/list.html:62
 msgid "Nombre del Rol"
-msgstr ""
+msgstr "Role Name"
 
 #: app/forms/role_form.py:15
 msgid "El nombre del rol es requerido"
-msgstr ""
-
-#: app/forms/role_form.py:16
-msgid "El nombre debe tener entre 2 y 50 caracteres"
-msgstr ""
+msgstr "Role name is required"
 
 #: app/forms/role_form.py:18
 msgid "Ej: Editor, Administrador, Visualizador"
-msgstr ""
-
-#: app/forms/role_form.py:20
-msgid "Descripción"
-msgstr ""
+msgstr "E.g.: Editor, Administrator, Viewer"
 
 #: app/forms/role_form.py:22
 msgid "La descripción no puede exceder 255 caracteres"
-msgstr ""
+msgstr "Description cannot exceed 255 characters"
 
 #: app/forms/role_form.py:25
 msgid "Describe las responsabilidades de este rol..."
-msgstr ""
+msgstr "Describe the responsibilities of this role..."
 
-#: app/forms/role_form.py:30
+#: app/forms/role_form.py:29 app/forms/role_form.py:48
+#: app/templates/role/edit.html:74 app/templates/role/list.html:304
 msgid "Módulos de Acceso"
-msgstr ""
+msgstr "Access Modules"
 
-#: app/forms/role_form.py:32
-msgid "Geográfico - Gestión de información geográfica"
-msgstr ""
-
-#: app/forms/role_form.py:33
-msgid "Cultivos - Administración de cultivos"
-msgstr ""
-
-#: app/forms/role_form.py:34
-msgid "Clima - Información meteorológica"
-msgstr ""
-
-#: app/forms/role_form.py:35
-msgid "Usuarios - Gestión de usuarios del sistema"
-msgstr ""
-
-#: app/forms/role_form.py:36
-msgid "API - Acceso a interfaces de programación"
-msgstr ""
-
-#: app/forms/role_form.py:38
+#: app/forms/role_form.py:31 app/forms/role_form.py:50
 msgid "Debe seleccionar al menos un módulo"
-msgstr ""
+msgstr "You must select at least one module"
 
-#: app/forms/role_form.py:41 app/templates/adm1/list.html:46
-msgid "Habilitado"
-msgstr ""
+#: app/forms/role_form.py:56 app/templates/role/edit.html:138
+#: app/templates/setup/edit.html:101
+msgid "Guardar Cambios"
+msgstr "Save Changes"
 
-#: app/forms/role_form.py:43
-msgid "Guardar Rol"
+#: app/forms/season_form.py:8 app/templates/season/list.html:66
+#: app/templates/season/list.html:237
+msgid "Localidad"
+msgstr "Location"
+
+#: app/forms/season_form.py:10
+msgid "Debe seleccionar una localidad."
+msgstr "You must select a location."
+
+#: app/forms/season_form.py:22 app/templates/season/list.html:68
+#: app/templates/season/list.html:249
+msgid "Inicio de siembra"
+msgstr "Planting start date"
+
+#: app/forms/season_form.py:24
+msgid "Debe ingresar la fecha de inicio de siembra."
+msgstr "You must enter the planting start date."
+
+#: app/forms/season_form.py:28 app/templates/season/list.html:69
+#: app/templates/season/list.html:255
+msgid "Fin de siembra"
+msgstr "Planting end date"
+
+#: app/forms/season_form.py:30
+msgid "Debe ingresar la fecha de fin de siembra."
+msgstr "You must enter the planting end date."
+
+#: app/forms/season_form.py:34 app/templates/season/list.html:70
+#: app/templates/season/list.html:261
+msgid "Inicio de temporada"
+msgstr "Season start date"
+
+#: app/forms/season_form.py:36
+msgid "Debe ingresar la fecha de inicio de temporada."
+msgstr "You must enter the season start date."
+
+#: app/forms/season_form.py:40 app/templates/season/list.html:71
+#: app/templates/season/list.html:267
+msgid "Fin de temporada"
+msgstr "Season end date"
+
+#: app/forms/season_form.py:42
+msgid "Debe ingresar la fecha de fin de temporada."
+msgstr "You must enter the season end date."
+
+#: app/forms/setup_form.py:9 app/templates/setup/list.html:58
+#: app/templates/setup/list.html:234
+msgid "Cultivar"
+msgstr "Cultivar"
+
+#: app/forms/setup_form.py:11
+msgid "Debe seleccionar un cultivar."
+msgstr "You must select a cultivar."
+
+#: app/forms/setup_form.py:16 app/templates/setup/list.html:59
+#: app/templates/setup/list.html:240
+msgid "Suelo"
+msgstr "Soil"
+
+#: app/forms/setup_form.py:18
+msgid "Debe seleccionar un suelo."
+msgstr "You must select a soil."
+
+#: app/forms/setup_form.py:23 app/templates/setup/list.html:60
+#: app/templates/setup/list.html:246
+msgid "Temporada"
+msgstr "Season"
+
+#: app/forms/setup_form.py:25
+msgid "Debe seleccionar una temporada."
+msgstr "You must select a season."
+
+#: app/forms/setup_form.py:30 app/templates/setup/list.html:61
+msgid "Frecuencia"
+msgstr "Frequency"
+
+#: app/forms/setup_form.py:32
+msgid "Debe ingresar la frecuencia."
+msgstr "You must enter the frequency."
+
+#: app/forms/setup_form.py:33
+msgid "La frecuencia debe ser mayor a 0."
+msgstr "Frequency must be greater than 0."
+
+#: app/forms/setup_form.py:38
+msgid "Archivos de configuración"
+msgstr "Configuration files"
+
+#: app/forms/setup_form.py:40
+msgid ""
+"Solo se permiten archivos de configuración con las extensiones: crp, exp,"
+" sol, csv, cul, eco, spe"
 msgstr ""
+"Only configuration files with these extensions are allowed: crp, exp, sol,"
+" csv, cul, eco, spe"
+
+#: app/forms/source_form.py:18
+msgid "Debe seleccionar un tipo de fuente."
+msgstr "You must select a source type."
+
+#: app/forms/stress_form.py:24 app/templates/stress/list.html:68
+#: app/templates/stress/list.html:221
+msgid "Categoría"
+msgstr "Category"
+
+#: app/forms/stress_form.py:26
+msgid "Debe seleccionar una categoría."
+msgstr "You must select a category."
+
+#: app/forms/user_form.py:8 app/templates/user/edit.html:43
+msgid "Nombre de Usuario"
+msgstr "Username"
+
+#: app/forms/user_form.py:10
+msgid "El nombre de usuario es obligatorio."
+msgstr "Username is required."
+
+#: app/forms/user_form.py:11
+msgid "El nombre de usuario debe tener entre 3 y 50 caracteres."
+msgstr "Username must be between 3 and 50 characters."
+
+#: app/forms/user_form.py:16 app/forms/user_form.py:68
+msgid "Email"
+msgstr "Email"
+
+#: app/forms/user_form.py:18
+msgid "El email es obligatorio."
+msgstr "Email is required."
+
+#: app/forms/user_form.py:19 app/forms/user_form.py:71
+msgid "Ingrese un email válido."
+msgstr "Enter a valid email."
+
+#: app/forms/user_form.py:35
+msgid "El apellido es obligatorio."
+msgstr "Last name is required."
+
+#: app/forms/user_form.py:43
+msgid "La contraseña es obligatoria."
+msgstr "Password is required."
+
+#: app/forms/user_form.py:47 app/templates/user/list.html:298
+msgid "Guardar Usuario"
+msgstr "Save User"
+
+#: app/forms/user_form.py:77
+msgid "Rol"
+msgstr "Role"
+
+#: app/forms/user_form.py:79
+msgid "Debe seleccionar un rol."
+msgstr "You must select a role."
+
+#: app/forms/user_form.py:85
+msgid "Actualizar Usuario"
+msgstr "Update User"
+
+#: app/routes/adm1_routes.py:25 app/routes/adm2_routes.py:27
+#: app/routes/adm2_routes.py:48
+msgid "División administrativa agregada correctamente."
+msgstr "Administrative division added successfully."
+
+#: app/routes/adm1_routes.py:37 app/routes/adm1_routes.py:75
+#: app/routes/adm2_routes.py:59 app/routes/adm2_routes.py:97
+#: app/routes/crop_routes.py:33 app/routes/crop_routes.py:63
+#: app/routes/cultivar_routes.py:42 app/routes/cultivar_routes.py:82
+#: app/routes/data_source_routes.py:42 app/routes/data_source_routes.py:85
+#: app/routes/indicators_routes.py:39 app/routes/indicators_routes.py:75
+#: app/routes/phenological_stage_routes.py:41
+#: app/routes/phenological_stage_routes.py:81
+#: app/routes/phenological_stage_stress_routes.py:41
+#: app/routes/phenological_stage_stress_routes.py:80
+#: app/routes/season_routes.py:43 app/routes/season_routes.py:84
+#: app/routes/setup_routes.py:55 app/routes/setup_routes.py:156
+#: app/routes/soil_routes.py:41 app/routes/soil_routes.py:80
+#: app/routes/source_routes.py:37 app/routes/source_routes.py:75
+#: app/routes/stress_routes.py:38 app/routes/stress_routes.py:75
+msgid "Registro no encontrado."
+msgstr "Record not found."
+
+#: app/routes/adm1_routes.py:54 app/routes/adm2_routes.py:76
+msgid "División administrativa actualizada."
+msgstr "Administrative division updated."
+
+#: app/routes/adm1_routes.py:64 app/routes/crop_routes.py:53
+#: app/routes/cultivar_routes.py:72 app/routes/data_source_routes.py:74
+#: app/routes/indicators_routes.py:65
+#: app/routes/phenological_stage_routes.py:71
+#: app/routes/phenological_stage_stress_routes.py:70
+#: app/routes/season_routes.py:74 app/routes/setup_routes.py:90
+#: app/routes/soil_routes.py:70 app/routes/source_routes.py:64
+#: app/routes/stress_routes.py:65
+msgid "No se pudo deshabilitar."
+msgstr "Could not disable."
+
+#: app/routes/adm1_routes.py:66
+msgid "División deshabilitada."
+msgstr "Division disabled."
+
+#: app/routes/adm1_routes.py:79 app/routes/adm2_routes.py:101
+msgid "División administrativa reactivada."
+msgstr "Administrative division reactivated."
+
+#: app/routes/adm2_routes.py:86
+msgid "No se pudo deshabilitar la división."
+msgstr "Could not disable the division."
+
+#: app/routes/adm2_routes.py:88
+msgid "División deshabilitada correctamente."
+msgstr "Division successfully disabled."
+
+#: app/routes/country_routes.py:23 app/routes/country_routes.py:42
+msgid "País agregado exitosamente."
+msgstr "Country added successfully."
+
+#: app/routes/country_routes.py:54 app/routes/country_routes.py:87
+msgid "País no encontrado."
+msgstr "Country not found."
+
+#: app/routes/country_routes.py:66
+msgid "País actualizado correctamente."
+msgstr "Country updated successfully."
+
+#: app/routes/country_routes.py:76
+msgid "No se pudo deshabilitar el país."
+msgstr "Could not disable the country."
+
+#: app/routes/country_routes.py:78
+msgid "País deshabilitado."
+msgstr "Country disabled."
+
+#: app/routes/country_routes.py:91
+msgid "País recuperado."
+msgstr "Country recovered."
+
+#: app/routes/crop_routes.py:22
+msgid "Cultivo agregado correctamente."
+msgstr "Crop added successfully."
+
+#: app/routes/crop_routes.py:44
+msgid "Cultivo actualizado."
+msgstr "Crop updated."
+
+#: app/routes/crop_routes.py:55
+msgid "Cultivo deshabilitado."
+msgstr "Crop disabled."
+
+#: app/routes/crop_routes.py:67
+msgid "Cultivo reactivado."
+msgstr "Crop reactivated."
+
+#: app/routes/cultivar_routes.py:31
+msgid "Cultivar agregado correctamente."
+msgstr "Cultivar added successfully."
+
+#: app/routes/cultivar_routes.py:63
+msgid "Cultivar actualizado."
+msgstr "Cultivar updated."
+
+#: app/routes/cultivar_routes.py:74
+msgid "Cultivar deshabilitado."
+msgstr "Cultivar disabled."
+
+#: app/routes/cultivar_routes.py:86
+msgid "Cultivar reactivado."
+msgstr "Cultivar reactivated."
+
+#: app/routes/data_source_routes.py:30
+msgid "Fuente de datos agregada correctamente."
+msgstr "Data source added successfully."
+
+#: app/routes/data_source_routes.py:64 app/routes/source_routes.py:54
+msgid "Fuente actualizada."
+msgstr "Source updated."
+
+#: app/routes/data_source_routes.py:76 app/routes/source_routes.py:66
+msgid "Fuente deshabilitada."
+msgstr "Source disabled."
+
+#: app/routes/data_source_routes.py:89 app/routes/source_routes.py:79
+msgid "Fuente reactivada."
+msgstr "Source reactivated."
+
+#: app/routes/indicators_routes.py:28
+msgid "Indicador agregado correctamente."
+msgstr "Indicator added successfully."
+
+#: app/routes/indicators_routes.py:56
+msgid "Indicador actualizado."
+msgstr "Indicator updated."
+
+#: app/routes/indicators_routes.py:67
+msgid "Indicador deshabilitado."
+msgstr "Indicator disabled."
+
+#: app/routes/indicators_routes.py:79
+msgid "Indicador reactivado."
+msgstr "Indicator reactivated."
+
+#: app/routes/main_routes.py:38 app/routes/main_routes.py:61
+msgid "Authentication service not available"
+msgstr "Authentication service not available"
+
+#: app/routes/main_routes.py:49
+msgid "Error initiating authentication"
+msgstr "Error initiating authentication"
+
+#: app/routes/main_routes.py:69 app/routes/main_routes.py:93
+msgid "Authentication failed"
+msgstr "Authentication failed"
+
+#: app/routes/main_routes.py:77
+msgid "Failed to get user information"
+msgstr "Failed to get user information"
+
+#: app/routes/main_routes.py:89
+msgid "Login successful!"
+msgstr "Login successful!"
+
+#: app/routes/main_routes.py:98
+msgid "Authentication error occurred"
+msgstr "Authentication error occurred"
+
+#: app/routes/main_routes.py:237
+msgid "Logged out successfully"
+msgstr "Logged out successfully"
+
+#: app/routes/main_routes.py:242
+msgid "Logout completed"
+msgstr "Logout completed"
+
+#: app/routes/main_routes.py:294
+msgid "Roles refreshed successfully"
+msgstr "Roles refreshed successfully"
+
+#: app/routes/main_routes.py:302
+msgid "Failed to refresh roles"
+msgstr "Failed to refresh roles"
+
+#: app/routes/main_routes.py:310
+msgid "Error refreshing roles"
+msgstr "Error refreshing roles"
+
+#: app/routes/phenological_stage_routes.py:30
+msgid "Etapa fenológica agregada correctamente."
+msgstr "Phenological stage added successfully."
+
+#: app/routes/phenological_stage_routes.py:62
+msgid "Etapa fenológica actualizada."
+msgstr "Phenological stage updated."
+
+#: app/routes/phenological_stage_routes.py:73
+msgid "Etapa fenológica deshabilitada."
+msgstr "Phenological stage disabled."
+
+#: app/routes/phenological_stage_routes.py:85
+msgid "Etapa fenológica reactivada."
+msgstr "Phenological stage reactivated."
+
+#: app/routes/phenological_stage_stress_routes.py:30
+msgid "Parámetro de estrés por etapa agregado correctamente."
+msgstr "Stage stress parameter added successfully."
+
+#: app/routes/phenological_stage_stress_routes.py:61
+msgid "Parámetro de estrés por etapa actualizado."
+msgstr "Stage stress parameter updated."
+
+#: app/routes/phenological_stage_stress_routes.py:72
+msgid "Parámetro deshabilitado."
+msgstr "Parameter disabled."
+
+#: app/routes/phenological_stage_stress_routes.py:84
+msgid "Parámetro reactivado."
+msgstr "Parameter reactivated."
+
+#: app/routes/season_routes.py:32
+msgid "Temporada agregada correctamente."
+msgstr "Season added successfully."
+
+#: app/routes/season_routes.py:65
+msgid "Temporada actualizada."
+msgstr "Season updated."
+
+#: app/routes/season_routes.py:76
+msgid "Temporada deshabilitada."
+msgstr "Season disabled."
+
+#: app/routes/season_routes.py:88
+msgid "Temporada reactivada."
+msgstr "Season reactivated."
+
+#: app/routes/setup_routes.py:42 app/routes/setup_routes.py:79
+msgid "Archivos subidos correctamente."
+msgstr "Files uploaded successfully."
+
+#: app/routes/setup_routes.py:44
+msgid "Configuración agregada correctamente."
+msgstr "Configuration added successfully."
+
+#: app/routes/setup_routes.py:81
+msgid "Configuración actualizada."
+msgstr "Configuration updated."
+
+#: app/routes/setup_routes.py:92
+msgid "Configuración deshabilitada."
+msgstr "Configuration disabled."
+
+#: app/routes/setup_routes.py:112
+msgid "Archivo eliminado correctamente."
+msgstr "File deleted successfully."
+
+#: app/routes/setup_routes.py:114
+msgid "Archivo no encontrado."
+msgstr "File not found."
+
+#: app/routes/setup_routes.py:160
+msgid "Configuración reactivada."
+msgstr "Configuration reactivated."
+
+#: app/routes/soil_routes.py:30
+msgid "Suelo agregado correctamente."
+msgstr "Soil added successfully."
+
+#: app/routes/soil_routes.py:61
+msgid "Suelo actualizado."
+msgstr "Soil updated."
+
+#: app/routes/soil_routes.py:72
+msgid "Suelo deshabilitado."
+msgstr "Soil disabled."
+
+#: app/routes/soil_routes.py:84
+msgid "Suelo reactivado."
+msgstr "Soil reactivated."
+
+#: app/routes/source_routes.py:25
+msgid "Fuente agregada correctamente."
+msgstr "Source added successfully."
+
+#: app/routes/stress_routes.py:27
+msgid "Estrés agregado correctamente."
+msgstr "Stress added successfully."
+
+#: app/routes/stress_routes.py:56
+msgid "Estrés actualizado."
+msgstr "Stress updated."
+
+#: app/routes/stress_routes.py:67
+msgid "Estrés deshabilitado."
+msgstr "Stress disabled."
+
+#: app/routes/stress_routes.py:79
+msgid "Estrés reactivado."
+msgstr "Stress reactivated."
 
 #: app/templates/base.html:6
 msgid "Admin Panel"
-msgstr ""
+msgstr "Admin Panel"
 
 #: app/templates/base.html:68 app/templates/home.html:9
 msgid "AClimate Admin"
-msgstr ""
+msgstr "AClimate Admin"
 
 #: app/templates/base.html:115
 msgid "Cerrar Sesión"
-msgstr ""
+msgstr "Log Out"
 
-#: app/templates/base.html:138
-msgid "Geográfico"
-msgstr ""
-
-#: app/templates/base.html:148
-msgid "Countries"
-msgstr ""
-
-#: app/templates/base.html:154
-msgid "Adm 1"
-msgstr ""
-
-#: app/templates/base.html:160
-msgid "Adm 2"
-msgstr ""
-
-#: app/templates/base.html:163 app/templates/home.html:103
-msgid "Locations"
-msgstr ""
-
-#: app/templates/base.html:179
-msgid "Cultivos"
-msgstr ""
-
-#: app/templates/base.html:186 app/templates/home.html:120
-msgid "Crops"
-msgstr ""
-
-#: app/templates/base.html:189 app/templates/home.html:133
-msgid "Simulations"
-msgstr ""
-
-#: app/templates/base.html:192 app/templates/base.html:218
-#: app/templates/home.html:151 app/templates/home.html:181
-msgid "Parameters"
-msgstr ""
-
-#: app/templates/base.html:208
+#: app/templates/base.html:140
 msgid "Clima"
-msgstr ""
+msgstr "Climate"
 
-#: app/templates/base.html:215 app/templates/home.html:168
+#: app/templates/base.html:147 app/templates/home.html:168
 msgid "Weather"
-msgstr ""
+msgstr "Weather"
+
+#: app/templates/base.html:150 app/templates/home.html:151
+#: app/templates/home.html:181
+msgid "Parameters"
+msgstr "Parameters"
+
+#: app/templates/base.html:168 app/templates/crop/crop_list.html:2
+#: app/templates/crop/crop_list.html:6 app/templates/crop/list.html:2
+#: app/templates/crop/list.html:6
+msgid "Cultivos"
+msgstr "Crops"
+
+#: app/templates/base.html:175 app/templates/home.html:120
+msgid "Crops"
+msgstr "Crops"
+
+#: app/templates/base.html:178
+msgid "Stresses"
+msgstr "Stresses"
+
+#: app/templates/base.html:181
+msgid "Phenological stages"
+msgstr "Phenological stages"
+
+#: app/templates/base.html:185
+msgid "Soils"
+msgstr "Soils"
+
+#: app/templates/base.html:189
+msgid "Cultivars"
+msgstr "Cultivars"
+
+#: app/templates/base.html:193
+msgid "Seasons"
+msgstr "Seasons"
+
+#: app/templates/base.html:197
+msgid "Setup simulations crops"
+msgstr "Setup crop simulations"
+
+#: app/templates/base.html:200
+msgid "Stress parameters"
+msgstr "Stress parameters"
+
+#: app/templates/base.html:218
+msgid "Geográfico"
+msgstr "Geographic"
+
+#: app/templates/base.html:228
+msgid "Countries"
+msgstr "Countries"
 
 #: app/templates/base.html:234
-msgid "Usuarios"
-msgstr ""
+msgid "Adm 1"
+msgstr "Adm 1"
 
-#: app/templates/base.html:241 app/templates/home.html:196
+#: app/templates/base.html:240
+msgid "Adm 2"
+msgstr "Adm 2"
+
+#: app/templates/base.html:243 app/templates/home.html:103
+msgid "Locations"
+msgstr "Locations"
+
+#: app/templates/base.html:263 app/templates/user/edit.html:13
+#: app/templates/user/list.html:1 app/templates/user/list.html:5
+msgid "Usuarios"
+msgstr "Users"
+
+#: app/templates/base.html:270 app/templates/home.html:196
 #: app/templates/home.html:230
 msgid "Users"
-msgstr ""
+msgstr "Users"
 
-#: app/templates/base.html:247 app/templates/home.html:212
+#: app/templates/base.html:276 app/templates/home.html:212
+#: app/templates/role/edit.html:13 app/templates/role/list.html:1
+#: app/templates/role/list.html:5
 msgid "Roles"
-msgstr ""
+msgstr "Roles"
 
-#: app/templates/base.html:289
+#: app/templates/base.html:294
+msgid "Configuration"
+msgstr "Configuration"
+
+#: app/templates/base.html:304
+msgid "Sources"
+msgstr "Sources"
+
+#: app/templates/base.html:310
+msgid "Client parameters"
+msgstr "Client parameters"
+
+#: app/templates/base.html:316
+msgid "Indicators"
+msgstr "Indicators"
+
+#: app/templates/base.html:370
 msgid "Close"
-msgstr ""
+msgstr "Close"
 
 #: app/templates/home.html:12
 msgid ""
 "Manage all necessary AClimate parameters from this system, try any of the"
 " modules listed below."
-msgstr ""
+msgstr "Manage all necessary AClimate parameters from this system, try any of the modules listed below."
 
 #: app/templates/home.html:23
 msgid "Geographic"
-msgstr ""
+msgstr "Geographic"
 
 #: app/templates/home.html:39
 msgid "Country"
-msgstr ""
+msgstr "Country"
 
 #: app/templates/home.html:41 app/templates/home.html:64
 #: app/templates/home.html:87 app/templates/home.html:105
@@ -262,175 +1091,975 @@ msgstr ""
 #: app/templates/home.html:182 app/templates/home.html:214
 #: app/templates/home.html:232
 msgid "Manage"
-msgstr ""
+msgstr "Manage"
 
 #: app/templates/home.html:61
 msgid "Administrative level 1"
-msgstr ""
+msgstr "Administrative level 1"
 
 #: app/templates/home.html:84
 msgid "Administrative level 2"
-msgstr ""
+msgstr "Administrative level 2"
 
-#: app/templates/home.html:249
-msgid "System Information"
-msgstr ""
+#: app/templates/home.html:133
+msgid "Simulations"
+msgstr "Simulations"
 
-#: app/templates/home.html:261
-msgid "Current user"
-msgstr ""
+#: app/templates/login.html:1
+msgid "Login"
+msgstr "Login"
 
-#: app/templates/home.html:271
-msgid "Role"
-msgstr ""
+#: app/templates/login.html:9
+msgid "Welcome"
+msgstr "Welcome"
 
-#: app/templates/login.html:2
-msgid "Iniciar Sesión - AClimate Admin"
-msgstr ""
+#: app/templates/login.html:10
+msgid "Please sign in to continue"
+msgstr "Please sign in to continue"
 
-#: app/templates/login.html:24
+#: app/templates/login.html:16
+msgid "Sign in with Keycloak"
+msgstr "Sign in with Keycloak"
+
+#: app/templates/login.html:22
+msgid "You will be redirected to the secure login page"
+msgstr "You will be redirected to the secure login page"
+
+#: app/templates/register.html:2
+msgid "Crear cuenta - AClimate Admin"
+msgstr "Create account - AClimate Admin"
+
+#: app/templates/register.html:24
 msgid "Bienvenido a"
-msgstr ""
+msgstr "Welcome to"
 
-#: app/templates/login.html:27
+#: app/templates/register.html:27
 msgid "Sistema de administración para la gestión de los datos de AClimate."
-msgstr ""
+msgstr "Administration system for managing AClimate data."
 
-#: app/templates/login.html:46
-msgid "Accede al panel de administración"
-msgstr ""
+#: app/templates/register.html:46
+msgid "Crea cuenta para acceder al panel de administración"
+msgstr "Create account to access the admin panel"
 
-#: app/templates/login.html:85
-msgid "Forgot your password?"
-msgstr ""
+#: app/templates/register.html:95 app/templates/register.html:102
+#: app/templates/user/list.html:242 app/templates/user/list.html:249
+msgid "Elige un nombre de usuario único"
+msgstr "Choose a unique username"
+
+#: app/templates/register.html:105 app/templates/user/list.html:252
+msgid "Mínimo 3 caracteres, sin espacios"
+msgstr "Minimum 3 characters, no spaces"
+
+#: app/templates/register.html:115 app/templates/register.html:122
+#: app/templates/user/edit.html:120 app/templates/user/edit.html:127
+#: app/templates/user/list.html:262 app/templates/user/list.html:269
+msgid "ejemplo@dominio.com"
+msgstr "example@domain.com"
+
+#: app/templates/register.html:132 app/templates/register.html:139
+#: app/templates/user/list.html:279 app/templates/user/list.html:286
+msgid "Crea una contraseña segura"
+msgstr "Create a strong password"
+
+#: app/templates/register.html:142
+msgid "Usa al menos 8 caracteres con mayúsculas y minúsculas"
+msgstr "Use at least 8 characters with uppercase and lowercase letters"
+
+#: app/templates/register.html:148
+msgid "¿Ya tienes una cuenta?"
+msgstr "Already have an account?"
+
+#: app/templates/register.html:150
+msgid "Inicia sesión aquí"
+msgstr "Log in here"
 
 #: app/templates/adm1/edit.html:1
 msgid "Editar Adm1"
-msgstr ""
+msgstr "Edit Adm1"
 
-#: app/templates/adm1/edit.html:4
-msgid "Editar división administrativa"
-msgstr ""
+#: app/templates/adm1/edit.html:12 app/templates/location/edit.html:1
+#: app/templates/location/edit.html:12
+msgid "Editar Locación"
+msgstr "Edit Location"
 
-#: app/templates/adm1/edit.html:30 app/templates/adm1/list.html:127
-#: app/templates/adm2/edit.html:41 app/templates/adm2/list.html:133
-#: app/templates/country/edit.html:29 app/templates/country/list.html:121
+#: app/templates/adm1/edit.html:38 app/templates/adm1/list.html:166
+#: app/templates/adm2/edit.html:49 app/templates/adm2/list.html:169
+#: app/templates/country/edit.html:37 app/templates/country/list.html:163
+#: app/templates/crop/crop_list.html:159 app/templates/crop/list.html:159
+#: app/templates/cultivar/list.html:194 app/templates/data_source/list.html:192
+#: app/templates/indicator/list.html:194 app/templates/location/edit.html:85
+#: app/templates/location/list.html:228
+#: app/templates/phenological_stage/list.html:209
+#: app/templates/phenological_stage_stress/list.html:188
+#: app/templates/role/list.html:359 app/templates/role/list.html:404
+#: app/templates/season/list.html:208 app/templates/setup/edit.html:102
+#: app/templates/setup/list.html:205 app/templates/soil/list.html:187
+#: app/templates/source/list.html:174 app/templates/stress/list.html:186
+#: app/templates/user/list.html:295 app/templates/user/list.html:340
 msgid "Cancelar"
-msgstr ""
+msgstr "Cancel"
 
 #: app/templates/adm1/list.html:1
 msgid "Divisiones Adm1"
-msgstr ""
+msgstr "Adm1 Divisions"
 
 #: app/templates/adm1/list.html:5
 msgid "Divisiones administrativas - Nivel 1"
-msgstr ""
+msgstr "Administrative divisions - Level 1"
 
-#: app/templates/adm1/list.html:11 app/templates/adm1/list.html:130
-#: app/templates/adm2/list.html:11 app/templates/adm2/list.html:135
-#: app/templates/country/list.html:12 app/templates/country/list.html:124
-msgid "Agregar"
-msgstr ""
+#: app/templates/adm1/list.html:33 app/templates/adm2/list.html:33
+#: app/templates/country/list.html:34 app/templates/crop/crop_list.html:34
+#: app/templates/crop/list.html:34 app/templates/cultivar/list.html:34
+#: app/templates/data_source/list.html:34 app/templates/indicator/list.html:34
+#: app/templates/location/list.html:33
+#: app/templates/phenological_stage/list.html:34
+#: app/templates/phenological_stage_stress/list.html:34
+#: app/templates/season/list.html:34 app/templates/setup/list.html:34
+#: app/templates/soil/list.html:34 app/templates/source/list.html:34
+#: app/templates/stress/list.html:34
+msgid "Limpiar filtros"
+msgstr "Clear filters"
 
-#: app/templates/adm1/list.html:20
-msgid "Buscar..."
-msgstr ""
+#: app/templates/adm1/list.html:38 app/templates/adm2/list.html:38
+#: app/templates/country/list.html:39 app/templates/crop/crop_list.html:39
+#: app/templates/crop/list.html:39 app/templates/cultivar/list.html:39
+#: app/templates/data_source/list.html:39 app/templates/indicator/list.html:39
+#: app/templates/location/list.html:38
+#: app/templates/phenological_stage/list.html:39
+#: app/templates/phenological_stage_stress/list.html:39
+#: app/templates/season/list.html:39 app/templates/setup/list.html:39
+#: app/templates/soil/list.html:39 app/templates/source/list.html:39
+#: app/templates/stress/list.html:39
+msgid "Cargando filtros..."
+msgstr "Loading filters..."
 
-#: app/templates/adm1/list.html:25 app/templates/adm2/list.html:25
-#: app/templates/country/list.html:26
-msgid "Filtros"
-msgstr ""
+#: app/templates/adm1/list.html:47 app/templates/adm2/list.html:47
+#: app/templates/country/list.html:48 app/templates/crop/crop_list.html:47
+#: app/templates/crop/list.html:47 app/templates/cultivar/list.html:47
+#: app/templates/data_source/list.html:48 app/templates/indicator/list.html:47
+#: app/templates/location/list.html:46
+#: app/templates/phenological_stage/list.html:47
+#: app/templates/phenological_stage_stress/list.html:47
+#: app/templates/season/list.html:47 app/templates/setup/list.html:47
+#: app/templates/soil/list.html:47 app/templates/source/list.html:48
+#: app/templates/stress/list.html:47
+msgid "No se encontraron resultados para"
+msgstr "No results found for"
 
-#: app/templates/adm1/list.html:36 app/templates/adm2/list.html:37
-msgid "Estado"
-msgstr ""
+#: app/templates/adm1/list.html:56 app/templates/adm2/list.html:56
+#: app/templates/country/list.html:57 app/templates/crop/crop_list.html:56
+#: app/templates/crop/list.html:56 app/templates/cultivar/list.html:56
+#: app/templates/data_source/list.html:57 app/templates/indicator/list.html:56
+#: app/templates/location/list.html:55
+#: app/templates/phenological_stage/list.html:56
+#: app/templates/phenological_stage_stress/list.html:56
+#: app/templates/season/list.html:56 app/templates/soil/list.html:56
+#: app/templates/source/list.html:57 app/templates/stress/list.html:56
+msgid "Deshabilitar seleccionados"
+msgstr "Disable selected"
 
-#: app/templates/adm1/list.html:37 app/templates/adm2/list.html:38
-#: app/templates/country/list.html:37
-msgid "Acciones"
-msgstr ""
+#: app/templates/adm1/list.html:59 app/templates/adm2/list.html:59
+#: app/templates/country/list.html:60 app/templates/crop/crop_list.html:59
+#: app/templates/crop/list.html:59 app/templates/cultivar/list.html:59
+#: app/templates/data_source/list.html:60 app/templates/indicator/list.html:59
+#: app/templates/location/list.html:58
+#: app/templates/phenological_stage/list.html:59
+#: app/templates/phenological_stage_stress/list.html:59
+#: app/templates/season/list.html:59 app/templates/soil/list.html:59
+#: app/templates/source/list.html:60 app/templates/stress/list.html:59
+msgid "Recuperar seleccionados"
+msgstr "Recover selected"
 
-#: app/templates/adm1/list.html:46
+#: app/templates/adm1/list.html:79 app/templates/adm1/list.html:209
+#: app/templates/adm2/list.html:209 app/templates/country/list.html:79
+#: app/templates/country/list.html:206 app/templates/crop/crop_list.html:192
+#: app/templates/crop/list.html:192 app/templates/cultivar/list.html:91
+#: app/templates/cultivar/list.html:251 app/templates/data_source/list.html:249
+#: app/templates/indicator/list.html:235 app/templates/location/list.html:88
+#: app/templates/location/list.html:354
+#: app/templates/phenological_stage/list.html:90
+#: app/templates/phenological_stage/list.html:260
+#: app/templates/phenological_stage_stress/list.html:87
+#: app/templates/phenological_stage_stress/list.html:233
+#: app/templates/season/list.html:95 app/templates/season/list.html:277
+#: app/templates/setup/list.html:91 app/templates/setup/list.html:256
+#: app/templates/soil/list.html:88 app/templates/soil/list.html:238
+#: app/templates/source/list.html:214 app/templates/stress/list.html:233
+msgid "Habilitado"
+msgstr "Enabled"
+
+#: app/templates/adm1/list.html:79 app/templates/adm1/list.html:210
+#: app/templates/adm2/list.html:210 app/templates/country/list.html:79
+#: app/templates/country/list.html:207 app/templates/crop/crop_list.html:193
+#: app/templates/crop/list.html:193 app/templates/cultivar/list.html:91
+#: app/templates/cultivar/list.html:252 app/templates/data_source/list.html:250
+#: app/templates/indicator/list.html:236 app/templates/location/list.html:88
+#: app/templates/location/list.html:355
+#: app/templates/phenological_stage/list.html:90
+#: app/templates/phenological_stage/list.html:261
+#: app/templates/phenological_stage_stress/list.html:87
+#: app/templates/phenological_stage_stress/list.html:234
+#: app/templates/season/list.html:95 app/templates/season/list.html:278
+#: app/templates/setup/list.html:91 app/templates/setup/list.html:257
+#: app/templates/soil/list.html:88 app/templates/soil/list.html:239
+#: app/templates/source/list.html:215 app/templates/stress/list.html:234
 msgid "Deshabilitado"
-msgstr ""
+msgstr "Disabled"
 
-#: app/templates/adm1/list.html:51
-msgid "Editar"
-msgstr ""
-
-#: app/templates/adm1/list.html:59
+#: app/templates/adm1/list.html:92 app/templates/cultivar/list.html:105
+#: app/templates/location/list.html:101
+#: app/templates/phenological_stage/list.html:104
+#: app/templates/phenological_stage_stress/list.html:101
+#: app/templates/season/list.html:109 app/templates/setup/list.html:105
+#: app/templates/soil/list.html:102
 msgid "Deshabilitar"
-msgstr ""
+msgstr "Disable"
 
-#: app/templates/adm1/list.html:67
+#: app/templates/adm1/list.html:100 app/templates/cultivar/list.html:113
+#: app/templates/location/list.html:109
+#: app/templates/phenological_stage/list.html:112
+#: app/templates/phenological_stage_stress/list.html:109
+#: app/templates/season/list.html:117 app/templates/setup/list.html:113
+#: app/templates/soil/list.html:110
 msgid "Recuperar"
-msgstr ""
+msgstr "Recover"
 
-#: app/templates/adm1/list.html:79 app/templates/adm2/list.html:81
+#: app/templates/adm1/list.html:114 app/templates/adm2/list.html:113
+#: app/templates/country/list.html:114 app/templates/crop/crop_list.html:113
+#: app/templates/crop/list.html:113 app/templates/cultivar/list.html:127
+#: app/templates/data_source/list.html:118
+#: app/templates/indicator/list.html:124 app/templates/location/list.html:123
+#: app/templates/phenological_stage/list.html:126
+#: app/templates/phenological_stage_stress/list.html:123
+#: app/templates/role/list.html:658 app/templates/season/list.html:131
+#: app/templates/setup/list.html:127 app/templates/soil/list.html:124
+#: app/templates/source/list.html:121 app/templates/stress/list.html:123
+#: app/templates/user/list.html:524
+msgid "Mostrando"
+msgstr "Showing"
+
+#: app/templates/adm1/list.html:114 app/templates/adm2/list.html:113
+#: app/templates/country/list.html:114 app/templates/data_source/list.html:118
+#: app/templates/location/list.html:123 app/templates/source/list.html:121
+msgid "resultado (s)"
+msgstr "result(s)"
+
+#: app/templates/adm1/list.html:118 app/templates/adm2/list.html:117
 msgid "No hay divisiones administrativas registradas."
-msgstr ""
+msgstr "No administrative divisions registered."
 
-#: app/templates/adm1/list.html:97
+#: app/templates/adm1/list.html:136
 msgid "Agregar división Adm1"
-msgstr ""
+msgstr "Add Adm1 division"
 
-#: app/templates/adm1/list.html:103
+#: app/templates/adm1/list.html:142 app/templates/cultivar/list.html:155
+#: app/templates/location/list.html:151
+#: app/templates/phenological_stage/list.html:154
+#: app/templates/phenological_stage_stress/list.html:151
+#: app/templates/season/list.html:159 app/templates/setup/list.html:155
+#: app/templates/soil/list.html:152
 msgid "Cerrar"
-msgstr ""
+msgstr "Close"
 
 #: app/templates/adm2/edit.html:1
 msgid "Editar Adm2"
-msgstr ""
+msgstr "Edit Adm2"
 
-#: app/templates/adm2/edit.html:5
+#: app/templates/adm2/edit.html:13
 msgid "Editar división administrativa - Nivel 2"
-msgstr ""
+msgstr "Edit administrative division - Level 2"
 
-#: app/templates/adm2/edit.html:7
+#: app/templates/adm2/edit.html:15 app/templates/setup/edit.html:19
 msgid "Volver al listado"
-msgstr ""
+msgstr "Back to list"
 
 #: app/templates/adm2/list.html:1
 msgid "Divisiones Adm2"
-msgstr ""
+msgstr "Adm2 Divisions"
 
 #: app/templates/adm2/list.html:5
 msgid "Divisiones administrativas - Nivel 2"
-msgstr ""
+msgstr "Administrative divisions - Level 2"
 
-#: app/templates/adm2/list.html:35
+#: app/templates/adm2/list.html:67
 msgid "Adm1 asociado"
-msgstr ""
+msgstr "Associated Adm1"
 
-#: app/templates/adm2/list.html:36
-msgid "Visible"
-msgstr ""
-
-#: app/templates/adm2/list.html:99
+#: app/templates/adm2/list.html:135
 msgid "Agregar división Adm2"
-msgstr ""
+msgstr "Add Adm2 division"
 
 #: app/templates/country/edit.html:1
 msgid "Editar País"
-msgstr ""
+msgstr "Edit Country"
 
-#: app/templates/country/edit.html:4
+#: app/templates/country/edit.html:7
+msgid "Paises"
+msgstr "Countries"
+
+#: app/templates/country/edit.html:12
 msgid "Editar país"
-msgstr ""
+msgstr "Edit country"
 
 #: app/templates/country/list.html:1 app/templates/country/list.html:5
 msgid "Países"
-msgstr ""
+msgstr "Countries"
 
-#: app/templates/country/list.html:36
+#: app/templates/country/list.html:68
 msgid "Código ISO"
-msgstr ""
+msgstr "ISO code"
 
-#: app/templates/country/list.html:77
+#: app/templates/country/list.html:118
 msgid "No hay países registrados."
-msgstr ""
+msgstr "No countries registered."
 
-#: app/templates/country/list.html:93
+#: app/templates/country/list.html:135
 msgid "Agregar país"
-msgstr ""
+msgstr "Add country"
 
+#: app/templates/country/list.html:196
+msgid "Código ISO 2"
+msgstr "ISO 2 code"
+
+#: app/templates/crop/crop_list.html:113 app/templates/crop/list.html:113
+#: app/templates/indicator/list.html:124
+#: app/templates/phenological_stage/list.html:126
+#: app/templates/phenological_stage_stress/list.html:123
+#: app/templates/setup/list.html:127 app/templates/stress/list.html:123
+msgid "resultados"
+msgstr "results"
+
+#: app/templates/crop/crop_list.html:117 app/templates/crop/list.html:117
+msgid "No hay cultivos registrados."
+msgstr "No crops registered."
+
+#: app/templates/crop/crop_list.html:135 app/templates/crop/list.html:135
+msgid "Agregar cultivo"
+msgstr "Add crop"
+
+#: app/templates/cultivar/list.html:2 app/templates/cultivar/list.html:6
+msgid "Cultivares"
+msgstr "Cultivars"
+
+#: app/templates/cultivar/list.html:70 app/templates/cultivar/list.html:241
+msgid "Secano"
+msgstr "Rainfed"
+
+#: app/templates/cultivar/list.html:81 app/templates/cultivar/list.html:89
+msgid "Sí"
+msgstr "Yes"
+
+#: app/templates/cultivar/list.html:81 app/templates/cultivar/list.html:89
+#: app/templates/cultivar/list.html:243
+msgid "No"
+msgstr "No"
+
+#: app/templates/cultivar/list.html:127 app/templates/season/list.html:131
+#: app/templates/soil/list.html:124
+msgid "resultado(s)"
+msgstr "result(s)"
+
+#: app/templates/cultivar/list.html:131
+msgid "No hay cultivares registrados."
+msgstr "No cultivars registered."
+
+#: app/templates/cultivar/list.html:149
+msgid "Agregar cultivar"
+msgstr "Add cultivar"
+
+#: app/templates/cultivar/list.html:225 app/templates/soil/list.html:218
+msgid "Sin país"
+msgstr "No country"
+
+#: app/templates/cultivar/list.html:231
+#: app/templates/phenological_stage/list.html:240
+#: app/templates/season/list.html:245 app/templates/soil/list.html:224
+msgid "Sin cultivo"
+msgstr "No crop"
+
+#: app/templates/cultivar/list.html:237
+#: app/templates/phenological_stage/list.html:246
+#: app/templates/soil/list.html:230
+msgid "Sin orden"
+msgstr "No order"
+
+#: app/templates/data_source/list.html:2 app/templates/data_source/list.html:6
+msgid "Configuración de parámetros de clientes"
+msgstr "Client parameters configuration"
+
+#: app/templates/data_source/list.html:122 app/templates/source/list.html:125
+msgid "No hay fuentes de datos registradas."
+msgstr "No data sources registered."
+
+#: app/templates/data_source/list.html:140 app/templates/source/list.html:143
+msgid "Agregar fuente"
+msgstr "Add source"
+
+#: app/templates/indicator/list.html:2 app/templates/indicator/list.html:6
+msgid "Indicadores"
+msgstr "Indicators"
+
+#: app/templates/indicator/list.html:128
+msgid "No hay indicadores registrados."
+msgstr "No indicators registered."
+
+#: app/templates/indicator/list.html:146
+msgid "Agregar indicador"
+msgstr "Add indicator"
+
+#: app/templates/indicator/list.html:226
+msgid "Sin tipo"
+msgstr "No type"
+
+#: app/templates/location/edit.html:7 app/templates/location/list.html:1
+#: app/templates/location/list.html:5
+msgid "Locaciones"
+msgstr "Locations"
+
+#: app/templates/location/edit.html:79 app/templates/location/list.html:213
+msgid "Ubicación en el mapa"
+msgstr "Map location"
+
+#: app/templates/location/list.html:67
+msgid "Locación"
+msgstr "Location"
+
+#: app/templates/location/list.html:68 app/templates/location/list.html:338
+msgid "División administrativa 1"
+msgstr "Administrative division 1"
+
+#: app/templates/location/list.html:69 app/templates/location/list.html:344
+msgid "División administrativa 2"
+msgstr "Administrative division 2"
+
+#: app/templates/location/list.html:127
+msgid "No hay locaciones registradas."
+msgstr "No locations registered."
+
+#: app/templates/location/list.html:145
+msgid "Agregar Locación"
+msgstr "Add Location"
+
+#: app/templates/phenological_stage/list.html:2
+#: app/templates/phenological_stage/list.html:6
+msgid "Etapas Fenológicas"
+msgstr "Phenological Stages"
+
+#: app/templates/phenological_stage/list.html:70
+msgid "Duración (días)"
+msgstr "Duration (days)"
+
+#: app/templates/phenological_stage/list.html:130
+msgid "No hay etapas fenológicas registradas."
+msgstr "No phenological stages registered."
+
+#: app/templates/phenological_stage/list.html:148
+msgid "Agregar etapa fenológica"
+msgstr "Add phenological stage"
+
+#: app/templates/phenological_stage/list.html:250
+msgid "Duración"
+msgstr "Duration"
+
+#: app/templates/phenological_stage/list.html:252
+msgid "Sin duración"
+msgstr "No duration"
+
+#: app/templates/phenological_stage_stress/list.html:2
+#: app/templates/phenological_stage_stress/list.html:6
+msgid "Parámetros de Estrés por Etapa Fenológica"
+msgstr "Stress Parameters by Phenological Stage"
+
+#: app/templates/phenological_stage_stress/list.html:127
+msgid "No hay parámetros registrados."
+msgstr "No parameters registered."
+
+#: app/templates/phenological_stage_stress/list.html:145
+msgid "Agregar parámetro de estrés por etapa"
+msgstr "Add stress parameter by stage"
+
+#: app/templates/phenological_stage_stress/list.html:219
+msgid "Sin estrés"
+msgstr "No stress"
+
+#: app/templates/phenological_stage_stress/list.html:225
+msgid "Sin etapa"
+msgstr "No stage"
+
+#: app/templates/role/edit.html:2 app/templates/role/edit.html:17
+#: app/templates/role/edit.html:26
+msgid "Editar Rol"
+msgstr "Edit Role"
+
+#: app/templates/role/edit.html:27
+msgid "Modificar información del rol:"
+msgstr "Modify role information:"
+
+#: app/templates/role/edit.html:39
+msgid "Información del Rol"
+msgstr "Role Information"
+
+#: app/templates/role/edit.html:46 app/templates/user/edit.html:46
+msgid "No se puede modificar"
+msgstr "Cannot be modified"
+
+#: app/templates/role/edit.html:57 app/templates/role/list.html:132
+#: app/templates/role/list.html:663
+msgid "Sin descripción"
+msgstr "No description"
+
+#: app/templates/role/edit.html:60
+msgid "Se gestiona desde Keycloak"
+msgstr "Managed from Keycloak"
+
+#: app/templates/role/edit.html:66
+msgid "Editar Módulos de Acceso"
+msgstr "Edit Access Modules"
+
+#: app/templates/role/edit.html:75
+msgid "Editable"
+msgstr "Editable"
+
+#: app/templates/role/edit.html:131 app/templates/role/list.html:353
+msgid "Selecciona los módulos a los que este rol tendrá acceso."
+msgstr "Select the modules this role will have access to."
+
+#: app/templates/role/edit.html:149 app/templates/user/edit.html:168
+msgid "Volver al Listado"
+msgstr "Back to List"
+
+#: app/templates/role/list.html:23
+msgid "Buscar por nombre o descripción..."
+msgstr "Search by name or description..."
+
+#: app/templates/role/list.html:26 app/templates/role/list.html:664
+#: app/templates/user/list.html:26 app/templates/user/list.html:530
+msgid "Buscar"
+msgstr "Search"
+
+#: app/templates/role/list.html:54 app/templates/user/list.html:54
+msgid "Eliminar seleccionados"
+msgstr "Delete selected"
+
+#: app/templates/role/list.html:65
+msgid "Módulo Geográfico - Gestión de países, adm1, adm2 y localizaciones"
+msgstr "Geographic Module - Management of countries, adm1, adm2 and locations"
+
+#: app/templates/role/list.html:67
+msgid "Módulo Geográfico"
+msgstr "Geographic Module"
+
+#: app/templates/role/list.html:69
+msgid "Datos Climáticos - Gestión de datos climáticos"
+msgstr "Climate Data - Climate data management"
+
+#: app/templates/role/list.html:71
+msgid "Datos Climáticos"
+msgstr "Climate Data"
+
+#: app/templates/role/list.html:73
+msgid "Datos de Cultivos - Gestión de datos de cultivos"
+msgstr "Crop Data - Crop data management"
+
+#: app/templates/role/list.html:75
+msgid "Datos de Cultivos"
+msgstr "Crop Data"
+
+#: app/templates/role/list.html:77
+msgid "Gestión de Usuarios - Administración de usuarios y roles del sistema"
+msgstr "User Management - System users and roles administration"
+
+#: app/templates/role/list.html:79
+msgid "Gestión de Usuarios"
+msgstr "User Management"
+
+#: app/templates/role/list.html:103
+msgid "No se puede seleccionar este rol del sistema"
+msgstr "This system role cannot be selected"
+
+#: app/templates/role/list.html:202
+msgid "Eliminar rol"
+msgstr "Delete role"
+
+#: app/templates/role/list.html:215
+msgid "No se puede eliminar rol del sistema"
+msgstr "System role cannot be deleted"
+
+#: app/templates/role/list.html:230
+msgid "No se encontraron roles que coincidan con la búsqueda"
+msgstr "No roles matching the search were found"
+
+#: app/templates/role/list.html:232
+msgid "Intenta con otros términos o limpia la búsqueda para ver todos los roles."
+msgstr "Try other terms or clear the search to see all roles."
+
+#: app/templates/role/list.html:238
+msgid "No hay roles registrados o no se pudieron cargar desde la API."
+msgstr "No roles registered or could not be loaded from the API."
+
+#: app/templates/role/list.html:256
+msgid "Agregar Rol"
+msgstr "Add Role"
+
+#: app/templates/role/list.html:271 app/templates/role/list.html:278
+msgid "Ingresa el nombre del rol"
+msgstr "Enter role name"
+
+#: app/templates/role/list.html:281
+msgid "Nombre único para identificar el rol"
+msgstr "Unique name to identify the role"
+
+#: app/templates/role/list.html:290 app/templates/role/list.html:297
+msgid "Describe las funciones de este rol"
+msgstr "Describe the functions of this role"
+
+#: app/templates/role/list.html:362
+msgid "Guardar Rol"
+msgstr "Save Role"
+
+#: app/templates/role/list.html:381 app/templates/user/list.html:317
+msgid "Confirmar Eliminación"
+msgstr "Confirm Deletion"
+
+#: app/templates/role/list.html:392
+msgid "¿Está seguro de que desea eliminar el rol"
+msgstr "Are you sure you want to delete the role"
+
+#: app/templates/role/list.html:395
+msgid "Información del rol:"
+msgstr "Role information:"
+
+#: app/templates/role/list.html:397
+msgid "Rol:"
+msgstr "Role:"
+
+#: app/templates/role/list.html:398
+msgid "Descripcion:"
+msgstr "Description:"
+
+#: app/templates/role/list.html:409
+msgid "Eliminar Rol"
+msgstr "Delete Role"
+
+#: app/templates/role/list.html:659
+msgid "rol"
+msgstr "role"
+
+#: app/templates/role/list.html:660
+msgid "roles"
+msgstr "roles"
+
+#: app/templates/role/list.html:661 app/templates/user/list.html:527
+msgid "de"
+msgstr "of"
+
+#: app/templates/role/list.html:662 app/templates/user/list.html:528
+msgid "Total"
+msgstr "Total"
+
+#: app/templates/role/list.html:665 app/templates/user/list.html:531
+msgid "Limpiar búsqueda"
+msgstr "Clear search"
+
+#: app/templates/role/list.html:666 app/templates/user/list.html:532
+msgid "Seleccionar todos"
+msgstr "Select all"
+
+#: app/templates/role/list.html:667 app/templates/user/list.html:533
+msgid "Deseleccionar todos"
+msgstr "Deselect all"
+
+#: app/templates/role/list.html:668 app/templates/user/list.html:534
+msgid "seleccionado"
+msgstr "selected"
+
+#: app/templates/role/list.html:669 app/templates/user/list.html:535
+msgid "seleccionados"
+msgstr "selected"
+
+#: app/templates/role/list.html:670 app/templates/user/list.html:536
+msgid "Eliminando"
+msgstr "Deleting"
+
+#: app/templates/role/list.html:671 app/templates/user/list.html:537
+msgid "Eliminado"
+msgstr "Deleted"
+
+#: app/templates/role/list.html:672
+msgid "Eliminando roles..."
+msgstr "Deleting roles..."
+
+#: app/templates/role/list.html:673 app/templates/user/list.html:539
+msgid "Eliminación completada"
+msgstr "Deletion completed"
+
+#: app/templates/role/list.html:674 app/templates/user/list.html:540
+msgid "Error al eliminar"
+msgstr "Error deleting"
+
+#: app/templates/role/list.html:675
+msgid "roles eliminados exitosamente"
+msgstr "roles successfully deleted"
+
+#: app/templates/role/list.html:676
+msgid "Algunos roles no pudieron ser eliminados"
+msgstr "Some roles could not be deleted"
+
+#: app/templates/role/list.html:677 app/templates/user/list.html:543
+msgid "Preparando..."
+msgstr "Preparing..."
+
+#: app/templates/season/list.html:2 app/templates/season/list.html:6
+msgid "Temporadas"
+msgstr "Seasons"
+
+#: app/templates/season/list.html:135
+msgid "No hay temporadas registradas."
+msgstr "No seasons registered."
+
+#: app/templates/season/list.html:153
+msgid "Agregar temporada"
+msgstr "Add season"
+
+#: app/templates/season/list.html:239
+msgid "Sin localidad"
+msgstr "No location"
+
+#: app/templates/setup/edit.html:2 app/templates/setup/edit.html:17
+msgid "Editar Configuración de Simulación"
+msgstr "Edit Simulation Configuration"
+
+#: app/templates/setup/edit.html:9 app/templates/setup/list.html:2
+#: app/templates/setup/list.html:6
+msgid "Configuraciones de Simulación"
+msgstr "Simulation Configurations"
+
+#: app/templates/setup/edit.html:27
+msgid "Información de la Configuración"
+msgstr "Configuration Information"
+
+#: app/templates/setup/edit.html:64
+msgid "Archivos de Configuración"
+msgstr "Configuration Files"
+
+#: app/templates/setup/edit.html:67
+msgid "Archivos Existentes"
+msgstr "Existing Files"
+
+#: app/templates/setup/edit.html:75
+msgid "¿Eliminar este archivo?"
+msgstr "Delete this file?"
+
+#: app/templates/setup/edit.html:76
+msgid "Eliminar"
+msgstr "Delete"
+
+#: app/templates/setup/edit.html:82
+msgid "No hay archivos de configuración."
+msgstr "No configuration files."
+
+#: app/templates/setup/edit.html:85
+msgid "Agregar Nuevos Archivos"
+msgstr "Add New Files"
+
+#: app/templates/setup/edit.html:90 app/templates/setup/list.html:193
+msgid "Arrastra tus archivos aquí o haz clic para seleccionar"
+msgstr "Drag your files here or click to select"
+
+#: app/templates/setup/edit.html:91 app/templates/setup/list.html:194
+msgid "Formatos permitidos: .crp, .exp, .sol, .csv, .cul, .eco, .spe"
+msgstr "Allowed formats: .crp, .exp, .sol, .csv, .cul, .eco, .spe"
+
+#: app/templates/setup/list.html:62
+msgid "Archivos"
+msgstr "Files"
+
+#: app/templates/setup/list.html:84
+msgid "archivos"
+msgstr "files"
+
+#: app/templates/setup/list.html:87
+msgid "Sin archivos"
+msgstr "No files"
+
+#: app/templates/setup/list.html:131
+msgid "No hay configuraciones registradas."
+msgstr "No configurations registered."
+
+#: app/templates/setup/list.html:149
+msgid "Agregar configuración de simulación"
+msgstr "Add simulation configuration"
+
+#: app/templates/setup/list.html:197
+msgid "Selecciona uno o más archivos para cargar."
+msgstr "Select one or more files to upload."
+
+#: app/templates/setup/list.html:236
+msgid "Sin cultivar"
+msgstr "No cultivar"
+
+#: app/templates/setup/list.html:242
+msgid "Sin suelo"
+msgstr "No soil"
+
+#: app/templates/setup/list.html:248
+msgid "Sin temporada"
+msgstr "No season"
+
+#: app/templates/soil/list.html:2 app/templates/soil/list.html:6
+msgid "Suelos"
+msgstr "Soils"
+
+#: app/templates/soil/list.html:128
+msgid "No hay suelos registrados."
+msgstr "No soils registered."
+
+#: app/templates/soil/list.html:146
+msgid "Agregar suelo"
+msgstr "Add soil"
+
+#: app/templates/source/list.html:2 app/templates/source/list.html:6
+msgid "Fuentes"
+msgstr "Sources"
+
+#: app/templates/stress/list.html:2 app/templates/stress/list.html:6
+msgid "Estreses"
+msgstr "Stresses"
+
+#: app/templates/stress/list.html:127
+msgid "No hay estreses registrados."
+msgstr "No stresses registered."
+
+#: app/templates/stress/list.html:145
+msgid "Agregar estrés"
+msgstr "Add stress"
+
+#: app/templates/stress/list.html:217
+msgid "Sin nombre corto"
+msgstr "No short name"
+
+#: app/templates/stress/list.html:224
+msgid "Sin categoría"
+msgstr "No category"
+
+#: app/templates/user/edit.html:2 app/templates/user/edit.html:17
+#: app/templates/user/edit.html:26
+msgid "Editar Usuario"
+msgstr "Edit User"
+
+#: app/templates/user/edit.html:27
+msgid "Modificar información del usuario:"
+msgstr "Modify user information:"
+
+#: app/templates/user/edit.html:39
+msgid "Información del Usuario"
+msgstr "User Information"
+
+#: app/templates/user/edit.html:51
+msgid "Rol Actual"
+msgstr "Current Role"
+
+#: app/templates/user/edit.html:59
+msgid "Sin rol"
+msgstr "No role"
+
+#: app/templates/user/edit.html:67
+msgid "Editar Información"
+msgstr "Edit Information"
+
+#: app/templates/user/edit.html:79 app/templates/user/edit.html:86
+#: app/templates/user/list.html:207 app/templates/user/list.html:214
+msgid "Ingresa el nombre"
+msgstr "Enter name"
+
+#: app/templates/user/edit.html:89
+msgid "Nombre del usuario"
+msgstr "User name"
+
+#: app/templates/user/edit.html:99 app/templates/user/edit.html:106
+#: app/templates/user/list.html:224 app/templates/user/list.html:231
+msgid "Ingresa el apellido"
+msgstr "Enter last name"
+
+#: app/templates/user/edit.html:109
+msgid "Apellido del usuario"
+msgstr "User last name"
+
+#: app/templates/user/edit.html:130
+msgid "Correo electrónico del usuario"
+msgstr "User email"
+
+#: app/templates/user/edit.html:150
+msgid "Rol que tendrá el usuario en el sistema"
+msgstr "Role the user will have in the system"
+
+#: app/templates/user/list.html:23
+msgid "Buscar por usuario, nombre o email..."
+msgstr "Search by username, name or email..."
+
+#: app/templates/user/list.html:83
+msgid "No se puede seleccionar este usuario"
+msgstr "This user cannot be selected"
+
+#: app/templates/user/list.html:163
+msgid "No se encontraron usuarios que coincidan con la búsqueda"
+msgstr "No users matching the search were found"
+
+#: app/templates/user/list.html:165
+msgid ""
+"Intenta con otros términos o limpia la búsqueda para ver todos los "
+"usuarios."
+msgstr ""
+"Try different terms or clear the search to see all users."
+
+#: app/templates/user/list.html:189
+msgid "Agregar Usuario"
+msgstr "Add User"
+
+#: app/templates/user/list.html:289
+msgid "Crea una contraseña segura para el usuario"
+msgstr "Create a secure password for the user"
+
+#: app/templates/user/list.html:328
+msgid "¿Está seguro de que desea eliminar al usuario"
+msgstr "Are you sure you want to delete the user"
+
+#: app/templates/user/list.html:331
+msgid "Información del usuario:"
+msgstr "User information:"
+
+#: app/templates/user/list.html:333
+msgid "Usuario:"
+msgstr "User:"
+
+#: app/templates/user/list.html:334
+msgid "Nombre:"
+msgstr "Name:"
+
+#: app/templates/user/list.html:344
+msgid "Eliminar Usuario"
+msgstr "Delete User"
+
+#: app/templates/user/list.html:525
+msgid "usuario"
+msgstr "user"
+
+#: app/templates/user/list.html:526
+msgid "usuarios"
+msgstr "users"
+
+#: app/templates/user/list.html:529
+msgid "Sin nombre"
+msgstr "No name"
+
+#: app/templates/user/list.html:538
+msgid "Eliminando usuarios..."
+msgstr "Deleting users..."
+
+#: app/templates/user/list.html:541
+msgid "usuarios eliminados exitosamente"
+msgstr "users deleted successfully"
+
+#: app/templates/user/list.html:542
+msgid "Algunos usuarios no pudieron ser eliminados"
+msgstr "Some users could not be deleted"
