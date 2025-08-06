@@ -106,11 +106,11 @@ msgstr "Save"
 
 #: app/forms/adm2_form.py:16
 msgid "División Adm1 asociada"
-msgstr "Associated Adm1 Division"
+msgstr "Associated state"
 
 #: app/forms/adm2_form.py:18 app/forms/location_form.py:27
 msgid "Debe seleccionar una división de nivel 1."
-msgstr "You must select a level 1 division."
+msgstr "You must select a state."
 
 #: app/forms/adm2_form.py:22 app/forms/location_form.py:70
 msgid "¿Es visible?"
@@ -301,15 +301,15 @@ msgstr "Select a source ID."
 #: app/forms/location_form.py:25 app/templates/adm1/edit.html:7
 #: app/templates/adm2/list.html:199
 msgid "Nivel administrativo 1"
-msgstr "Administrative level 1"
+msgstr "State"
 
 #: app/forms/location_form.py:32 app/templates/adm2/edit.html:7
 msgid "Nivel administrativo 2"
-msgstr "Administrative level 2"
+msgstr "Counties"
 
 #: app/forms/location_form.py:34
 msgid "Debe seleccionar una división de nivel 2."
-msgstr "You must select a level 2 division."
+msgstr "You must select a counties."
 
 #: app/forms/location_form.py:39
 msgid "Nombre ubicación"
@@ -590,8 +590,8 @@ msgid ""
 "Solo se permiten archivos de configuración con las extensiones: crp, exp,"
 " sol, csv, cul, eco, spe"
 msgstr ""
-"Only configuration files with these extensions are allowed: crp, exp, sol,"
-" csv, cul, eco, spe"
+"Only configuration files with these extensions are allowed: crp, exp, "
+"sol, csv, cul, eco, spe"
 
 #: app/forms/source_form.py:18
 msgid "Debe seleccionar un tipo de fuente."
@@ -1025,11 +1025,11 @@ msgstr "Countries"
 
 #: app/templates/base.html:234
 msgid "Adm 1"
-msgstr "Adm 1"
+msgstr "States"
 
 #: app/templates/base.html:240
 msgid "Adm 2"
-msgstr "Adm 2"
+msgstr "Counties"
 
 #: app/templates/base.html:243 app/templates/home.html:103
 msgid "Locations"
@@ -1075,7 +1075,9 @@ msgstr "Close"
 msgid ""
 "Manage all necessary AClimate parameters from this system, try any of the"
 " modules listed below."
-msgstr "Manage all necessary AClimate parameters from this system, try any of the modules listed below."
+msgstr ""
+"Manage all necessary AClimate parameters from this system, try any of the"
+" modules listed below."
 
 #: app/templates/home.html:23
 msgid "Geographic"
@@ -1175,7 +1177,7 @@ msgstr "Log in here"
 
 #: app/templates/adm1/edit.html:1
 msgid "Editar Adm1"
-msgstr "Edit Adm1"
+msgstr "Edit state"
 
 #: app/templates/adm1/edit.html:12 app/templates/location/edit.html:1
 #: app/templates/location/edit.html:12
@@ -1201,11 +1203,73 @@ msgstr "Cancel"
 
 #: app/templates/adm1/list.html:1
 msgid "Divisiones Adm1"
-msgstr "Adm1 Divisions"
+msgstr "States"
 
 #: app/templates/adm1/list.html:5
 msgid "Divisiones administrativas - Nivel 1"
-msgstr "Administrative divisions - Level 1"
+msgstr "States"
+
+#: app/templates/adm1/list.html:11 app/templates/adm1/list.html:169
+#: app/templates/adm2/list.html:11 app/templates/adm2/list.html:171
+#: app/templates/country/list.html:12 app/templates/country/list.html:166
+#: app/templates/crop/crop_list.html:12 app/templates/crop/crop_list.html:161
+#: app/templates/crop/list.html:12 app/templates/crop/list.html:161
+#: app/templates/cultivar/list.html:12 app/templates/cultivar/list.html:196
+#: app/templates/data_source/list.html:12
+#: app/templates/data_source/list.html:194 app/templates/indicator/list.html:12
+#: app/templates/indicator/list.html:196 app/templates/location/list.html:11
+#: app/templates/location/list.html:231
+#: app/templates/phenological_stage/list.html:12
+#: app/templates/phenological_stage/list.html:211
+#: app/templates/phenological_stage_stress/list.html:12
+#: app/templates/phenological_stage_stress/list.html:190
+#: app/templates/role/list.html:12 app/templates/season/list.html:12
+#: app/templates/season/list.html:210 app/templates/setup/list.html:12
+#: app/templates/setup/list.html:207 app/templates/soil/list.html:12
+#: app/templates/soil/list.html:189 app/templates/source/list.html:12
+#: app/templates/source/list.html:176 app/templates/stress/list.html:12
+#: app/templates/stress/list.html:188 app/templates/user/list.html:12
+#, fuzzy
+msgid "Agregar"
+msgstr "Add Role"
+
+#: app/templates/adm1/list.html:21 app/templates/adm2/list.html:21
+#: app/templates/country/list.html:22 app/templates/crop/crop_list.html:22
+#: app/templates/crop/list.html:22 app/templates/cultivar/list.html:22
+#: app/templates/data_source/list.html:22 app/templates/indicator/list.html:22
+#: app/templates/location/list.html:21
+#: app/templates/phenological_stage/list.html:22
+#: app/templates/phenological_stage_stress/list.html:22
+#: app/templates/season/list.html:22 app/templates/setup/list.html:22
+#: app/templates/soil/list.html:22 app/templates/source/list.html:22
+#: app/templates/stress/list.html:22
+#, fuzzy
+msgid "Buscar..."
+msgstr "Search"
+
+#: app/templates/adm1/list.html:32 app/templates/adm1/list.html:35
+#: app/templates/adm2/list.html:32 app/templates/adm2/list.html:35
+#: app/templates/country/list.html:33 app/templates/country/list.html:36
+#: app/templates/crop/crop_list.html:33 app/templates/crop/crop_list.html:36
+#: app/templates/crop/list.html:33 app/templates/crop/list.html:36
+#: app/templates/cultivar/list.html:33 app/templates/cultivar/list.html:36
+#: app/templates/data_source/list.html:33
+#: app/templates/data_source/list.html:36 app/templates/indicator/list.html:33
+#: app/templates/indicator/list.html:36 app/templates/location/list.html:32
+#: app/templates/location/list.html:35
+#: app/templates/phenological_stage/list.html:33
+#: app/templates/phenological_stage/list.html:36
+#: app/templates/phenological_stage_stress/list.html:33
+#: app/templates/phenological_stage_stress/list.html:36
+#: app/templates/role/list.html:38 app/templates/season/list.html:33
+#: app/templates/season/list.html:36 app/templates/setup/list.html:33
+#: app/templates/setup/list.html:36 app/templates/soil/list.html:33
+#: app/templates/soil/list.html:36 app/templates/source/list.html:33
+#: app/templates/source/list.html:36 app/templates/stress/list.html:33
+#: app/templates/stress/list.html:36 app/templates/user/list.html:38
+#, fuzzy
+msgid "Filtros"
+msgstr "Clear filters"
 
 #: app/templates/adm1/list.html:33 app/templates/adm2/list.html:33
 #: app/templates/country/list.html:34 app/templates/crop/crop_list.html:34
@@ -1270,6 +1334,43 @@ msgstr "Disable selected"
 msgid "Recuperar seleccionados"
 msgstr "Recover selected"
 
+#: app/templates/adm1/list.html:68 app/templates/adm1/list.html:205
+#: app/templates/adm2/list.html:68 app/templates/adm2/list.html:205
+#: app/templates/country/list.html:69 app/templates/country/list.html:202
+#: app/templates/crop/crop_list.html:67 app/templates/crop/crop_list.html:188
+#: app/templates/crop/list.html:67 app/templates/crop/list.html:188
+#: app/templates/cultivar/list.html:71 app/templates/cultivar/list.html:247
+#: app/templates/data_source/list.html:70
+#: app/templates/data_source/list.html:245 app/templates/indicator/list.html:71
+#: app/templates/indicator/list.html:231 app/templates/location/list.html:71
+#: app/templates/location/list.html:350
+#: app/templates/phenological_stage/list.html:71
+#: app/templates/phenological_stage/list.html:256
+#: app/templates/phenological_stage_stress/list.html:70
+#: app/templates/phenological_stage_stress/list.html:229
+#: app/templates/season/list.html:72 app/templates/season/list.html:273
+#: app/templates/setup/list.html:63 app/templates/setup/list.html:252
+#: app/templates/soil/list.html:70 app/templates/soil/list.html:234
+#: app/templates/source/list.html:69 app/templates/source/list.html:210
+#: app/templates/stress/list.html:70 app/templates/stress/list.html:229
+#, fuzzy
+msgid "Estado"
+msgstr "results"
+
+#: app/templates/adm1/list.html:69 app/templates/adm2/list.html:69
+#: app/templates/country/list.html:70 app/templates/crop/crop_list.html:68
+#: app/templates/crop/list.html:68 app/templates/cultivar/list.html:72
+#: app/templates/data_source/list.html:71 app/templates/indicator/list.html:72
+#: app/templates/location/list.html:72
+#: app/templates/phenological_stage/list.html:72
+#: app/templates/phenological_stage_stress/list.html:71
+#: app/templates/role/list.html:81 app/templates/season/list.html:73
+#: app/templates/setup/list.html:64 app/templates/soil/list.html:71
+#: app/templates/source/list.html:70 app/templates/stress/list.html:71
+#, fuzzy
+msgid "Acciones"
+msgstr "Locations"
+
 #: app/templates/adm1/list.html:79 app/templates/adm1/list.html:209
 #: app/templates/adm2/list.html:209 app/templates/country/list.html:79
 #: app/templates/country/list.html:206 app/templates/crop/crop_list.html:192
@@ -1305,6 +1406,16 @@ msgstr "Enabled"
 #: app/templates/source/list.html:215 app/templates/stress/list.html:234
 msgid "Deshabilitado"
 msgstr "Disabled"
+
+#: app/templates/adm1/list.html:84 app/templates/cultivar/list.html:97
+#: app/templates/location/list.html:93
+#: app/templates/phenological_stage/list.html:96
+#: app/templates/phenological_stage_stress/list.html:93
+#: app/templates/season/list.html:101 app/templates/setup/list.html:97
+#: app/templates/soil/list.html:94
+#, fuzzy
+msgid "Editar"
+msgstr "Edit Role"
 
 #: app/templates/adm1/list.html:92 app/templates/cultivar/list.html:105
 #: app/templates/location/list.html:101
@@ -1350,7 +1461,7 @@ msgstr "No administrative divisions registered."
 
 #: app/templates/adm1/list.html:136
 msgid "Agregar división Adm1"
-msgstr "Add Adm1 division"
+msgstr "Add State"
 
 #: app/templates/adm1/list.html:142 app/templates/cultivar/list.html:155
 #: app/templates/location/list.html:151
@@ -1363,11 +1474,11 @@ msgstr "Close"
 
 #: app/templates/adm2/edit.html:1
 msgid "Editar Adm2"
-msgstr "Edit Adm2"
+msgstr "Edit countie"
 
 #: app/templates/adm2/edit.html:13
 msgid "Editar división administrativa - Nivel 2"
-msgstr "Edit administrative division - Level 2"
+msgstr "Edit countie"
 
 #: app/templates/adm2/edit.html:15 app/templates/setup/edit.html:19
 msgid "Volver al listado"
@@ -1375,19 +1486,19 @@ msgstr "Back to list"
 
 #: app/templates/adm2/list.html:1
 msgid "Divisiones Adm2"
-msgstr "Adm2 Divisions"
+msgstr "Counties"
 
 #: app/templates/adm2/list.html:5
 msgid "Divisiones administrativas - Nivel 2"
-msgstr "Administrative divisions - Level 2"
+msgstr "Counties
 
 #: app/templates/adm2/list.html:67
 msgid "Adm1 asociado"
-msgstr "Associated Adm1"
+msgstr "Associated state"
 
 #: app/templates/adm2/list.html:135
 msgid "Agregar división Adm2"
-msgstr "Add Adm2 division"
+msgstr "Add counties"
 
 #: app/templates/country/edit.html:1
 msgid "Editar País"
@@ -1643,7 +1754,7 @@ msgstr "Delete selected"
 
 #: app/templates/role/list.html:65
 msgid "Módulo Geográfico - Gestión de países, adm1, adm2 y localizaciones"
-msgstr "Geographic Module - Management of countries, adm1, adm2 and locations"
+msgstr "Geographic Module - Management of countries, states, counties and locations"
 
 #: app/templates/role/list.html:67
 msgid "Módulo Geográfico"
@@ -2009,8 +2120,7 @@ msgstr "No users matching the search were found"
 msgid ""
 "Intenta con otros términos o limpia la búsqueda para ver todos los "
 "usuarios."
-msgstr ""
-"Try different terms or clear the search to see all users."
+msgstr "Try different terms or clear the search to see all users."
 
 #: app/templates/user/list.html:189
 msgid "Agregar Usuario"
@@ -2063,3 +2173,4 @@ msgstr "users deleted successfully"
 #: app/templates/user/list.html:542
 msgid "Algunos usuarios no pudieron ser eliminados"
 msgstr "Some users could not be deleted"
+

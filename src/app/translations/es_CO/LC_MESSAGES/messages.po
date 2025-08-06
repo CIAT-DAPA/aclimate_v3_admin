@@ -106,11 +106,11 @@ msgstr "Guardar"
 
 #: app/forms/adm2_form.py:16
 msgid "División Adm1 asociada"
-msgstr "División Adm1 asociada"
+msgstr "Departamento asociado"
 
 #: app/forms/adm2_form.py:18 app/forms/location_form.py:27
 msgid "Debe seleccionar una división de nivel 1."
-msgstr "Debe seleccionar una división de nivel 1."
+msgstr "Debe seleccionar un Departamento."
 
 #: app/forms/adm2_form.py:22 app/forms/location_form.py:70
 msgid "¿Es visible?"
@@ -301,15 +301,15 @@ msgstr "Seleccione un ID origen."
 #: app/forms/location_form.py:25 app/templates/adm1/edit.html:7
 #: app/templates/adm2/list.html:199
 msgid "Nivel administrativo 1"
-msgstr "Nivel administrativo 1"
+msgstr "Departamento"
 
 #: app/forms/location_form.py:32 app/templates/adm2/edit.html:7
 msgid "Nivel administrativo 2"
-msgstr "Nivel administrativo 2"
+msgstr "Municipio"
 
 #: app/forms/location_form.py:34
 msgid "Debe seleccionar una división de nivel 2."
-msgstr "Debe seleccionar una división de nivel 2."
+msgstr "Debe seleccionar una municipio."
 
 #: app/forms/location_form.py:39
 msgid "Nombre ubicación"
@@ -1025,11 +1025,11 @@ msgstr "Países"
 
 #: app/templates/base.html:234
 msgid "Adm 1"
-msgstr "Adm 1"
+msgstr "Departamentos"
 
 #: app/templates/base.html:240
 msgid "Adm 2"
-msgstr "Adm 2"
+msgstr "Municipios"
 
 #: app/templates/base.html:243 app/templates/home.html:103
 msgid "Locations"
@@ -1076,7 +1076,8 @@ msgid ""
 "Manage all necessary AClimate parameters from this system, try any of the"
 " modules listed below."
 msgstr ""
-"Administre todos los parámetros necesarios de AClimate desde este sistema, pruebe cualquiera de los módulos listados abajo."
+"Administre todos los parámetros necesarios de AClimate desde este "
+"sistema, pruebe cualquiera de los módulos listados abajo."
 
 #: app/templates/home.html:23
 msgid "Geographic"
@@ -1096,11 +1097,11 @@ msgstr "Administrar"
 
 #: app/templates/home.html:61
 msgid "Administrative level 1"
-msgstr "Nivel administrativo 1"
+msgstr "Departamento"
 
 #: app/templates/home.html:84
 msgid "Administrative level 2"
-msgstr "Nivel administrativo 2"
+msgstr "Municipio"
 
 #: app/templates/home.html:133
 msgid "Simulations"
@@ -1176,7 +1177,7 @@ msgstr "Inicie sesión aquí"
 
 #: app/templates/adm1/edit.html:1
 msgid "Editar Adm1"
-msgstr "Editar Adm1"
+msgstr "Editar Departamento"
 
 #: app/templates/adm1/edit.html:12 app/templates/location/edit.html:1
 #: app/templates/location/edit.html:12
@@ -1202,11 +1203,11 @@ msgstr "Cancelar"
 
 #: app/templates/adm1/list.html:1
 msgid "Divisiones Adm1"
-msgstr "Divisiones Adm1"
+msgstr "Departamentos"
 
 #: app/templates/adm1/list.html:5
 msgid "Divisiones administrativas - Nivel 1"
-msgstr "Divisiones administrativas - Nivel 1"
+msgstr "Departamentos"
 
 #: app/templates/adm1/list.html:11 app/templates/adm1/list.html:169
 #: app/templates/adm2/list.html:11 app/templates/adm2/list.html:171
@@ -1258,12 +1259,12 @@ msgstr "Buscar..."
 #: app/templates/phenological_stage/list.html:36
 #: app/templates/phenological_stage_stress/list.html:33
 #: app/templates/phenological_stage_stress/list.html:36
-#: app/templates/role/list.html:38 app/templates/season/list.html:38
-#: app/templates/setup/list.html:33 app/templates/setup/list.html:36
-#: app/templates/soil/list.html:33 app/templates/soil/list.html:36
-#: app/templates/source/list.html:33 app/templates/source/list.html:36
-#: app/templates/stress/list.html:33 app/templates/stress/list.html:36
-#: app/templates/user/list.html:38
+#: app/templates/role/list.html:38 app/templates/season/list.html:33
+#: app/templates/season/list.html:36 app/templates/setup/list.html:33
+#: app/templates/setup/list.html:36 app/templates/soil/list.html:33
+#: app/templates/soil/list.html:36 app/templates/source/list.html:33
+#: app/templates/source/list.html:36 app/templates/stress/list.html:33
+#: app/templates/stress/list.html:36 app/templates/user/list.html:38
 msgid "Filtros"
 msgstr "Filtros"
 
@@ -1274,7 +1275,7 @@ msgstr "Filtros"
 #: app/templates/location/list.html:33
 #: app/templates/phenological_stage/list.html:34
 #: app/templates/phenological_stage_stress/list.html:34
-#: app/templates/season/list.html:39 app/templates/setup/list.html:34
+#: app/templates/season/list.html:34 app/templates/setup/list.html:34
 #: app/templates/soil/list.html:34 app/templates/source/list.html:34
 #: app/templates/stress/list.html:34
 msgid "Limpiar filtros"
@@ -1287,7 +1288,7 @@ msgstr "Limpiar filtros"
 #: app/templates/location/list.html:38
 #: app/templates/phenological_stage/list.html:39
 #: app/templates/phenological_stage_stress/list.html:39
-#: app/templates/season/list.html:44 app/templates/setup/list.html:39
+#: app/templates/season/list.html:39 app/templates/setup/list.html:39
 #: app/templates/soil/list.html:39 app/templates/source/list.html:39
 #: app/templates/stress/list.html:39
 msgid "Cargando filtros..."
@@ -1300,7 +1301,7 @@ msgstr "Cargando filtros..."
 #: app/templates/location/list.html:46
 #: app/templates/phenological_stage/list.html:47
 #: app/templates/phenological_stage_stress/list.html:47
-#: app/templates/season/list.html:52 app/templates/setup/list.html:47
+#: app/templates/season/list.html:47 app/templates/setup/list.html:47
 #: app/templates/soil/list.html:47 app/templates/source/list.html:48
 #: app/templates/stress/list.html:47
 msgid "No se encontraron resultados para"
@@ -1313,7 +1314,7 @@ msgstr "No se encontraron resultados para"
 #: app/templates/location/list.html:55
 #: app/templates/phenological_stage/list.html:56
 #: app/templates/phenological_stage_stress/list.html:56
-#: app/templates/season/list.html:61 app/templates/soil/list.html:56
+#: app/templates/season/list.html:56 app/templates/soil/list.html:56
 #: app/templates/source/list.html:57 app/templates/stress/list.html:56
 msgid "Deshabilitar seleccionados"
 msgstr "Deshabilitar seleccionados"
@@ -1325,7 +1326,7 @@ msgstr "Deshabilitar seleccionados"
 #: app/templates/location/list.html:58
 #: app/templates/phenological_stage/list.html:59
 #: app/templates/phenological_stage_stress/list.html:59
-#: app/templates/season/list.html:64 app/templates/soil/list.html:59
+#: app/templates/season/list.html:59 app/templates/soil/list.html:59
 #: app/templates/source/list.html:60 app/templates/stress/list.html:59
 msgid "Recuperar seleccionados"
 msgstr "Recuperar seleccionados"
@@ -1344,7 +1345,7 @@ msgstr "Recuperar seleccionados"
 #: app/templates/phenological_stage/list.html:256
 #: app/templates/phenological_stage_stress/list.html:70
 #: app/templates/phenological_stage_stress/list.html:229
-#: app/templates/season/list.html:77 app/templates/season/list.html:273
+#: app/templates/season/list.html:72 app/templates/season/list.html:273
 #: app/templates/setup/list.html:63 app/templates/setup/list.html:252
 #: app/templates/soil/list.html:70 app/templates/soil/list.html:234
 #: app/templates/source/list.html:69 app/templates/source/list.html:210
@@ -1359,7 +1360,7 @@ msgstr "Estado"
 #: app/templates/location/list.html:72
 #: app/templates/phenological_stage/list.html:72
 #: app/templates/phenological_stage_stress/list.html:71
-#: app/templates/role/list.html:81 app/templates/season/list.html:78
+#: app/templates/role/list.html:81 app/templates/season/list.html:73
 #: app/templates/setup/list.html:64 app/templates/soil/list.html:71
 #: app/templates/source/list.html:70 app/templates/stress/list.html:71
 msgid "Acciones"
@@ -1376,7 +1377,7 @@ msgstr "Acciones"
 #: app/templates/phenological_stage/list.html:260
 #: app/templates/phenological_stage_stress/list.html:87
 #: app/templates/phenological_stage_stress/list.html:233
-#: app/templates/season/list.html:100 app/templates/season/list.html:277
+#: app/templates/season/list.html:95 app/templates/season/list.html:277
 #: app/templates/setup/list.html:91 app/templates/setup/list.html:256
 #: app/templates/soil/list.html:88 app/templates/soil/list.html:238
 #: app/templates/source/list.html:214 app/templates/stress/list.html:233
@@ -1394,7 +1395,7 @@ msgstr "Habilitado"
 #: app/templates/phenological_stage/list.html:261
 #: app/templates/phenological_stage_stress/list.html:87
 #: app/templates/phenological_stage_stress/list.html:234
-#: app/templates/season/list.html:100 app/templates/season/list.html:278
+#: app/templates/season/list.html:95 app/templates/season/list.html:278
 #: app/templates/setup/list.html:91 app/templates/setup/list.html:257
 #: app/templates/soil/list.html:88 app/templates/soil/list.html:239
 #: app/templates/source/list.html:215 app/templates/stress/list.html:234
@@ -1405,7 +1406,7 @@ msgstr "Deshabilitado"
 #: app/templates/location/list.html:93
 #: app/templates/phenological_stage/list.html:96
 #: app/templates/phenological_stage_stress/list.html:93
-#: app/templates/season/list.html:106 app/templates/setup/list.html:97
+#: app/templates/season/list.html:101 app/templates/setup/list.html:97
 #: app/templates/soil/list.html:94
 msgid "Editar"
 msgstr "Editar"
@@ -1414,7 +1415,7 @@ msgstr "Editar"
 #: app/templates/location/list.html:101
 #: app/templates/phenological_stage/list.html:104
 #: app/templates/phenological_stage_stress/list.html:101
-#: app/templates/season/list.html:114 app/templates/setup/list.html:105
+#: app/templates/season/list.html:109 app/templates/setup/list.html:105
 #: app/templates/soil/list.html:102
 msgid "Deshabilitar"
 msgstr "Deshabilitar"
@@ -1423,7 +1424,7 @@ msgstr "Deshabilitar"
 #: app/templates/location/list.html:109
 #: app/templates/phenological_stage/list.html:112
 #: app/templates/phenological_stage_stress/list.html:109
-#: app/templates/season/list.html:122 app/templates/setup/list.html:113
+#: app/templates/season/list.html:117 app/templates/setup/list.html:113
 #: app/templates/soil/list.html:110
 msgid "Recuperar"
 msgstr "Recuperar"
@@ -1435,7 +1436,7 @@ msgstr "Recuperar"
 #: app/templates/indicator/list.html:124 app/templates/location/list.html:123
 #: app/templates/phenological_stage/list.html:126
 #: app/templates/phenological_stage_stress/list.html:123
-#: app/templates/role/list.html:658 app/templates/season/list.html:136
+#: app/templates/role/list.html:658 app/templates/season/list.html:131
 #: app/templates/setup/list.html:127 app/templates/soil/list.html:124
 #: app/templates/source/list.html:121 app/templates/stress/list.html:123
 #: app/templates/user/list.html:524
@@ -1454,24 +1455,24 @@ msgstr "No hay divisiones administrativas registradas."
 
 #: app/templates/adm1/list.html:136
 msgid "Agregar división Adm1"
-msgstr "Agregar división Adm1"
+msgstr "Agregar Departamento"
 
 #: app/templates/adm1/list.html:142 app/templates/cultivar/list.html:155
 #: app/templates/location/list.html:151
 #: app/templates/phenological_stage/list.html:154
 #: app/templates/phenological_stage_stress/list.html:151
-#: app/templates/season/list.html:164 app/templates/setup/list.html:155
+#: app/templates/season/list.html:159 app/templates/setup/list.html:155
 #: app/templates/soil/list.html:152
 msgid "Cerrar"
 msgstr "Cerrar"
 
 #: app/templates/adm2/edit.html:1
 msgid "Editar Adm2"
-msgstr "Editar Adm2"
+msgstr "Editar municipio"
 
 #: app/templates/adm2/edit.html:13
 msgid "Editar división administrativa - Nivel 2"
-msgstr "Editar división administrativa - Nivel 2"
+msgstr "Editar municipio"
 
 #: app/templates/adm2/edit.html:15 app/templates/setup/edit.html:19
 msgid "Volver al listado"
@@ -1479,19 +1480,19 @@ msgstr "Volver al listado"
 
 #: app/templates/adm2/list.html:1
 msgid "Divisiones Adm2"
-msgstr "Divisiones Adm2"
+msgstr "Municipios"
 
 #: app/templates/adm2/list.html:5
 msgid "Divisiones administrativas - Nivel 2"
-msgstr "Divisiones administrativas - Nivel 2"
+msgstr "Municipios"
 
 #: app/templates/adm2/list.html:67
 msgid "Adm1 asociado"
-msgstr "Adm1 asociado"
+msgstr "Departamento asociado"
 
 #: app/templates/adm2/list.html:135
 msgid "Agregar división Adm2"
-msgstr "Agregar división Adm2"
+msgstr "Agregar municipio"
 
 #: app/templates/country/edit.html:1
 msgid "Editar País"
@@ -1747,7 +1748,7 @@ msgstr "Eliminar seleccionados"
 
 #: app/templates/role/list.html:65
 msgid "Módulo Geográfico - Gestión de países, adm1, adm2 y localizaciones"
-msgstr "Módulo geográfico - Gestión de países, adm1, adm2 y ubicaciones"
+msgstr "Módulo geográfico - Gestión de países, departamentos, municipios y ubicaciones"
 
 #: app/templates/role/list.html:67
 msgid "Módulo Geográfico"
@@ -2113,7 +2114,9 @@ msgstr "No se encontraron usuarios que coincidan con la búsqueda"
 msgid ""
 "Intenta con otros términos o limpia la búsqueda para ver todos los "
 "usuarios."
-msgstr "Intente con otros términos o limpie la búsqueda para ver todos los usuarios."
+msgstr ""
+"Intente con otros términos o limpie la búsqueda para ver todos los "
+"usuarios."
 
 #: app/templates/user/list.html:189
 msgid "Agregar Usuario"
@@ -2166,3 +2169,4 @@ msgstr "usuarios eliminados exitosamente"
 #: app/templates/user/list.html:542
 msgid "Algunos usuarios no pudieron ser eliminados"
 msgstr "Algunos usuarios no pudieron ser eliminados"
+

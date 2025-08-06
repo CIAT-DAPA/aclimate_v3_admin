@@ -106,11 +106,11 @@ msgstr "Guardar"
 
 #: app/forms/adm2_form.py:16
 msgid "División Adm1 asociada"
-msgstr "División Adm1 asociada"
+msgstr "Provincia asociada"
 
 #: app/forms/adm2_form.py:18 app/forms/location_form.py:27
 msgid "Debe seleccionar una división de nivel 1."
-msgstr "Debe seleccionar una división de nivel 1."
+msgstr "Debe seleccionar una provincia."
 
 #: app/forms/adm2_form.py:22 app/forms/location_form.py:70
 msgid "¿Es visible?"
@@ -590,8 +590,8 @@ msgid ""
 "Solo se permiten archivos de configuración con las extensiones: crp, exp,"
 " sol, csv, cul, eco, spe"
 msgstr ""
-"Solo se aceptan archivos de configuración con estas terminaciones: crp, exp,"
-" sol, csv, cul, eco, spe"
+"Solo se aceptan archivos de configuración con estas terminaciones: crp, "
+"exp, sol, csv, cul, eco, spe"
 
 #: app/forms/source_form.py:18
 msgid "Debe seleccionar un tipo de fuente."
@@ -1025,11 +1025,11 @@ msgstr "Países"
 
 #: app/templates/base.html:234
 msgid "Adm 1"
-msgstr "Nivel 1"
+msgstr "Provincias"
 
 #: app/templates/base.html:240
 msgid "Adm 2"
-msgstr "Nivel 2"
+msgstr "Municipios"
 
 #: app/templates/base.html:243 app/templates/home.html:103
 msgid "Locations"
@@ -1076,7 +1076,8 @@ msgid ""
 "Manage all necessary AClimate parameters from this system, try any of the"
 " modules listed below."
 msgstr ""
-"Administre todos los parámetros necesarios de AClimate desde este sistema, pruebe cualquiera de los módulos listados abajo."
+"Administre todos los parámetros necesarios de AClimate desde este "
+"sistema, pruebe cualquiera de los módulos listados abajo."
 
 #: app/templates/home.html:23
 msgid "Geographic"
@@ -1176,7 +1177,7 @@ msgstr "Inicie sesión aquí"
 
 #: app/templates/adm1/edit.html:1
 msgid "Editar Adm1"
-msgstr "Editar Nivel 1"
+msgstr "Editar provincia"
 
 #: app/templates/adm1/edit.html:12 app/templates/location/edit.html:1
 #: app/templates/location/edit.html:12
@@ -1202,11 +1203,11 @@ msgstr "Cancelar"
 
 #: app/templates/adm1/list.html:1
 msgid "Divisiones Adm1"
-msgstr "Divisiones Nivel 1"
+msgstr "Provincias"
 
 #: app/templates/adm1/list.html:5
 msgid "Divisiones administrativas - Nivel 1"
-msgstr "Divisiones administrativas - Nivel 1"
+msgstr "Provincias"
 
 #: app/templates/adm1/list.html:11 app/templates/adm1/list.html:169
 #: app/templates/adm2/list.html:11 app/templates/adm2/list.html:171
@@ -1454,7 +1455,7 @@ msgstr "No hay divisiones administrativas registradas."
 
 #: app/templates/adm1/list.html:136
 msgid "Agregar división Adm1"
-msgstr "Agregar división Nivel 1"
+msgstr "Agregar provincia"
 
 #: app/templates/adm1/list.html:142 app/templates/cultivar/list.html:155
 #: app/templates/location/list.html:151
@@ -1467,11 +1468,11 @@ msgstr "Cerrar"
 
 #: app/templates/adm2/edit.html:1
 msgid "Editar Adm2"
-msgstr "Editar Nivel 2"
+msgstr "Editar municipio"
 
 #: app/templates/adm2/edit.html:13
 msgid "Editar división administrativa - Nivel 2"
-msgstr "Editar división administrativa - Nivel 2"
+msgstr "Editar municipio"
 
 #: app/templates/adm2/edit.html:15 app/templates/setup/edit.html:19
 msgid "Volver al listado"
@@ -1479,19 +1480,19 @@ msgstr "Volver al listado"
 
 #: app/templates/adm2/list.html:1
 msgid "Divisiones Adm2"
-msgstr "Divisiones Nivel 2"
+msgstr "Municipios"
 
 #: app/templates/adm2/list.html:5
 msgid "Divisiones administrativas - Nivel 2"
-msgstr "Divisiones administrativas - Nivel 2"
+msgstr "Municipios"
 
 #: app/templates/adm2/list.html:67
 msgid "Adm1 asociado"
-msgstr "Nivel 1 asociado"
+msgstr "Departamento asociado"
 
 #: app/templates/adm2/list.html:135
 msgid "Agregar división Adm2"
-msgstr "Agregar división Nivel 2"
+msgstr "Agregar municipio"
 
 #: app/templates/country/edit.html:1
 msgid "Editar País"
@@ -1747,7 +1748,7 @@ msgstr "Eliminar seleccionados"
 
 #: app/templates/role/list.html:65
 msgid "Módulo Geográfico - Gestión de países, adm1, adm2 y localizaciones"
-msgstr "Módulo Geográfico - Gestión de países, adm1, adm2 y ubicaciones"
+msgstr "Módulo Geográfico - Gestión de países, provincias, municipios y ubicaciones"
 
 #: app/templates/role/list.html:67
 msgid "Módulo Geográfico"
@@ -2113,7 +2114,9 @@ msgstr "No se encontraron usuarios que coincidan con la búsqueda"
 msgid ""
 "Intenta con otros términos o limpia la búsqueda para ver todos los "
 "usuarios."
-msgstr "Intente con otros términos o limpie la búsqueda para ver todos los usuarios."
+msgstr ""
+"Intente con otros términos o limpie la búsqueda para ver todos los "
+"usuarios."
 
 #: app/templates/user/list.html:189
 msgid "Agregar Usuario"
@@ -2166,3 +2169,4 @@ msgstr "usuarios eliminados exitosamente"
 #: app/templates/user/list.html:542
 msgid "Algunos usuarios no pudieron ser eliminados"
 msgstr "Algunos usuarios no pudieron ser eliminados"
+
