@@ -1,6 +1,6 @@
+import logging
 from flask_login import UserMixin
 from flask import session
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,10 @@ class User(UserMixin):
         # Debug detallado de extracción de roles
         self.roles = self._extract_roles(user_data)
         
-        logger.info(f"Created user: {self.username} (ID: {self.id}) with roles: {self.roles}")
+        # Extraer países/grupos
+        self.countries = self._extract_countries(user_data)
+        
+        logger.info(f"Created user: {self.username} (ID: {self.id}) with roles: {self.roles} and countries: {self.countries}")
         
     def _extract_roles(self, user_data):
         """Extrae roles de diferentes ubicaciones en los datos de Keycloak"""
@@ -41,7 +44,6 @@ class User(UserMixin):
             ('roles', user_data.get('roles', [])),
             ('realm_access.roles', user_data.get('realm_access', {}).get('roles', [])),
             ('resource_access', self._extract_from_resource_access(user_data)),
-            ('groups', user_data.get('groups', [])),
             ('client_roles', self._extract_from_client_roles(user_data)),
             ('role_name', [user_data.get('role_name')] if user_data.get('role_name') else []),
         ]
@@ -70,6 +72,57 @@ class User(UserMixin):
         
         logger.info(f"Final filtered roles: {unique_roles}")
         return unique_roles
+    
+    def _extract_countries(self, user_data):
+        """Extrae países/grupos de los datos de Keycloak"""
+        logger.info("Starting country extraction...")
+        
+        groups = user_data.get('groups', [])
+        logger.info(f"Groups data: {groups}")
+        
+        countries = []
+        
+        if isinstance(groups, list):
+            for group in groups:
+                if isinstance(group, dict):
+                    # Si el grupo es un objeto con estructura
+                    group_name = group.get('name', '')
+                    group_id = group.get('id', '')
+                    
+                    # Extraer nombre del país del nombre del grupo
+                    country_name = self._extract_country_name(group_name)
+                    
+                    countries.append({
+                        'id': group_id,
+                        'name': group_name,
+                        'display_name': country_name,
+                        'country_name': country_name
+                    })
+                elif isinstance(group, str):
+                    # Si el grupo es solo un string (nombre)
+                    country_name = self._extract_country_name(group)
+                    countries.append({
+                        'id': group,  # Usar el nombre como ID temporal
+                        'name': group,
+                        'display_name': country_name,
+                        'country_name': country_name
+                    })
+        
+        logger.info(f"Extracted countries: {countries}")
+        return countries
+    
+    def _extract_country_name(self, group_name: str) -> str:
+        """Extrae el nombre del país del nombre del grupo"""
+        if not group_name:
+            return ''
+            
+        # Remover prefijos comunes y capitalizar
+        if 'aclimate_admin_' in group_name.lower():
+            country = group_name.lower().replace('aclimate_admin_', '')
+            return country.capitalize()
+        
+        # Si no tiene el prefijo esperado, usar el nombre completo capitalizado
+        return group_name.replace('_', ' ').title()
     
     def _extract_from_resource_access(self, user_data):
         """Extrae roles específicos de resource_access"""
@@ -123,6 +176,28 @@ class User(UserMixin):
         from app.config.permissions import RolePermissionMapper
         return list(RolePermissionMapper.get_user_modules(self.roles))
     
+    def get_country_names(self):
+        """Obtiene lista de nombres de países del usuario"""
+        return [country['country_name'] for country in self.countries]
+    
+    def get_country_group_names(self):
+        """Obtiene lista de nombres de grupos (para API calls)"""
+        return [country['name'] for country in self.countries]
+    
+    def get_country_ids(self):
+        """Obtiene lista de IDs de países del usuario"""
+        return [country['id'] for country in self.countries]
+    
+    def has_country_access(self, country_name: str) -> bool:
+        """Verifica si el usuario tiene acceso a un país específico"""
+        user_countries = self.get_country_names()
+        return country_name.lower() in [c.lower() for c in user_countries]
+    
+    def has_group_access(self, group_name: str) -> bool:
+        """Verifica si el usuario pertenece a un grupo específico"""
+        user_groups = self.get_country_group_names()
+        return group_name in user_groups
+    
     def is_super_admin(self):
         """Verifica si el usuario es super administrador"""
         return 'adminsuper' in self.roles
@@ -161,7 +236,7 @@ class User(UserMixin):
             
             # Crear usuario con información enriquecida
             user = User(user_info)
-            logger.info(f"User created with roles: {user.roles}")
+            logger.info(f"User created with roles: {user.roles} and countries: {user.countries}")
             
             return user
         return None
@@ -192,77 +267,44 @@ class User(UserMixin):
         """Compatibilidad: OAuth no usa contraseñas locales"""
         return False
     
-    def refresh_roles(self):
-        """Actualiza los roles del usuario desde la API"""
+    def refresh_roles_and_countries(self):
+        """Actualiza los roles y países del usuario desde la API"""
         try:
             from app.services.user_service import UserService
             
             # Solo refrescar si hay un token válido
             if not self.validate_token():
-                logger.warning("Cannot refresh roles: invalid token")
+                logger.warning("Cannot refresh user data: invalid token")
                 return False
             
-            logger.info(f"Refreshing roles for user: {self.id}")
+            logger.info(f"Refreshing user data for: {self.id}")
             
             user_service = UserService()
-            complete_user_data = user_service.get_by_id(self.id)
+            updated_user_data = user_service.get_user_by_id(self.id)
             
-            logger.info(f"Retrieved complete user data for refresh: {complete_user_data}")
+            if updated_user_data:
+                # Actualizar roles y países
+                self.roles = self._extract_roles(updated_user_data)
+                self.countries = self._extract_countries(updated_user_data)
+                
+                # Actualizar otros campos básicos si han cambiado
+                self.email = updated_user_data.get('email', self.email)
+                self.first_name = updated_user_data.get('firstName', self.first_name)
+                self.last_name = updated_user_data.get('lastName', self.last_name)
+                
+                # Actualizar sesión
+                session['user_data'] = updated_user_data
+                
+                logger.info(f"Successfully refreshed user data: roles={self.roles}, countries={self.countries}")
+                return True
             
-            # Extraer roles usando la misma lógica que en el enriquecimiento
-            api_roles = []
-            
-            # 1. Extraer del campo 'role_name' directo
-            role_name = complete_user_data.get('role_name')
-            if role_name:
-                api_roles.append(role_name)
-                logger.info(f"Found role from 'role_name': {role_name}")
-            
-            # 2. Extraer de 'client_roles' array
-            client_roles = complete_user_data.get('client_roles', [])
-            if client_roles:
-                logger.info(f"Processing client_roles for refresh: {client_roles}")
-                for role in client_roles:
-                    if isinstance(role, dict):
-                        role_name = role.get('name')
-                        if role_name and role_name not in api_roles:
-                            api_roles.append(role_name)
-                            logger.info(f"Found role from 'client_roles': {role_name}")
-                    elif isinstance(role, str):
-                        if role not in api_roles:
-                            api_roles.append(role)
-                            logger.info(f"Found role from 'client_roles' (string): {role}")
-            
-            # 3. Extraer de cualquier otro campo 'roles' si existe
-            roles_array = complete_user_data.get('roles', [])
-            if roles_array:
-                logger.info(f"Processing roles array for refresh: {roles_array}")
-                for role in roles_array:
-                    if isinstance(role, str) and role not in api_roles:
-                        api_roles.append(role)
-                        logger.info(f"Found role from 'roles' array: {role}")
-            
-            logger.info(f"Final extracted roles for refresh: {api_roles}")
-            
-            # Actualizar roles en el objeto usuario
-            self.roles = api_roles
-            
-            # Actualizar roles en la sesión
-            user_data = session.get('user_data', {})
-            user_data['roles'] = api_roles
-            user_data['client_roles'] = client_roles
-            user_data['role_name'] = complete_user_data.get('role_name')
-            user_data['role_id'] = complete_user_data.get('role_id')
-            
-            if 'realm_access' not in user_data:
-                user_data['realm_access'] = {}
-            user_data['realm_access']['roles'] = api_roles
-            
-            session['user_data'] = user_data
-            
-            logger.info(f"Successfully refreshed roles for user {self.username}: {api_roles}")
-            return True
+            return False
             
         except Exception as e:
-            logger.error(f"Error refreshing roles for user {self.username}: {e}")
+            logger.error(f"Error refreshing user data: {e}")
             return False
+    
+    # Mantener el método anterior para compatibilidad
+    def refresh_roles(self):
+        """Compatibilidad: redirige al nuevo método"""
+        return self.refresh_roles_and_countries()
