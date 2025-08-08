@@ -64,6 +64,7 @@ block content %}
             <th>Nombre Completo</th>
             <th>Email</th>
             <th>Rol</th>
+            <th>Países</th>
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
@@ -116,6 +117,22 @@ block content %}
                 <i class="fas fa-eye"></i> {{ user.role_name }} {% else %}
                 <i class="fas fa-user-tag"></i> {{ user.role_name }} {% endif %}
               </span>
+            </td>
+            <td>
+              {% if user.countries %}
+              <div class="d-flex flex-wrap gap-1">
+                {% for country in user.countries %}
+                <span class="badge bg-dark" title="{{ country.name }}">
+                  <span class="fi fi-{{ country.country_name|get_country_code }} me-2"></span>
+                  <span>{{ country.country_name }}</span>
+                </span>
+                {% endfor %}
+                {% else %}
+                <span class="text-muted fst-italic">
+                  <i class="fas fa-minus"></i> Sin países asignados
+                </span>
+              </div>
+              {% endif %}
             </td>
             <td class="text-end">
               <a
@@ -289,7 +306,56 @@ block content %}
             <i class="fas fa-shield-alt me-1"></i>{{_('Crea una contraseña segura para el usuario')}}
           </div>
         </div>
+        <!-- Selección de países -->
+        <div class="mb-3">
+            <!-- Countries/Groups Selection -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="fas fa-flag me-2"></i>{{ form.countries.label.text }}
+              </label>
+              
+              {% if form.countries.errors %}
+              <div class="alert alert-danger">
+                {% for error in form.countries.errors %}
+                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                {% endfor %}
+              </div>
+              {% endif %}
+              
+              <div class="countries-selection-container border rounded p-3" style="max-height: 300px; overflow-y: auto; background-color: #f8f9fa;">
+                {% if countries %}
+                  {% for country in countries %}
+                  <div class="mb-2">
+                    <div class="form-check">
+                      <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name="countries" 
+                        value="{{ country.name }}" 
+                        id="create_country_{{ loop.index }}"
+                      >
+                      <label class="form-check-label p-0" for="create_country_{{ loop.index }}">
+                        <span class="fi fi-{{ country.display_name|get_country_code }} me-2"></span>
+                        <span>{{ country.display_name }}</span>
+                      </label>
+                    </div>
+                  </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="text-muted text-center py-3">
+                    <i class="fas fa-info-circle me-2"></i>{{_('No hay países disponibles')}}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>{{_('Seleccione los países a los que el usuario tendrá acceso')}}
+              </div>
+            </div>
+          </div>
       </div>
+      
+          
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           <i class="fas fa-times"></i> {{_('Cancelar')}}

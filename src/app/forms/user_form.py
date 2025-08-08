@@ -50,7 +50,25 @@ class UserForm(FlaskForm):
         ]
     )
 
+    countries = MultiCheckboxField(
+        _l('Países'),
+        validators=[
+            Optional()
+        ],
+        choices=[],
+        coerce=str,
+        description=_l('Seleccione los países a los que el usuario tendrá acceso.')
+    )
+
     submit = SubmitField(_l('Guardar Usuario'))
+
+    def populate_countries(self, available_countries):
+        """Poblar las opciones de países disponibles"""
+        # Crear choices con formato (valor, etiqueta)
+        self.countries.choices = [
+            (country['name'], country['display_name']) 
+            for country in available_countries
+        ]
 
 class UserEditForm(FlaskForm):
     """Formulario para editar usuario"""

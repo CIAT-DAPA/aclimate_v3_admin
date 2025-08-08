@@ -13,6 +13,46 @@ class UserService:
             return {'Authorization': f'Bearer {token}'}
         return {}
     
+    def _extract_countries_from_groups(self, groups_data: List) -> List[Dict]:
+        """Extrae información de países desde los grupos del usuario"""
+        countries = []
+        
+        if isinstance(groups_data, list):
+            for group in groups_data:
+                if isinstance(group, dict):
+                    group_name = group.get('name', '')
+                    group_id = group.get('id', '')
+                elif isinstance(group, str):
+                    group_name = group
+                    group_id = group
+                else:
+                    continue
+                
+                # Extraer nombre del país del nombre del grupo
+                country_name = self._extract_country_name(group_name)
+                
+                countries.append({
+                    'id': group_id,
+                    'name': group_name,
+                    'display_name': country_name,
+                    'country_name': country_name
+                })
+        
+        return countries
+
+    def _extract_country_name(self, group_name: str) -> str:
+        """Extrae el nombre del país del nombre del grupo"""
+        if not group_name:
+            return ''
+            
+        # Remover prefijos comunes y capitalizar
+        if 'aclimate_admin_' in group_name.lower():
+            country = group_name.lower().replace('aclimate_admin_', '')
+            return country.capitalize()
+        
+        # Si no tiene el prefijo esperado, usar el nombre completo capitalizado
+        return group_name.replace('_', ' ').title()
+
     def _normalize_user_data(self, api_user: Dict) -> Dict:
         """Convierte la estructura de la API a la estructura interna"""
         # Obtener el primer rol o asignar valores por defecto
@@ -29,6 +69,10 @@ class UserService:
         created_timestamp = api_user.get('createdTimestamp', 0)
         created_at = datetime.fromtimestamp(created_timestamp / 1000) if created_timestamp else datetime.now()
         
+        # Extraer países/grupos
+        groups_data = api_user.get('groups', [])
+        countries = self._extract_countries_from_groups(groups_data)
+        
         return {
             'id': api_user.get('id'),
             'username': api_user.get('username'),
@@ -44,9 +88,11 @@ class UserService:
             'updated_at': created_at,
             'totp': api_user.get('totp', False),
             'access': api_user.get('access', {}),
-            'client_roles': client_roles
+            'client_roles': client_roles,
+            'groups': groups_data,
+            'countries': countries
         }
-    
+
     def get_all(self) -> List[Dict]:
         """Obtener todos los usuarios desde la API"""
         try:
@@ -57,8 +103,8 @@ class UserService:
             )
             
             print(f"API Response Status: {response.status_code}")
-            print(f"API Response Content: {response.text[:500]}...")
-            
+            print(f"API Response Content: {response.text}")
+
             if response.status_code == 200:
                 api_users = response.json()
                 

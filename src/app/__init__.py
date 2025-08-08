@@ -54,6 +54,49 @@ def create_app():
     login_manager.login_message = 'Por favor inicia sesión para acceder a esta página.'
     login_manager.login_message_category = 'info'
     
+    # AGREGAR LOS FILTROS PERSONALIZADOS AQUÍ
+    @app.template_filter('get_country_code')
+    def get_country_code(country_name):
+        """Convierte nombre de país a código ISO de 2 letras para flag-icons"""
+        country_codes = {
+            'colombia': 'co',
+            'peru': 'pe',
+            'brasil': 'br',
+            'brazil': 'br',
+            'ecuador': 'ec',
+            'argentina': 'ar',
+            'chile': 'cl',
+            'bolivia': 'bo',
+            'venezuela': 've',
+            'uruguay': 'uy',
+            'paraguay': 'py',
+            'guyana': 'gy',
+            'suriname': 'sr',
+            'guatemala': 'gt',
+            'nicaragua': 'ni',
+            'honduras': 'hn',
+            'costa rica': 'cr',
+            'panama': 'pa',
+            'mexico': 'mx',
+            'estados unidos': 'us',
+            'united states': 'us',
+            'canada': 'ca',
+            'españa': 'es',
+            'spain': 'es',
+        }
+        
+        if not country_name:
+            return 'xx'  # Bandera genérica
+        
+        country_lower = country_name.lower().strip()
+        return country_codes.get(country_lower, 'xx')
+
+    @app.template_filter('get_country_flag')
+    def get_country_flag(country_name):
+        """Convierte nombre de país a emoji de bandera (respaldo)"""
+        # Este filtro ahora es un respaldo, pero podemos mantenerlo
+        return get_country_code(country_name)
+    
     # Hacer get_locale disponible en templates
     @app.context_processor
     def inject_conf_vars():

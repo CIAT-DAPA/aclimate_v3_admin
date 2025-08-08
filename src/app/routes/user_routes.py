@@ -17,19 +17,30 @@ role_service = RoleService()
 def list_user():
     form = UserForm()
     users = user_service.get_all()
-    return render_template('user/list.html', users=users, form=form)
+    from app.services.group_service import GroupService
+    group_service = GroupService()
+    countries = group_service.get_all()
+    form.populate_countries(countries)
+    return render_template('user/list.html', users=users, form=form, countries=countries)
 
 # Ruta: Solo crear usuario
 @bp.route('/user/create', methods=['POST'])
 @token_required
 @require_module_access(Module.USER_MANAGEMENT)
 def create_user():
+    # Obtener países disponibles para el formulario
+    from app.services.group_service import GroupService
+    group_service = GroupService()
+    countries = group_service.get_all()
+    
     form = UserForm()
+    form.populate_countries(countries)
     
     if form.validate_on_submit():
         try: 
             print(f"Intentando crear usuario: {form.username.data}")
             
+            # Crear el usuario básico primero
             created_user = user_service.create(
                 username=form.username.data,
                 email=form.email.data,
@@ -39,7 +50,28 @@ def create_user():
             )
             
             print(f"Usuario creado exitosamente: {created_user}")
-            flash('Usuario agregado exitosamente.', 'success')
+            
+            # Si el usuario fue creado y se seleccionaron países, asignarlos
+            if created_user and form.countries.data:
+                try:
+                    user_id = created_user.get('id')
+                    selected_countries = form.countries.data
+                    
+                    print(f"Asignando países {selected_countries} al usuario {user_id}")
+                    
+                    # Usar el GroupService para asignar países
+                    countries_assigned = group_service.assign_user_to_groups(user_id, selected_countries)
+                    
+                    if countries_assigned:
+                        flash('Usuario creado y países asignados exitosamente.', 'success')
+                    else:
+                        flash('Usuario creado pero hubo problemas asignando países.', 'warning')
+                        
+                except Exception as e:
+                    print(f"Error asignando países: {e}")
+                    flash('Usuario creado pero no se pudieron asignar los países.', 'warning')
+            else:
+                flash('Usuario agregado exitosamente.', 'success')
             
         except ValueError as e:
             print(f"Error de validación: {e}")
@@ -49,15 +81,13 @@ def create_user():
             print(f"Tipo de error: {type(e)}")
             import traceback
             traceback.print_exc()
-            flash(f'Error al agregar usuario: {str(e)}', 'danger')
+            flash(f'Error creando usuario: {str(e)}', 'danger')
     else:
-        # Si hay errores de validación del formulario, mostrarlos
-        print(f"Errores de formulario: {form.errors}")
+        # Si hay errores de validación
         for field, errors in form.errors.items():
             for error in errors:
                 flash(f'Error en {field}: {error}', 'danger')
     
-    # Siempre redirigir a la lista (formulario estará limpio)
     return redirect(url_for('user.list_user'))
 
 # Ruta: Eliminar usuario
@@ -96,14 +126,23 @@ def edit_user(user_id):
         
         # Obtener todos los roles disponibles
         roles = role_service.get_all()
+
+        # Obtener todos los grupos/países disponibles
+        from app.services.group_service import GroupService
+        group_service = GroupService()
+        countries = group_service.get_all()
         
         if not roles:
             flash('No se pudieron cargar los roles disponibles.', 'warning')
             return redirect(url_for('user.list_user'))
         
+        if not countries:
+            flash('No se pudieron cargar los países disponibles.', 'warning')
+        
         # Crear formulario y llenar opciones de roles
         form = UserEditForm()
         form.role_id.choices = [(role['id'], role['display_name']) for role in roles]
+        form.countries.choices = [(country['name'], country['display_name']) for country in countries]
         
         if request.method == 'GET':
             # Mostrar formulario con datos actuales
@@ -111,7 +150,18 @@ def edit_user(user_id):
             form.last_name.data = user.get('last_name', '')
             form.email.data = user.get('email', '')
             form.role_id.data = user.get('role_id', '')
-            return render_template('user/edit.html', form=form, user=user, roles=roles)
+            
+            # Pre-seleccionar países del usuario
+            user_countries = user.get('countries', [])
+            if user_countries:
+                form.countries.data = [country['name'] for country in user_countries]
+            
+            return render_template('user/edit.html', 
+                                form=form, 
+                                user=user, 
+                                roles=roles, 
+                                countries=countries)
+        
         
         elif request.method == 'POST' and form.validate_on_submit():
             # Procesar la actualización del usuario
@@ -123,15 +173,18 @@ def edit_user(user_id):
                 current_last_name = user.get('last_name', '')
                 current_email = user.get('email', '')
                 current_role_id = user.get('role_id', '')
+                current_countries = [country['name'] for country in user.get('countries', [])]
                 
                 new_first_name = form.first_name.data.strip() if form.first_name.data else ''
                 new_last_name = form.last_name.data.strip() if form.last_name.data else ''
                 new_email = form.email.data.strip() if form.email.data else ''
                 new_role_id = form.role_id.data
+                new_countries = form.countries.data if form.countries.data else []
                 
                 # Flags para rastrear cambios
                 user_data_changed = False
                 role_changed = False
+                countries_changed = False
                 
                 # Verificar cambios en datos básicos del usuario
                 if (new_first_name != current_first_name or 
@@ -143,8 +196,12 @@ def edit_user(user_id):
                 if new_role_id != current_role_id:
                     role_changed = True
                 
+                # Verificar cambio de países
+                if set(new_countries) != set(current_countries):
+                    countries_changed = True
+                
                 # Si no hay cambios
-                if not user_data_changed and not role_changed:
+                if not user_data_changed and not role_changed and not countries_changed:
                     flash('No se realizaron cambios.', 'info')
                     return redirect(url_for('user.edit_user', user_id=user_id))
                 
@@ -233,7 +290,25 @@ def edit_user(user_id):
                         print(f"Error inesperado actualizando rol: {e}")
                         flash(f'Error al actualizar rol: {str(e)}', 'danger')
                         has_errors = True
-                
+                # Actualizar países si cambiaron - usando GroupService
+                if countries_changed:
+                    try:
+                        print(f"Cambiando países de {current_countries} a {new_countries}")
+                        
+                        # Usar el método del GroupService existente
+                        countries_update_success = group_service.update_user_groups(user_id, new_countries)
+                        
+                        if countries_update_success:
+                            success_messages.append('Países/grupos actualizados')
+                        else:
+                            flash('No se pudieron actualizar los países del usuario.', 'danger')
+                            has_errors = True
+                    
+                    except Exception as e:
+                        print(f"Error inesperado actualizando países: {e}")
+                        flash(f'Error al actualizar países: {str(e)}', 'danger')
+                        has_errors = True
+
                 # Mostrar mensajes de éxito
                 if success_messages:
                     success_msg = 'Usuario actualizado exitosamente: ' + ', '.join(success_messages)
@@ -256,7 +331,7 @@ def edit_user(user_id):
                     flash(f'Error en {field}: {error}', 'danger')
         
         # En caso de error, volver a mostrar el formulario
-        return render_template('user/edit.html', form=form, user=user, roles=roles)
+        return render_template('user/edit.html', form=form, user=user, roles=roles, countries=countries)
         
     except ValueError as e:
         print(f"Error obteniendo usuario: {e}")
