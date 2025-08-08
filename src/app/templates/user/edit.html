@@ -180,7 +180,8 @@
                           {% if country.name in form.countries.data %}checked{% endif %}
                         >
                         <label class="form-check-label" for="country_{{ loop.index }}">
-                          <i class="fas fa-flag me-1"></i>{{ country.display_name }}
+                          <span class="fi fi-{{ country.display_name|get_country_code }}"></span>
+                          {{ country.display_name }}
                         </label>
                       </div>
                     </div>

@@ -115,18 +115,18 @@ def delete_user(user_id):
     return redirect(url_for('user.list_user'))
 
 # Ruta: Editar usuario
-@bp.route('/user/edit/<string:user_id>', methods=['GET', 'POST'])
+@bp.route('/user/edit/<user_id>', methods=['GET', 'POST'])
 @token_required
 @require_module_access(Module.USER_MANAGEMENT)
 def edit_user(user_id):
-    """Editar usuario - permite cambiar nombre, apellido, email y rol"""
+    """Editar usuario - permite cambiar nombre, apellido, email, rol y países"""
     try:
         # Obtener el usuario específico por ID
         user = user_service.get_by_id(user_id)
         
         # Obtener todos los roles disponibles
         roles = role_service.get_all()
-
+        
         # Obtener todos los grupos/países disponibles
         from app.services.group_service import GroupService
         group_service = GroupService()
@@ -139,7 +139,7 @@ def edit_user(user_id):
         if not countries:
             flash('No se pudieron cargar los países disponibles.', 'warning')
         
-        # Crear formulario y llenar opciones de roles
+        # Crear formulario y llenar opciones
         form = UserEditForm()
         form.role_id.choices = [(role['id'], role['display_name']) for role in roles]
         form.countries.choices = [(country['name'], country['display_name']) for country in countries]
@@ -151,17 +151,18 @@ def edit_user(user_id):
             form.email.data = user.get('email', '')
             form.role_id.data = user.get('role_id', '')
             
-            # Pre-seleccionar países del usuario
+            # Pre-seleccionar países del usuario - CORREGIR AQUÍ
             user_countries = user.get('countries', [])
-            if user_countries:
-                form.countries.data = [country['name'] for country in user_countries]
+            if user_countries and isinstance(user_countries, list):
+                form.countries.data = [country['name'] for country in user_countries if isinstance(country, dict) and 'name' in country]
+            else:
+                form.countries.data = []  # Lista vacía si no hay países
             
             return render_template('user/edit.html', 
                                 form=form, 
                                 user=user, 
                                 roles=roles, 
                                 countries=countries)
-        
         
         elif request.method == 'POST' and form.validate_on_submit():
             # Procesar la actualización del usuario
@@ -173,12 +174,20 @@ def edit_user(user_id):
                 current_last_name = user.get('last_name', '')
                 current_email = user.get('email', '')
                 current_role_id = user.get('role_id', '')
-                current_countries = [country['name'] for country in user.get('countries', [])]
+                
+                # CORREGIR AQUÍ - Manejar países actuales correctamente
+                current_countries_data = user.get('countries', [])
+                if current_countries_data and isinstance(current_countries_data, list):
+                    current_countries = [country['name'] for country in current_countries_data if isinstance(country, dict) and 'name' in country]
+                else:
+                    current_countries = []
                 
                 new_first_name = form.first_name.data.strip() if form.first_name.data else ''
                 new_last_name = form.last_name.data.strip() if form.last_name.data else ''
                 new_email = form.email.data.strip() if form.email.data else ''
                 new_role_id = form.role_id.data
+                
+                # CORREGIR AQUÍ - Manejar países nuevos correctamente
                 new_countries = form.countries.data if form.countries.data else []
                 
                 # Flags para rastrear cambios
@@ -196,9 +205,11 @@ def edit_user(user_id):
                 if new_role_id != current_role_id:
                     role_changed = True
                 
-                # Verificar cambio de países
+                # Verificar cambio de países - CORREGIR AQUÍ
                 if set(new_countries) != set(current_countries):
                     countries_changed = True
+                    print(f"Países actuales: {current_countries}")
+                    print(f"Países nuevos: {new_countries}")
                 
                 # Si no hay cambios
                 if not user_data_changed and not role_changed and not countries_changed:
@@ -275,13 +286,11 @@ def edit_user(user_id):
                         role_update_success = user_service.assign_role(user_id, new_role_id)
                         
                         if role_update_success:
-                            # Obtener el nombre del nuevo rol para el mensaje
-                            new_role_name = next((role['display_name'] for role in roles if role['id'] == new_role_id), 'Desconocido')
-                            success_messages.append(f'Rol actualizado a "{new_role_name}"')
+                            success_messages.append('Rol actualizado')
                         else:
-                            flash('No se pudo asignar el nuevo rol al usuario.', 'danger')
+                            flash('No se pudo actualizar el rol del usuario.', 'danger')
                             has_errors = True
-                            
+                    
                     except ValueError as e:
                         print(f"Error actualizando rol: {e}")
                         flash(f'Error actualizando rol: {str(e)}', 'danger')
@@ -290,6 +299,7 @@ def edit_user(user_id):
                         print(f"Error inesperado actualizando rol: {e}")
                         flash(f'Error al actualizar rol: {str(e)}', 'danger')
                         has_errors = True
+                
                 # Actualizar países si cambiaron - usando GroupService
                 if countries_changed:
                     try:
@@ -308,30 +318,35 @@ def edit_user(user_id):
                         print(f"Error inesperado actualizando países: {e}")
                         flash(f'Error al actualizar países: {str(e)}', 'danger')
                         has_errors = True
-
-                # Mostrar mensajes de éxito
-                if success_messages:
-                    success_msg = 'Usuario actualizado exitosamente: ' + ', '.join(success_messages)
-                    flash(success_msg, 'success')
                 
-                # Redirigir según el resultado
-                if not has_errors and success_messages:
+                # Mostrar mensajes de éxito si los hay
+                if success_messages and not has_errors:
+                    message = 'Usuario actualizado exitosamente: ' + ', '.join(success_messages)
+                    flash(message, 'success')
                     return redirect(url_for('user.list_user'))
-                elif success_messages:  # Éxito parcial
+                elif success_messages and has_errors:
+                    message = 'Algunas actualizaciones fueron exitosas: ' + ', '.join(success_messages)
+                    flash(message, 'warning')
                     return redirect(url_for('user.edit_user', user_id=user_id))
-                    
+                else:
+                    return redirect(url_for('user.edit_user', user_id=user_id))
+                
             except Exception as e:
-                print(f"Error general en actualización: {e}")
-                flash(f'Error general al actualizar usuario: {str(e)}', 'danger')
+                print(f"Error general procesando actualizaciones: {e}")
+                flash(f'Error procesando la actualización: {str(e)}', 'danger')
+                return redirect(url_for('user.edit_user', user_id=user_id))
         
         else:
             # Errores de validación del formulario
             for field, errors in form.errors.items():
                 for error in errors:
                     flash(f'Error en {field}: {error}', 'danger')
-        
-        # En caso de error, volver a mostrar el formulario
-        return render_template('user/edit.html', form=form, user=user, roles=roles, countries=countries)
+            
+            return render_template('user/edit.html', 
+                                form=form, 
+                                user=user, 
+                                roles=roles, 
+                                countries=countries)
         
     except ValueError as e:
         print(f"Error obteniendo usuario: {e}")
@@ -339,7 +354,7 @@ def edit_user(user_id):
         return redirect(url_for('user.list_user'))
     except Exception as e:
         print(f"Error inesperado en edit_user: {e}")
-        flash(f'Error al cargar usuario: {str(e)}', 'danger')
+        flash('Error cargando la página de edición.', 'danger')
         return redirect(url_for('user.list_user'))
     
 @bp.route('/users/bulk_action', methods=['POST'])

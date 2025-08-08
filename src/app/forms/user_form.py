@@ -135,10 +135,16 @@ class UserEditForm(FlaskForm):
             if isinstance(user_countries, list) and len(user_countries) > 0:
                 if isinstance(user_countries[0], dict):
                     # Si user_countries es una lista de diccionarios
-                    self.countries.data = [country['name'] for country in user_countries]
+                    self.countries.data = [country['name'] for country in user_countries if isinstance(country, dict) and 'name' in country]
                 else:
                     # Si user_countries es una lista de strings
                     self.countries.data = user_countries
+            else:
+                # Si está vacío o None, asegurar que data sea una lista vacía
+                self.countries.data = []
+        else:
+            # Si user_countries es None, inicializar como lista vacía
+            self.countries.data = []
     
     def populate_roles(self, available_roles, user_role=None):
         """Poblar las opciones de roles disponibles"""

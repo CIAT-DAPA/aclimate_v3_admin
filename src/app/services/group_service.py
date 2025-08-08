@@ -165,7 +165,7 @@ class GroupService:
             headers = self._get_auth_headers()
             headers['Content-Type'] = 'application/json'
             
-            response = requests.delete(
+            response = requests.post(
                 f"{Config.API_BASE_URL}/users/remove-groups",
                 headers=headers,
                 json=data,
@@ -197,7 +197,7 @@ class GroupService:
             
             # Obtener información actual del usuario incluyendo sus grupos
             user_service = UserService()
-            user_data = user_service.get_user_by_id(user_id)
+            user_data = user_service.get_by_id(user_id)
             
             if not user_data:
                 current_app.logger.error(f"Could not get user data for {user_id}")

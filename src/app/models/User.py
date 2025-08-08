@@ -280,7 +280,7 @@ class User(UserMixin):
             logger.info(f"Refreshing user data for: {self.id}")
             
             user_service = UserService()
-            updated_user_data = user_service.get_user_by_id(self.id)
+            updated_user_data = user_service.get_by_id(self.id)
             
             if updated_user_data:
                 # Actualizar roles y países
