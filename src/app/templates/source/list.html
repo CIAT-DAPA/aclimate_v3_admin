@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Fuentes') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Fuentes') }}</h2>
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addSourceModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="sourceSearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="sourceFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sourceFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="sourceSearchResults" class="text-muted small"></span>
+  </div>
+
+
+  <!-- Contenedor para mensajes -->
+  <div id="noSourceResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if sources %}
+  <div id="sourceTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('data_source.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+        </button>
+        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+        </button>
+      </div>
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            <th>{{ _('Nombre') }}</th>
+            <th>{{ _('Tipo de fuente') }}</th>
+            <th>{{ _('Estado') }}</th>
+            <th class="text-end">{{ _('Acciones') }}</th>
+          </tr>
+        </thead>
+        <tbody id="sourceTableBody">
+          {% for source in sources %}
+          <tr data-type="{% if source.source_type == 'AU' %}Automático{% else %}Manual{% endif %}"
+              data-status="{% if source.enable %}active{% else %}inactive{% endif %}">
+            <td><input type="checkbox" name="selected_ids" value="{{ source.id }}" class="select-row" /></td>
+            <td class="searchable">{{ source.name }}</td>
+            <td class="searchable">
+              {% if source.source_type == 'AU' %}
+                Automático
+              {% else %}
+                Manual
+              {% endif %}
+            </td>
+            <td>{{ 'Habilitado' if source.enable else 'Deshabilitado' }}</td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('source.edit_source', id=source.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="Editar"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% if source.enable %}
+              <a
+                href="{{ url_for('source.delete_source', id=source.id) }}"
+                class="btn btn-danger btn-sm"
+                title="Deshabilitar"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% else %}
+              <a
+                href="{{ url_for('source.reset_source', id=source.id) }}"
+                class="btn btn-success btn-sm"
+                title="Recuperar"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+ <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="sourceResultsCount"></span> {{ _('resultado (s)') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay fuentes de datos registradas.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Fuente -->
+<div
+  class="modal fade"
+  id="addSourceModal"
+  tabindex="-1"
+  aria-labelledby="addSourceLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addSourceLabel">
+          {{ _('Agregar fuente') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control") }}
+          {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.source_type.label(class="form-label") }}
+          {{ form.source_type(class="form-select") }}
+          {% for error in form.source_type.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="form-check mb-2">
+          {{ form.enable(class="form-check-input") }}
+          {{ form.enable.label(class="form-check-label") }}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Script para llamar la búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración específica para locaciones
+    initTableSearch({
+      searchInputId: 'sourceSearchInput',
+      filtersButtonId: 'sourceFiltersButton',
+      tableContainerId: 'sourceTableContainer',
+      noResultsId: 'noSourceResults',
+      resultsCountId: 'sourceResultsCount',
+      tableBodyId: 'sourceTableBody',
+
+      searchColumns: [
+        { selector: '.searchable' } // Buscar en todas las celdas con clase 'searchable'
+      ],
+      
+      filterConfigs: [
+        {
+          name: 'type',
+          label: '{{ _("Tipo de fuente") }}',
+          getValue: row => row.dataset.type,
+          getDisplayValue: row => row.dataset.type
+        },
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active' 
+              ? '{{ _("Habilitado") }}' 
+              : '{{ _("Deshabilitado") }}';
+          }
+        }
+      ]
+    });
+    // Configuración para bulk actions
+    setupBulkActions({
+      // Puedes personalizar los IDs si son diferentes en otras páginas
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+{% endblock %}
+
+

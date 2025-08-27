@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Editar Parámetro de Estrés{% endblock %}
+{% block content %}
+<div class="container">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('phenological_stage_stress.list_phenological_stage_stress') }}">Parámetros de Estrés por Etapa Fenológica</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {{ pss.stress.name if pss and pss.stress else '' }} - {{ pss.phenological_stage.name if pss and pss.phenological_stage else '' }}
+      </li>
+    </ol>
+  </nav>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Editar Parámetro de Estrés</h2>
+    <a href="{{ url_for('phenological_stage_stress.list_phenological_stage_stress') }}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Volver al listado
+    </a>
+  </div>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.stress_id.label(class="form-label") }}
+      {{ form.stress_id(class="form-select") }}
+      {% for error in form.stress_id.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="mb-3">
+      {{ form.phenological_stage_id.label(class="form-label") }}
+      {{ form.phenological_stage_id(class="form-select") }}
+      {% for error in form.phenological_stage_id.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        {{ form.min.label(class="form-label") }}
+        {{ form.min(class="form-control") }}
+        {% for error in form.min.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="col-md-6">
+        {{ form.max.label(class="form-label") }}
+        {{ form.max(class="form-control") }}
+        {% for error in form.max.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="form-check mb-4">
+      {{ form.enable(class="form-check-input") }}
+      {{ form.enable.label(class="form-check-label") }}
+    </div>
+
+    {{ form.submit(class="btn btn-success") }}
+    <a href="{{ url_for('phenological_stage_stress.list_phenological_stage_stress') }}" class="btn btn-outline-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

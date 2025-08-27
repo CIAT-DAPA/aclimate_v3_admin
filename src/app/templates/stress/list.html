@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Estreses') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Estreses') }}</h2>
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addStressModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="stressSearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="stressFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="stressFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="stressSearchResults" class="text-muted small"></span>
+  </div>
+
+  <!-- Contenedor para mensajes -->
+  <div id="noStressResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if stresses %}
+  <div id="stressTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('stress.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+        </button>
+        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+        </button>
+      </div>
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            <th>{{ _('Nombre') }}</th>
+            <th>{{ _('Nombre corto') }}</th>
+            <th>{{ _('Categoría') }}</th>
+            <th>{{ _('Descripción') }}</th>
+            <th>{{ _('Estado') }}</th>
+            <th class="text-end">{{ _('Acciones') }}</th>
+          </tr>
+        </thead>
+        <tbody id="stressTableBody">
+          {% for stress in stresses %}
+          <tr 
+            data-short_name="{{ stress.short_name }}"
+            data-category="{{ stress.category.value}}"
+            data-status="{% if stress.enable %}active{% else %}inactive{% endif %}"
+            >
+            <td><input type="checkbox" name="selected_ids" value="{{ stress.id }}" class="select-row" /></td>
+            <td class="searchable">{{ stress.name }}</td>
+            <td class="searchable">{{ stress.short_name }}</td>
+            <td class="searchable">{{ stress.category.value if stress.category else '' }}</td>
+            <td class="searchable">{{ stress.description or '' }}</td>
+            <td>
+              {{ 'Habilitado' if stress.enable else 'Deshabilitado' }}
+            </td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('stress.edit_stress', id=stress.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="Editar"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% if stress.enable %}
+              <a
+                href="{{ url_for('stress.delete_stress', id=stress.id) }}"
+                class="btn btn-danger btn-sm"
+                title="Deshabilitar"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% else %}
+              <a
+                href="{{ url_for('stress.reset_stress', id=stress.id) }}"
+                class="btn btn-success btn-sm"
+                title="Recuperar"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="stressResultsCount"></span> {{ _('resultados') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay estreses registrados.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Estrés -->
+<div
+  class="modal fade"
+  id="addStressModal"
+  tabindex="-1"
+  aria-labelledby="addStressLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addStressLabel">
+          {{ _('Agregar estrés') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control") }}
+          {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.short_name.label(class="form-label") }}
+          {{ form.short_name(class="form-control") }}
+          {% for error in form.short_name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.category.label(class="form-label") }}
+          {{ form.category(class="form-select") }}
+          {% for error in form.category.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-control") }}
+          {% for error in form.description.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Script para búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración para búsqueda en estreses
+    initTableSearch({
+      searchInputId: 'stressSearchInput',
+      filtersButtonId: 'stressFiltersButton',
+      tableContainerId: 'stressTableContainer',
+      noResultsId: 'noStressResults',
+      resultsCountId: 'stressResultsCount',
+      tableBodyId: 'stressTableBody',
+
+      searchColumns: [
+        { selector: '.searchable' }
+      ],
+      filterConfigs: [
+        {
+          name: 'short_name',
+          label: '{{ _("Nombre corto") }}',
+          getValue: row => row.dataset.short_name,
+          getDisplayValue: row => row.dataset.short_name || '{{ _("Sin nombre corto") }}'
+        },
+        {
+          name: 'category',
+          label: '{{ _("Categoría") }}',
+          getValue: row => row.dataset.category,
+          getDisplayValue: row => {
+            return row.dataset.category || '{{ _("Sin categoría") }}';
+          }
+        },
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active'
+              ? '{{ _("Habilitado") }}'
+              : '{{ _("Deshabilitado") }}';
+          }
+        }
+      ]
+    });
+    // Configuración para acciones masivas
+    setupBulkActions({
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+{% endblock %}
+
+

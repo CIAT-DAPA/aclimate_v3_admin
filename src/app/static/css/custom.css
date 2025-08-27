@@ -1,0 +1,24 @@
+:root {
+  --bs-primary: #bc6c25;
+  --bs-link-color-rgb: 188, 108, 37;
+  --bs-link-hover-color-rgb: 128, 69, 17;
+  --bs-primary-rgb: 188, 108, 37;
+  --bs-dark-rgb: 40, 54, 24;
+  --bs-font-sans-serif: "Montserrat", sans-serif;
+}
+
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  color: var(--bs-btn-color) !important; /* suele ser blanco */
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: rgba(var(--bs-primary-rgb), 0.85) !important;
+  border-color: rgba(var(--bs-primary-rgb), 0.85) !important;
+}
+
+.form-control:focus {
+  border-color: #dfc6b0 !important;
+  box-shadow: 0 0 0 0.25rem rgba(188, 108, 37, 0.25) !important;
+}

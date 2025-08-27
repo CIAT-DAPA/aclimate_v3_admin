@@ -1,0 +1,682 @@
+{% extends 'base.html' %} {% block title %}{{_('Roles')}}{% endblock %} {%
+block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{_('Roles')}}</h2>
+
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addRoleModal"
+    >
+      <i class="fas fa-plus"></i> {{_('Agregar')}}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda y filtros -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <div class="position-relative me-2" style="min-width: 300px;">
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        placeholder="{{_('Buscar por nombre o descripción...')}}"
+        autocomplete="off"
+      />
+      <i id="searchIcon" class="fas fa-search search-icon" title="{{_('Buscar')}}"></i>
+    </div>
+    <!-- Botón de filtros -->
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="filtersDropdown" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+      >
+        <i class="fas fa-filter"></i> {{_('Filtros')}}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filtersDropdown" style="min-width: 250px;">
+        <!-- Content will be generated dynamically by JavaScript -->
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> Cargando filtros...</div></li>
+      </ul>
+    </div>
+
+    <span id="searchResults" class="text-muted small"></span>
+  </div>
+
+  {% if roles %}
+  <form id="bulk-action-form" method="POST" action="{{ url_for('role.bulk_action') }}">
+    <div class="mb-2">
+      <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+      <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+        <i class="fas fa-trash"></i> {{ _('Eliminar seleccionados') }}
+      </button>
+    </div>
+    <div id="rolesTableContainer" class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            <th style="min-width: 180px">{{_('Nombre del Rol')}}</th>
+            <th style="min-width: 200px">{{_('Descripción')}}</th>
+            <!-- Columnas dinámicas para módulos -->
+            <th class="text-center module-header" title="{{_('Módulo Geográfico - Gestión de países, adm1, adm2 y localizaciones')}}" data-bs-toggle="tooltip">
+              <i class="fas fa-globe me-1"></i>
+              <div class="module-title">{{_('Módulo Geográfico')}}</div>
+            </th>
+            <th class="text-center module-header" title="{{_('Datos Climáticos - Gestión de datos climáticos')}}" data-bs-toggle="tooltip">
+              <i class="fas fa-cloud-sun me-1"></i>
+              <div class="module-title">{{_('Datos Climáticos')}}</div>
+            </th>
+            <th class="text-center module-header" title="{{_('Datos de Cultivos - Gestión de datos de cultivos')}}" data-bs-toggle="tooltip">
+              <i class="fas fa-seedling me-1"></i>
+              <div class="module-title">{{_('Datos de Cultivos')}}</div>
+            </th>
+            <th class="text-center module-header" title="{{_('Gestión de Usuarios - Administración de usuarios y roles del sistema')}}" data-bs-toggle="tooltip">
+              <i class="fas fa-users me-1"></i>
+              <div class="module-title">{{_('Gestión de Usuarios')}}</div>
+            </th>
+            <th class="text-end" style="min-width: 120px">{{_('Acciones')}}</th>
+          </tr>
+        </thead>
+        <tbody id="rolesTableBody">
+          {% for role in roles %}
+          {% set role_modules = role.get('modules', []) %}
+          {% set module_values = role_modules | map(attribute='value') | list %}
+          {% set has_geographic = 'geographic' in module_values %}
+          {% set has_climate = 'climate_data' in module_values %}
+          {% set has_crop = 'crop_data' in module_values %}
+          {% set has_users = 'user_management' in module_values %}
+          
+          <tr class="role-row" 
+              data-rolename="{{ role.name|lower }}"
+              data-description="{{ (role.description or '')|lower }}"
+              data-search="{{ (role.name + ' ' + (role.description or ''))|lower }}"
+              data-role-id="{{ role.id }}"
+              data-can-delete="{{ 'true' if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] else 'false' }}">
+            <td>
+              {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
+              <input type="checkbox" class="select-row" value="{{ role.id }}" data-rolename="{{ role.name }}" name="selected_ids"/>
+              {% else %}
+              <input type="checkbox" class="form-check-input" disabled title="{{_('No se puede seleccionar este rol del sistema')}}" />
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="role-icon me-2">
+                  {% if role.name.lower() in ['admin', 'super-admin', 'adminsuper'] %}
+                  <i class="fas fa-crown text-warning"></i>
+                  {% elif role.name.lower() in ['manager', 'supervisor'] %}
+                  <i class="fas fa-user-shield text-primary"></i>
+                  {% elif role.name.lower() in ['editor', 'moderator'] %}
+                  <i class="fas fa-user-edit text-info"></i>
+                  {% elif role.name.lower() in ['viewer', 'guest'] %}
+                  <i class="fas fa-eye text-secondary"></i>
+                  {% else %}
+                  <i class="fas fa-user-tag text-dark"></i>
+                  {% endif %}
+                </div>
+                <div>
+                  <strong class="searchable-rolename">{{ role.display_name }}</strong>
+                  <br />
+                  <small class="text-muted">ID: {{ role.id[:8] }}...</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if role.description %}
+              <span class="searchable-description">{{ role.description }}</span>
+              {% else %}
+              <span class="text-muted fst-italic">{{_('Sin descripción')}}</span>
+              {% endif %}
+            </td>
+            
+            <!-- Columna Módulo Geográfico -->
+            <td class="text-center">
+              {% if has_geographic %}
+                <span class="access-indicator access-granted">
+                  <i class="fas fa-check-circle text-success"></i>
+                </span>
+              {% else %}
+                <span class="access-indicator access-denied" >
+                  <i class="fas fa-times-circle text-danger"></i>
+                </span>
+              {% endif %}
+            </td>
+            
+            <!-- Columna Datos Climáticos -->
+            <td class="text-center">
+              {% if has_climate %}
+                <span class="access-indicator access-granted" >
+                  <i class="fas fa-check-circle text-success"></i>
+                </span>
+              {% else %}
+                <span class="access-indicator access-denied">
+                  <i class="fas fa-times-circle text-danger"></i>
+                </span>
+              {% endif %}
+            </td>
+            
+            <!-- Columna Datos de Cultivos -->
+            <td class="text-center">
+              {% if has_crop %}
+                <span class="access-indicator access-granted" >
+                  <i class="fas fa-check-circle text-success"></i>
+                </span>
+              {% else %}
+                <span class="access-indicator access-denied" >
+                  <i class="fas fa-times-circle text-danger"></i>
+                </span>
+              {% endif %}
+            </td>
+            
+            <!-- Columna Gestión de Usuarios -->
+            <td class="text-center">
+              {% if has_users %}
+                <span class="access-indicator access-granted" >
+                  <i class="fas fa-check-circle text-success"></i>
+                </span>
+              {% else %}
+                <span class="access-indicator access-denied" >
+                  <i class="fas fa-times-circle text-danger"></i>
+                </span>
+              {% endif %}
+            </td>
+            
+            <td class="text-end">
+                <!-- Botón para editar módulos (enlace a página separada) -->
+                <a
+                  href="{{ url_for('role.edit_role', role_name=role.name) }}"
+                  class="btn btn-warning btn-sm me-1"
+                >
+                  <i class="fas fa-pen"></i>
+                </a>
+                
+                <!-- Botón para eliminar rol -->
+                {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
+                <button 
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  title="{{_('Eliminar rol')}}"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteRolModal"
+                  data-role-id="{{ role.id }}"
+                  data-rolename="{{ role.name }}"
+                  data-role-description="{{ role.description or 'Sin descripción' }}"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+                {% else %}
+                <button
+                  class="btn btn-outline-secondary btn-sm"
+                  disabled
+                  title="{{_('No se puede eliminar rol del sistema')}}"
+                >
+                  <i class="fas fa-shield-alt"></i>
+                </button>
+                {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+  <!-- Mensaje cuando no hay resultados de búsqueda -->
+  <div id="noSearchResults" class="alert alert-warning mt-4" style="display: none;">
+    <i class="fas fa-search"></i>
+    <span id="noResultsText">{{_('No se encontraron roles que coincidan con la búsqueda')}}</span> "<span id="searchTerm"></span>".
+    <br>
+    <small class="text-muted">{{_('Intenta con otros términos o limpia la búsqueda para ver todos los roles.')}}</small>
+  </div>
+  
+  {% else %}
+  <div class="alert alert-info mt-4">
+    <i class="fas fa-info-circle"></i>
+    {{_('No hay roles registrados o no se pudieron cargar desde la API.')}}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar rol con selección de módulos MINIMALISTA -->
+<div
+  class="modal fade"
+  id="addRoleModal"
+  tabindex="-1"
+  aria-labelledby="addRoleLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" action="{{ url_for('role.create_role') }}" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addRoleLabel">
+          <i class="fas fa-user-tag"></i> {{_('Agregar Rol')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="name" class="form-label fw-semibold">
+            <i class="fas fa-tag me-2"></i>{{ form.name.label.text }}
+          </label>
+          {% if form.name.errors %}
+          {{ form.name(class="form-control is-invalid", id="name", placeholder=_('Ingresa el nombre del rol')) }}
+          <div class="invalid-feedback">
+            {% for error in form.name.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.name(class="form-control", id="name", placeholder=_('Ingresa el nombre del rol')) }}
+          {% endif %}
+          <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>{{_('Nombre único para identificar el rol')}}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label fw-semibold">
+            <i class="fas fa-align-left me-2"></i>{{ form.description.label.text }}
+          </label>
+          {% if form.description.errors %}
+          {{ form.description(class="form-control is-invalid", id="description", placeholder=_('Describe las funciones de este rol'), rows="3") }}
+          <div class="invalid-feedback">
+            {% for error in form.description.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.description(class="form-control", id="description", placeholder=_('Describe las funciones de este rol'), rows="3") }}
+          {% endif %}
+        </div>
+
+        <!-- Sección de módulos -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            <i class="fas fa-puzzle-piece me-2"></i>{{_('Módulos de Acceso')}}
+          </label>
+          {% if form.modules.errors %}
+          <div class="alert alert-danger">
+            {% for error in form.modules.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+                    <div class="modules-simple-list">
+            {% for value, label_info in form.modules.choices %}
+              {% set parts = label_info.split(' - ') %}
+              {% set module_name = parts[0] %}
+              {% set module_description = parts[1] if parts|length > 1 else '' %}
+              <div class="form-check mb-3 px-4 py-3 border rounded">
+                <input class="form-check-input" type="checkbox" 
+                       value="{{ value }}" 
+                       id="module_{{ value }}" 
+                       name="modules"
+                       {% if value in (form.modules.data or []) %}checked{% endif %}>
+                <label class="form-check-label w-100" for="module_{{ value }}">
+                  <div class="d-flex align-items-start">
+                    <div class="me-3 mt-1">
+                      {% if value == 'geographic' %}
+                        <i class="fas fa-globe fs-5"></i>
+                      {% elif value == 'climate_data' %}
+                        <i class="fas fa-cloud-sun fs-5"></i>
+                      {% elif value == 'crop_data' %}
+                        <i class="fas fa-seedling fs-5"></i>
+                      {% elif value == 'user_management' %}
+                        <i class="fas fa-users fs-5"></i>
+                      {% else %}
+                        <i class="fas fa-puzzle-piece fs-5"></i>
+                      {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="fw-semibold text-dark mb-1">{{ module_name }}</div>
+                      {% if module_description %}
+                        <div class="text-muted small">{{ module_description }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </label>
+              </div>
+            {% endfor %}
+          </div>
+          
+          <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>{{_('Selecciona los módulos a los que este rol tendrá acceso.')}}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times"></i> {{_('Cancelar')}}
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> {{_('Guardar Rol')}}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para confirmar eliminación individual -->
+<div
+  class="modal fade"
+  id="deleteRolModal"
+  tabindex="-1"
+  aria-labelledby="deleteRolLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteRolLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>{{_('Confirmar Eliminación')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-start mb-3">
+          {{_('¿Está seguro de que desea eliminar el rol')}} <strong class="deleteRolName"></strong>?
+        </p>
+        <div class="mb-3">
+          <strong>{{_('Información del rol:')}}</strong>
+          <ul class="list-unstyled mt-2">
+            <li><i class="fas fa-user me-2"></i><strong>{{_('Rol:')}} </strong><span class="deleteRolName"></span></li>
+            <li><i class="fas fa-id-card me-2"></i><strong>{{_('Descripcion:')}} </strong><span id="deleteRolDescription"></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times"></i> {{_('Cancelar')}}
+        </button>
+        <form method="POST" action="{{ url_for('role.delete_role', role_id='PLACEHOLDER') }}" id="deleteRoleForm" style="display: inline;">
+          <input type="hidden" name="role_name" class="deleteRoleName" />
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> {{_('Eliminar Rol')}}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .role-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+  
+  /* Estilos para las columnas de módulos */
+  .module-header {
+    min-width: 90px;
+    padding: 8px 4px;
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+  
+  .module-title {
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+  
+  .module-subtitle {
+    font-weight: 400;
+    font-size: 0.7rem;
+    color: #6c757d;
+  }
+  
+  /* Estilos para los indicadores de acceso */
+  .access-indicator {
+    display: inline-block;
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+  }
+  .access-granted i {
+    color: #198754 !important;
+  }
+  
+  .access-denied i {
+    color: #dc3545 !important;
+  }
+
+  
+  /* Estilos para el resaltado de búsqueda */
+  .role-row mark {
+    background-color: #ffc107 !important;
+    color: #000;
+    font-weight: bold;
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+  
+  /* Estilo para el input de búsqueda */
+  #searchInput {
+    padding-right: 40px;
+  }
+  
+  #searchInput:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #0d6efd;
+  }
+  
+  /* Estilo para el icono de búsqueda/limpiar */
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    z-index: 10;
+  }
+  
+  .search-icon:hover {
+    color: #0d6efd;
+  }
+  
+  .search-icon.clear-icon {
+    color: #dc3545;
+  }
+  
+  .search-icon.clear-icon:hover {
+    color: #b02a37;
+  }
+  
+  /* Animación suave para mostrar/ocultar filas */
+  .role-row {
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  /* Estilos para checkboxes */
+  .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  /* Estilo para filas seleccionadas */
+  .role-row.selected {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+  }
+  
+  /* Estilos para pantallas pequeñas */
+  @media (max-width: 768px) {
+    .module-header {
+      min-width: 70px;
+      font-size: 0.7rem;
+    }
+    
+    .module-title {
+      font-size: 0.65rem;
+    }
+    
+    .module-subtitle {
+      font-size: 0.6rem;
+    }
+    
+    .access-indicator {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializar tooltips
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  });
+
+   // Checkbox select all
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.select-row');
+    const bulkDisable = document.getElementById('bulk-disable');
+    const form = document.getElementById('bulk-action-form');
+
+    function updateBulkButtons() {
+      const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+      if (anyChecked) {
+      bulkDisable.style.visibility = 'visible';
+      } else {
+      bulkDisable.style.visibility = 'hidden';
+      }
+      bulkDisable.disabled = !anyChecked;
+    }
+
+    // Inicializar visibilidad al cargar
+    updateBulkButtons();
+
+    if (selectAll) {
+      selectAll.addEventListener('change', function() {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateBulkButtons();
+      });
+    }
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateBulkButtons);
+    });
+
+    // Opcional: deshabilitar ambos botones al enviar el form
+    form.addEventListener('submit', function() {
+      bulkDisable.disabled = true;
+    });
+
+    bulkDisable.addEventListener('click', function() {
+      document.getElementById('bulk-action-hidden').value = 'disable';
+      form.submit();
+    });
+  
+  // Funcionalidad de búsqueda
+  const searchInput = document.getElementById('searchInput');
+  const rolesTableBody = document.getElementById('rolesTableBody');
+  const noSearchResults = document.getElementById('noSearchResults');
+  const searchResults = document.getElementById('searchResults');
+  const searchTerm = document.getElementById('searchTerm');
+  
+  let totalRoles = rolesTableBody ? rolesTableBody.children.length : 0;
+  
+  function updateSearchResults(visibleCount) {
+    if (searchInput.value.trim()) {
+      searchResults.textContent = `${visibleCount} de ${totalRoles} roles`;
+      searchTerm.textContent = searchInput.value;
+      noSearchResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    } else {
+      searchResults.textContent = '';
+      noSearchResults.style.display = 'none';
+    }
+  }
+  
+  if (searchInput && rolesTableBody) {
+    searchInput.addEventListener('input', function() {
+      const searchText = this.value.toLowerCase().trim();
+      const rows = rolesTableBody.getElementsByTagName('tr');
+      let visibleCount = 0;
+      
+      for (let row of rows) {
+        const searchData = row.getAttribute('data-search');
+        if (!searchText || searchData.includes(searchText)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      }
+      
+      updateSearchResults(visibleCount);
+    });
+  }
+  
+  // Handlers para modales de eliminación
+  const deleteModal = document.getElementById('deleteRolModal');
+  if (deleteModal) {
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+      const roleId = button.getAttribute('data-role-id');
+      const roleName = button.getAttribute('data-rolename');
+      const roleDescription = button.getAttribute('data-role-description');
+      
+      const modalRoleName = deleteModal.querySelectorAll('.deleteRolName');
+      const modalRoleDescription = deleteModal.querySelector('#deleteRolDescription');
+      const deleteForm = deleteModal.querySelector('#deleteRoleForm');
+      const roleNameInput = deleteModal.querySelector('input[name="role_name"]');
+      
+      modalRoleName.forEach(el => el.textContent = roleName);
+      modalRoleDescription.textContent = roleDescription;
+      roleNameInput.value = roleName;
+      
+      // Actualizar la URL del formulario con el ID del rol
+      deleteForm.action = deleteForm.action.replace('PLACEHOLDER', roleId);
+    });
+  }
+});
+</script>
+
+<!-- Translations for JavaScript -->
+<script>
+window.translations = {
+    showing: "{{_('Mostrando')}}",
+    role: "{{_('rol')}}",
+    roles: "{{_('roles')}}",
+    of: "{{_('de')}}",
+    total: "{{_('Total')}}",
+    noDescription: "{{_('Sin descripción')}}",
+    search: "{{_('Buscar')}}",
+    clear: "{{_('Limpiar búsqueda')}}",
+    selectAll: "{{_('Seleccionar todos')}}",
+    deselectAll: "{{_('Deseleccionar todos')}}",
+    selected: "{{_('seleccionado')}}",
+    selectedPlural: "{{_('seleccionados')}}",
+    deleting: "{{_('Eliminando')}}",
+    deleted: "{{_('Eliminado')}}",
+    deletingRoles: "{{_('Eliminando roles...')}}",
+    deletionComplete: "{{_('Eliminación completada')}}",
+    errorDeleting: "{{_('Error al eliminar')}}",
+    rolesDeleted: "{{_('roles eliminados exitosamente')}}",
+    someErrors: "{{_('Algunos roles no pudieron ser eliminados')}}",
+    preparing: "{{_('Preparando...')}}"
+};
+</script>
+
+<script src="{{ url_for('static', filename='js/role/role.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Editar Cultivar{% endblock %}
+{% block content %}
+<div class="container">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('cultivar.list_cultivar') }}">Cultivares</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {{ cultivar.name if cultivar else '' }}
+      </li>
+    </ol>
+  </nav>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Editar Cultivar</h2>
+    <a href="{{ url_for('cultivar.list_cultivar') }}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Volver al listado
+    </a>
+  </div>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.name.label(class="form-label") }}
+      {{ form.name(class="form-control") }}
+      {% for error in form.name.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="mb-3">
+      {{ form.country_id.label(class="form-label") }}
+      {{ form.country_id(class="form-select") }}
+      {% for error in form.country_id.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="mb-3">
+      {{ form.crop_id.label(class="form-label") }}
+      {{ form.crop_id(class="form-select") }}
+      {% for error in form.crop_id.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="mb-3">
+      {{ form.sort_order.label(class="form-label") }}
+      {{ form.sort_order(class="form-control") }}
+      {% for error in form.sort_order.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="form-check mb-2">
+      {{ form.rainfed(class="form-check-input") }}
+      {{ form.rainfed.label(class="form-check-label") }}
+    </div>
+    <div class="form-check mb-4">
+      {{ form.enable(class="form-check-input") }}
+      {{ form.enable.label(class="form-check-label") }}
+    </div>
+    {{ form.submit(class="btn btn-success") }}
+    <a href="{{ url_for('cultivar.list_cultivar') }}" class="btn btn-outline-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

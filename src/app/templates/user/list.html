@@ -1,0 +1,615 @@
+{% extends 'base.html' %} {% block title %}{{_('Usuarios')}}{% endblock %} {%
+block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{_('Usuarios')}}</h2>
+
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addUserModal"
+    >
+      <i class="fas fa-plus"></i> {{_('Agregar')}}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda y filtros -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <div class="position-relative me-2" style="min-width: 300px;">
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        placeholder="{{_('Buscar por usuario, nombre o email...')}}"
+        autocomplete="off"
+      />
+      <i id="searchIcon" class="fas fa-search search-icon" title="{{_('Buscar')}}"></i>
+    </div>
+    <!-- Botón de filtros -->
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="filtersDropdown" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+      >
+        <i class="fas fa-filter"></i> {{_('Filtros')}}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filtersDropdown" style="min-width: 250px;">
+        <!-- Content will be generated dynamically by JavaScript -->
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> Cargando filtros...</div></li>
+      </ul>
+    </div>
+
+    <span id="searchResults" class="text-muted small"></span>
+  </div>
+
+  {% if users %}
+  <form id="bulk-action-form" method="POST" action="{{ url_for('user.bulk_action') }}">
+    <div class="mb-2">
+      <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+      <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+        <i class="fas fa-trash"></i> {{ _('Eliminar seleccionados') }}
+      </button>
+    </div>
+  
+    <div id="usersTableContainer">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            <th>Usuario</th>
+            <th>Nombre Completo</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Países</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          {% for user in users %}
+          <tr class="user-row {{ 'table-secondary' if not user.get('enabled', True) }}" 
+              data-username="{{ user.username|lower }}"
+              data-fullname="{{ (user.first_name + ' ' + user.last_name)|lower }}"
+              data-email="{{ (user.email or '')|lower }}"
+              data-search="{{ (user.username + ' ' + (user.first_name or '') + ' ' + (user.last_name or '') + ' ' + (user.email or ''))|lower }}"
+              data-user-id="{{ user.id }}"
+              data-can-delete="{{ 'true' if user.username.lower() not in ['admin', 'administrator'] and user.get('enabled', True) else 'false' }}">
+            <td>
+              {% if user.username.lower() not in ['admin', 'administrator'] and user.get('enabled', True) %}
+              <input type="checkbox" class="select-row" value="{{ user.id }}" data-username="{{ user.username }}" name="selected_ids"/>
+              {% else %}
+              <input type="checkbox" class="form-check-input" disabled title="{{_('No se puede seleccionar este usuario')}}" />
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="avatar-circle me-2">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div>
+                  <strong class="searchable-username">{{ user.username }}</strong>
+                  <br />
+                  <small class="text-muted">ID: {{ user.id[:8] }}...</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if user.first_name or user.last_name %}
+              <span class="searchable-fullname">{{ user.first_name }} {{ user.last_name }}</span>
+              {% else %}
+              <span class="text-muted fst-italic">Sin nombre</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="text-break searchable-email">{{ user.email or 'Sin email' }}</span>
+            </td>
+            <td>
+              <span class="badge bg-dark">
+                {% if user.role_name == 'adminsuper' %}
+                <i class="fas fa-crown"></i> Super Admin {% elif user.role_name ==
+                'admin' %} <i class="fas fa-user-shield"></i> Admin {% elif
+                user.role_name == 'Geo Admin' %}
+                <i class="fas fa-map"></i> {{ user.role_name }} {% elif
+                user.role_name == 'Guest' %}
+                <i class="fas fa-eye"></i> {{ user.role_name }} {% else %}
+                <i class="fas fa-user-tag"></i> {{ user.role_name }} {% endif %}
+              </span>
+            </td>
+            <td>
+              {% if user.countries %}
+              <div class="d-flex flex-wrap gap-1">
+                {% for country in user.countries %}
+                <span class="badge bg-dark" title="{{ country.name }}">
+                  <span class="fi fi-{{ country.country_name|get_country_code }} me-2"></span>
+                  <span>{{ country.country_name }}</span>
+                </span>
+                {% endfor %}
+                {% else %}
+                <span class="text-muted fst-italic">
+                  <i class="fas fa-minus"></i> Sin países asignados
+                </span>
+              </div>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('user.edit_user', user_id=user.id) }}"
+                class="btn btn-warning btn-sm me-1"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% if user.get('enabled', True) %} 
+              {% if user.username.lower() not in ['admin', 'administrator'] %}
+              <button 
+                type="button"
+                class="btn btn-danger btn-sm"
+                title="Eliminar usuario"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteUserModal"
+                data-user-id="{{ user.id }}"
+                data-username="{{ user.username }}"
+                data-user-name="{{ user.first_name }} {{ user.last_name }}"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+              {% else %}
+              <button
+                class="btn btn-secondary btn-sm"
+                disabled
+                title="No se puede eliminar usuario administrador"
+              >
+                <i class="fas fa-shield-alt"></i>
+              </button>
+              {% endif %} 
+              {% else %}
+              <span class="badge bg-secondary">Eliminado</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+  <!-- Mensaje cuando no hay resultados de búsqueda -->
+  <div id="noSearchResults" class="alert alert-warning mt-4" style="display: none;">
+    <i class="fas fa-search"></i>
+    <span id="noResultsText">{{_('No se encontraron usuarios que coincidan con la búsqueda')}}</span> "<span id="searchTerm"></span>".
+    <br>
+    <small class="text-muted">{{_('Intenta con otros términos o limpia la búsqueda para ver todos los usuarios.')}}</small>
+  </div>
+  
+  {% else %}
+  <div class="alert alert-info mt-4">
+    <i class="fas fa-info-circle"></i>
+    No hay usuarios registrados o no se pudieron cargar desde la API.
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar usuario -->
+<div
+  class="modal fade"
+  id="addUserModal"
+  tabindex="-1"
+  aria-labelledby="addUserLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <form method="POST" action="{{ url_for('user.create_user') }}" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserLabel">
+          <i class="fas fa-user-plus"></i> {{_('Agregar Usuario')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- Row for Name and Last Name -->
+        <div class="row">
+          <!-- First Name -->
+          <div class="col-md-6 mb-3">
+            <label for="first_name" class="form-label fw-semibold">
+              <i class="fas fa-id-badge me-2"></i>{{ form.first_name.label.text }}
+            </label>
+            {% if form.first_name.errors %}
+            {{ form.first_name(class="form-control is-invalid", id="first_name", placeholder=_('Ingresa el nombre')) }}
+            <div class="invalid-feedback">
+              {% for error in form.first_name.errors %}
+              <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+              {% endfor %}
+            </div>
+            {% else %}
+            {{ form.first_name(class="form-control", id="first_name", placeholder=_('Ingresa el nombre')) }}
+            {% endif %}
+          </div>
+
+          <!-- Last Name -->
+          <div class="col-md-6 mb-3">
+            <label for="last_name" class="form-label fw-semibold">
+              <i class="fas fa-user-tag me-2"></i>{{ form.last_name.label.text }}
+            </label>
+            {% if form.last_name.errors %}
+            {{ form.last_name(class="form-control is-invalid", id="last_name", placeholder=_('Ingresa el apellido')) }}
+            <div class="invalid-feedback">
+              {% for error in form.last_name.errors %}
+              <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+              {% endfor %}
+            </div>
+            {% else %}
+            {{ form.last_name(class="form-control", id="last_name", placeholder=_('Ingresa el apellido')) }}
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Username -->
+        <div class="mb-3">
+          <label for="username" class="form-label fw-semibold">
+            <i class="fas fa-at me-2"></i>{{ form.username.label.text }}
+          </label>
+          {% if form.username.errors %}
+          {{ form.username(class="form-control is-invalid", id="username", placeholder=_('Elige un nombre de usuario único')) }}
+          <div class="invalid-feedback">
+            {% for error in form.username.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.username(class="form-control", id="username", placeholder=_('Elige un nombre de usuario único')) }}
+          {% endif %}
+          <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>{{_('Mínimo 3 caracteres, sin espacios')}}
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold">
+            <i class="fas fa-envelope me-2"></i>{{ form.email.label.text }}
+          </label>
+          {% if form.email.errors %}
+          {{ form.email(class="form-control is-invalid", id="email", placeholder=_('ejemplo@dominio.com')) }}
+          <div class="invalid-feedback">
+            {% for error in form.email.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.email(class="form-control", id="email", placeholder=_('ejemplo@dominio.com')) }}
+          {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label for="password" class="form-label fw-semibold">
+            <i class="fas fa-key me-2"></i>{{ form.password.label.text }}
+          </label>
+          {% if form.password.errors %}
+          {{ form.password(class="form-control is-invalid", id="password", placeholder=_('Crea una contraseña segura'), type="password") }}
+          <div class="invalid-feedback">
+            {% for error in form.password.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.password(class="form-control", id="password", placeholder=_('Crea una contraseña segura'), type="password") }}
+          {% endif %}
+          <div class="form-text">
+            <i class="fas fa-shield-alt me-1"></i>{{_('Crea una contraseña segura para el usuario')}}
+          </div>
+        </div>
+        <!-- Selección de países -->
+        <div class="mb-3">
+            <!-- Countries/Groups Selection -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="fas fa-flag me-2"></i>{{ form.countries.label.text }}
+              </label>
+              
+              {% if form.countries.errors %}
+              <div class="alert alert-danger">
+                {% for error in form.countries.errors %}
+                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                {% endfor %}
+              </div>
+              {% endif %}
+              
+              <div class="countries-selection-container border rounded p-3" style="max-height: 300px; overflow-y: auto; background-color: #f8f9fa;">
+                {% if countries %}
+                  {% for country in countries %}
+                  <div class="mb-2">
+                    <div class="form-check">
+                      <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name="countries" 
+                        value="{{ country.name }}" 
+                        id="create_country_{{ loop.index }}"
+                      >
+                      <label class="form-check-label p-0" for="create_country_{{ loop.index }}">
+                        <span class="fi fi-{{ country.display_name|get_country_code }} me-2"></span>
+                        <span>{{ country.display_name }}</span>
+                      </label>
+                    </div>
+                  </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="text-muted text-center py-3">
+                    <i class="fas fa-info-circle me-2"></i>{{_('No hay países disponibles')}}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>{{_('Seleccione los países a los que el usuario tendrá acceso')}}
+              </div>
+            </div>
+          </div>
+      </div>
+      
+          
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times"></i> {{_('Cancelar')}}
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> {{_('Guardar Usuario')}}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para confirmar eliminación individual -->
+<div
+  class="modal fade"
+  id="deleteUserModal"
+  tabindex="-1"
+  aria-labelledby="deleteUserLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteUserLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>{{_('Confirmar Eliminación')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-start mb-3">
+          {{_('¿Está seguro de que desea eliminar al usuario')}} <strong class="deleteUsername"></strong>?
+        </p>
+        <div class="mb-3">
+          <strong>{{_('Información del usuario:')}}</strong>
+          <ul class="list-unstyled mt-2">
+            <li><i class="fas fa-user me-2"></i><strong>{{_('Usuario:')}} </strong><span class="deleteUsername"></span></li>
+            <li><i class="fas fa-id-card me-2"></i><strong>{{_('Nombre:')}} </strong><span id="deleteFullName"></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times"></i> {{_('Cancelar')}}
+        </button>
+        <form method="POST" action="" id="deleteUserForm" style="display: inline;">
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> {{_('Eliminar Usuario')}}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .avatar-circle {
+    width: 40px;
+    height: 40px;
+    background-color: #6c757d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+  }
+  
+  /* Estilos para el resaltado de búsqueda */
+  .user-row mark {
+    background-color: #ffc107 !important;
+    color: #000;
+    font-weight: bold;
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+  
+  /* Estilo para el input de búsqueda */
+  #searchInput {
+    padding-right: 40px;
+  }
+  
+  #searchInput:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #0d6efd;
+  }
+  
+  /* Estilo para el icono de búsqueda/limpiar */
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    z-index: 10;
+  }
+  
+  .search-icon:hover {
+    color: #0d6efd;
+  }
+  
+  .search-icon.clear-icon {
+    color: #dc3545;
+  }
+  
+  .search-icon.clear-icon:hover {
+    color: #b02a37;
+  }
+  
+  /* Animación suave para mostrar/ocultar filas */
+  .user-row {
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  /* Estilos para checkboxes */
+  .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  /* Estilo para filas seleccionadas */
+  .user-row.selected {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+  }
+  
+  /* Estilos para el dropdown de filtros */
+  .dropdown-item-text {
+    padding: 0.25rem 1rem;
+  }
+  
+  .form-check {
+    margin-bottom: 0;
+  }
+  
+  .form-check-label {
+    cursor: pointer;
+    width: 100%;
+    padding: 0.25rem 0;
+  }
+  
+  /* Estilo para el botón de filtros activos */
+  #filtersDropdown.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+  }
+  
+  #filtersDropdown.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+  }
+  
+  /* Estilos para la lista de usuarios seleccionados */
+  .selected-user-item {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .selected-user-item:last-child {
+    border-bottom: none;
+  }
+  
+  .selected-user-avatar {
+    width: 24px;
+    height: 24px;
+    background-color: #6c757d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 10px;
+    margin-right: 0.5rem;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+   // Checkbox select all
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.select-row');
+    const bulkDisable = document.getElementById('bulk-disable');
+    const form = document.getElementById('bulk-action-form');
+
+    function updateBulkButtons() {
+      const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+      if (anyChecked) {
+      bulkDisable.style.visibility = 'visible';
+      } else {
+      bulkDisable.style.visibility = 'hidden';
+      }
+      bulkDisable.disabled = !anyChecked;
+    }
+
+    // Inicializar visibilidad al cargar
+    updateBulkButtons();
+
+    if (selectAll) {
+      selectAll.addEventListener('change', function() {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateBulkButtons();
+      });
+    }
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateBulkButtons);
+    });
+
+    // Opcional: deshabilitar ambos botones al enviar el form
+    form.addEventListener('submit', function() {
+      bulkDisable.disabled = true;
+    });
+
+    bulkDisable.addEventListener('click', function() {
+      document.getElementById('bulk-action-hidden').value = 'disable';
+      form.submit();
+    });
+
+});    
+</script>
+
+<!-- Translations for JavaScript -->
+<script>
+window.translations = {
+    showing: "{{_('Mostrando')}}",
+    user: "{{_('usuario')}}",
+    users: "{{_('usuarios')}}",
+    of: "{{_('de')}}",
+    total: "{{_('Total')}}",
+    noName: "{{_('Sin nombre')}}",
+    search: "{{_('Buscar')}}",
+    clear: "{{_('Limpiar búsqueda')}}",
+    selectAll: "{{_('Seleccionar todos')}}",
+    deselectAll: "{{_('Deseleccionar todos')}}",
+    selected: "{{_('seleccionado')}}",
+    selectedPlural: "{{_('seleccionados')}}",
+    deleting: "{{_('Eliminando')}}",
+    deleted: "{{_('Eliminado')}}",
+    deletingUsers: "{{_('Eliminando usuarios...')}}",
+    deletionComplete: "{{_('Eliminación completada')}}",
+    errorDeleting: "{{_('Error al eliminar')}}",
+    usersDeleted: "{{_('usuarios eliminados exitosamente')}}",
+    someErrors: "{{_('Algunos usuarios no pudieron ser eliminados')}}",
+    preparing: "{{_('Preparando...')}}"
+};
+</script>
+
+<!-- User Management JavaScript -->
+<script src="{{ url_for('static', filename='js/user/user.js') }}"></script>
+{% endblock %}

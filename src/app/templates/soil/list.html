@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Suelos') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Suelos') }}</h2>
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addSoilModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="soilSearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="soilFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="soilFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="soilSearchResults" class="text-muted small"></span>
+  </div>
+
+  <!-- Contenedor para mensajes -->
+  <div id="noSoilResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if soils %}
+  <div id="soilTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('soil.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+        </button>
+        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+        </button>
+      </div>
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            <th>{{ _('Nombre') }}</th>
+            <th>{{ _('País') }}</th>
+            <th>{{ _('Cultivo') }}</th>
+            <th>{{ _('Orden') }}</th>
+            <th>{{ _('Estado') }}</th>
+            <th class="text-end">{{ _('Acciones') }}</th>
+          </tr>
+        </thead>
+        <tbody id="soilTableBody">
+          {% for soil in soils %}
+          <tr 
+            data-country="{{ soil.country.name if soil.country else '' }}"
+            data-crop="{{ soil.crop.name if soil.crop else '' }}"
+            data-sort_order="{{ soil.sort_order }}"
+            data-status="{% if soil.enable %}active{% else %}inactive{% endif %}"
+          >
+            <td><input type="checkbox" name="selected_ids" value="{{ soil.id }}" class="select-row" /></td>
+            <td class="searchable">{{ soil.name }}</td>
+            <td class="searchable">{{ soil.country.name if soil.country else '' }}</td>
+            <td class="searchable">{{ soil.crop.name if soil.crop else '' }}</td>
+            <td>{{ soil.sort_order }}</td>
+            <td>
+              {{ _('Habilitado') if soil.enable else _('Deshabilitado') }}
+            </td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('soil.edit_soil', id=soil.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="{{ _('Editar') }}"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% if soil.enable %}
+              <a
+                href="{{ url_for('soil.delete_soil', id=soil.id) }}"
+                class="btn btn-danger btn-sm"
+                title="{{ _('Deshabilitar') }}"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% else %}
+              <a
+                href="{{ url_for('soil.reset_soil', id=soil.id) }}"
+                class="btn btn-success btn-sm"
+                title="{{ _('Recuperar') }}"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="soilResultsCount"></span> {{ _('resultado(s)') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay suelos registrados.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Suelo -->
+<div
+  class="modal fade"
+  id="addSoilModal"
+  tabindex="-1"
+  aria-labelledby="addSoilLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addSoilLabel">
+          {{ _('Agregar suelo') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Cerrar') }}"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control") }}
+          {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.country_id.label(class="form-label") }}
+          {{ form.country_id(class="form-select") }}
+          {% for error in form.country_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.crop_id.label(class="form-label") }}
+          {{ form.crop_id(class="form-select") }}
+          {% for error in form.crop_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.sort_order.label(class="form-label") }}
+          {{ form.sort_order(class="form-control") }}
+          {% for error in form.sort_order.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Script para búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración para búsqueda en suelos
+    initTableSearch({
+      searchInputId: 'soilSearchInput',
+      filtersButtonId: 'soilFiltersButton',
+      tableContainerId: 'soilTableContainer',
+      noResultsId: 'noSoilResults',
+      resultsCountId: 'soilResultsCount',
+      tableBodyId: 'soilTableBody',
+
+      searchColumns: [
+        { selector: '.searchable' }
+      ],
+      filterConfigs: [
+        {
+          name: 'country',
+          label: '{{ _("País") }}',
+          getValue: row => row.dataset.country,
+          getDisplayValue: row => row.dataset.country || '{{ _("Sin país") }}'
+        },
+        {
+          name: 'crop',
+          label: '{{ _("Cultivo") }}',
+          getValue: row => row.dataset.crop,
+          getDisplayValue: row => row.dataset.crop || '{{ _("Sin cultivo") }}'
+        },
+        {
+          name: 'sort_order',
+          label: '{{ _("Orden") }}',
+          getValue: row => row.dataset.sort_order,
+          getDisplayValue: row => row.dataset.sort_order || '{{ _("Sin orden") }}'
+        },
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active'
+              ? '{{ _("Habilitado") }}'
+              : '{{ _("Deshabilitado") }}';
+          }
+        }
+      ]
+    });
+    // Configuración para acciones masivas
+    setupBulkActions({
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+{% endblock %}
+
+

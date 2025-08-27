@@ -1,0 +1,222 @@
+{% extends 'base.html' %} 
+{% block title %}{{_('Editar Usuario')}}{% endblock %} 
+
+{% block content %}
+<div class="container-fluid mt-4">
+  
+  <!-- Page Header -->
+  <div class="bg-dark text-white rounded p-3 mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-2">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('user.list_user') }}" class="text-decoration-none">
+              {{_('Usuarios')}}
+            </a>
+          </li>
+          <li class="breadcrumb-item active text-white" aria-current="page">
+            {{_('Editar Usuario')}}
+          </li>
+        </ol>
+      </nav>
+    <div class="d-flex align-items-center">
+      <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+        <i class="fas fa-user"></i>
+      </div>
+      <div>
+        <h4 class="mb-1">{{_('Editar Usuario')}}</h4>
+        <p class="mb-0">{{_('Modificar información del usuario:')}} <strong>{{ user.username }}</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Information & Edit Form -->
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        
+        <!-- User Information (Read-only) -->
+        <div class="col-md-4">
+          <h5 class="mb-3">{{_('Información del Usuario')}}</h5>
+          
+          <div class="bg-light rounded p-3 mb-3">
+            <div class="fw-bold text-muted small mb-1">
+              <i class="fas fa-at me-2"></i>{{_('Nombre de Usuario')}}
+            </div>
+            <p class="mb-0">{{ user.username }}</p>
+            <small class="text-muted">{{_('No se puede modificar')}}</small>
+          </div>
+
+          <div class="bg-light rounded p-3 mb-3">
+            <div class="fw-bold text-muted small mb-1">
+              <i class="fas fa-user-tag me-2"></i>{{_('Rol Actual')}}
+            </div>
+            <div>
+              {% if user.client_roles %}
+                {% for role in user.client_roles %}
+                  <span class="badge bg-dark me-1">{{ role.name }}</span>
+                {% endfor %}
+              {% else %}
+                <span class="badge bg-dark">{{ user.role_name or _('Sin rol') }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="col-md-8">
+          <h5 class="mb-3">{{_('Editar Información')}}</h5>
+          
+          <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <!-- First Name -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="first_name" class="form-label fw-bold">
+                  <i class="fas fa-id-badge me-2"></i>{{ form.first_name.label.text }}
+                </label>
+                {% if form.first_name.errors %}
+                {{ form.first_name(class="form-control is-invalid", id="first_name", placeholder=_('Ingresa el nombre')) }}
+                <div class="invalid-feedback">
+                  {% for error in form.first_name.errors %}
+                  <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                  {% endfor %}
+                </div>
+                {% else %}
+                {{ form.first_name(class="form-control", id="first_name", placeholder=_('Ingresa el nombre')) }}
+                {% endif %}
+                <div class="form-text">
+                  <i class="fas fa-info-circle me-1"></i>{{_('Nombre del usuario')}}
+                </div>
+              </div>
+
+              <!-- Last Name -->
+              <div class="col-md-6 mb-3">
+                <label for="last_name" class="form-label fw-bold">
+                  <i class="fas fa-user-tag me-2"></i>{{ form.last_name.label.text }}
+                </label>
+                {% if form.last_name.errors %}
+                {{ form.last_name(class="form-control is-invalid", id="last_name", placeholder=_('Ingresa el apellido')) }}
+                <div class="invalid-feedback">
+                  {% for error in form.last_name.errors %}
+                  <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                  {% endfor %}
+                </div>
+                {% else %}
+                {{ form.last_name(class="form-control", id="last_name", placeholder=_('Ingresa el apellido')) }}
+                {% endif %}
+                <div class="form-text">
+                  <i class="fas fa-info-circle me-1"></i>{{_('Apellido del usuario')}}
+                </div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label fw-bold">
+                <i class="fas fa-envelope me-2"></i>{{ form.email.label.text }}
+              </label>
+              {% if form.email.errors %}
+              {{ form.email(class="form-control is-invalid", id="email", placeholder=_('ejemplo@dominio.com')) }}
+              <div class="invalid-feedback">
+                {% for error in form.email.errors %}
+                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                {% endfor %}
+              </div>
+              {% else %}
+              {{ form.email(class="form-control", id="email", placeholder=_('ejemplo@dominio.com')) }}
+              {% endif %}
+              <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>{{_('Correo electrónico del usuario')}}
+              </div>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="mb-3">
+              <label for="role_id" class="form-label fw-bold">
+                <i class="fas fa-exchange-alt me-2"></i>{{ form.role_id.label.text }}
+              </label>
+              {% if form.role_id.errors %}
+              {{ form.role_id(class="form-select is-invalid", id="role_id") }}
+              <div class="invalid-feedback">
+                {% for error in form.role_id.errors %}
+                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                {% endfor %}
+              </div>
+              {% else %}
+              {{ form.role_id(class="form-select", id="role_id") }}
+              {% endif %}
+              <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>{{_('Rol que tendrá el usuario en el sistema')}}
+              </div>
+            </div>
+
+            <!-- Countries/Groups Selection -->
+            <div class="mb-4">
+              <label class="form-label fw-bold">
+                <i class="fas fa-globe me-2"></i>{{ form.countries.label.text }}
+              </label>
+              
+              {% if form.countries.errors %}
+              <div class="alert alert-danger">
+                {% for error in form.countries.errors %}
+                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                {% endfor %}
+              </div>
+              {% endif %}
+              
+              <div class="countries-selection-container border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                {% if countries %}
+                  <div class="row">
+                    {% for country in countries %}
+                    <div class="col-md-6 col-lg-4 mb-2">
+                      <div class="form-check">
+                        <input 
+                          class="form-check-input" 
+                          type="checkbox" 
+                          name="countries" 
+                          value="{{ country.name }}" 
+                          id="country_{{ loop.index }}"
+                          {% if country.name in form.countries.data %}checked{% endif %}
+                        >
+                        <label class="form-check-label" for="country_{{ loop.index }}">
+                          <span class="fi fi-{{ country.display_name|get_country_code }}"></span>
+                          {{ country.display_name }}
+                        </label>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="text-muted text-center py-3">
+                    <i class="fas fa-info-circle me-2"></i>{{_('No hay países disponibles')}}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>{{_('Seleccione los países a los que el usuario tendrá acceso')}}
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i>{{ form.submit.label.text }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <hr class="my-4">
+      <div>
+        <a href="{{ url_for('user.list_user') }}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i>{{_('Volver al Listado')}}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

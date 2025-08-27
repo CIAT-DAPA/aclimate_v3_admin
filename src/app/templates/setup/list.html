@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Configuraciones de Simulación') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Configuraciones de Simulación') }}</h2>
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addSetupModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="setupSearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="setupFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="setupFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="setupSearchResults" class="text-muted small"></span>
+  </div>
+
+  <!-- Contenedor para mensajes -->
+  <div id="noSetupResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if setup_list %}
+  <div id="setupTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('setup.bulk_action') }}">
+      <!-- ... (código existente) ... -->
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            <th>{{ _('Cultivar') }}</th>
+            <th>{{ _('Suelo') }}</th>
+            <th>{{ _('Temporada') }}</th>
+            <th>{{ _('Frecuencia') }}</th>
+            <th>{{ _('Archivos') }}</th> <!-- Nueva columna -->
+            <th>{{ _('Estado') }}</th>
+            <th class="text-end">{{ _('Acciones') }}</th>
+          </tr>
+        </thead>
+        <tbody id="setupTableBody">
+          {% for setup in setup_list %}
+          <tr 
+            data-cultivar="{{ setup.cultivar.name if setup.cultivar else '' }}"
+            data-soil="{{ setup.soil.name if setup.soil else '' }}"
+            data-season="{{ setup.season.name if setup.season else '' }}"
+            data-frequency="{{ setup.frequency }}"
+            data-status="{% if setup.enable %}active{% else %}inactive{% endif %}"
+          >
+            <td><input type="checkbox" name="selected_ids" value="{{ setup.id }}" class="select-row" /></td>
+            <td class="searchable">{{ setup.cultivar.name if setup.cultivar else '' }}</td>
+            <td class="searchable">{{ setup.soil.name if setup.soil else '' }}</td>
+            <td class="searchable">{{ setup.season.id if setup.season else '' }}</td>
+            <td>{{ setup.frequency }}</td>
+            <td>
+              {% if setup.configuration_files %}
+                <span class="badge bg-primary">
+                  {{ setup.configuration_files|length }} {{ _('archivos') }}
+                </span>
+              {% else %}
+                <span class="badge bg-secondary">{{ _('Sin archivos') }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {{ _('Habilitado') if setup.enable else _('Deshabilitado') }}
+            </td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('setup.edit_setup', id=setup.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="{{ _('Editar') }}"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% if setup.enable %}
+              <a
+                href="{{ url_for('setup.delete_setup', id=setup.id) }}"
+                class="btn btn-danger btn-sm"
+                title="{{ _('Deshabilitar') }}"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% else %}
+              <a
+                href="{{ url_for('setup.reset_setup', id=setup.id) }}"
+                class="btn btn-success btn-sm"
+                title="{{ _('Recuperar') }}"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="setupResultsCount"></span> {{ _('resultados') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay configuraciones registradas.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Configuración de Simulación -->
+<div
+  class="modal fade"
+  id="addSetupModal"
+  tabindex="-1"
+  aria-labelledby="addSetupLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content" enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addSetupLabel">
+          {{ _('Agregar configuración de simulación') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Cerrar') }}"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.cultivar_id.label(class="form-label") }}
+          {{ form.cultivar_id(class="form-select") }}
+          {% for error in form.cultivar_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.soil_id.label(class="form-label") }}
+          {{ form.soil_id(class="form-select") }}
+          {% for error in form.soil_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.season_id.label(class="form-label") }}
+          {{ form.season_id(class="form-select") }}
+          {% for error in form.season_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.frequency.label(class="form-label") }}
+          {{ form.frequency(class="form-control") }}
+          {% for error in form.frequency.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <!-- Sección de archivos de configuración -->
+        <div class="dropzone mb-3 p-4 border rounded text-center">
+          {{ form.config_files.label(class="form-label") }}
+          {{ form.config_files(class="d-none", id="file-input-modal") }}
+          <div class="dropzone-placeholder">
+            <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
+            <p>{{ _('Arrastra tus archivos aquí o haz clic para seleccionar') }}</p>
+            <p class="small text-muted">{{ _('Formatos permitidos: .crp, .exp, .sol, .csv, .cul, .eco, .spe') }}</p>
+          </div>
+          <div class="dropzone-preview mt-3 d-none"></div>
+          <div class="form-text">{{ _('Selecciona uno o más archivos para cargar.') }}</div>
+        </div>
+        {% for error in form.config_files.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Script para búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración para búsqueda en configuraciones de simulación
+    initTableSearch({
+      searchInputId: 'setupSearchInput',
+      filtersButtonId: 'setupFiltersButton',
+      tableContainerId: 'setupTableContainer',
+      noResultsId: 'noSetupResults',
+      resultsCountId: 'setupResultsCount',
+      tableBodyId: 'setupTableBody',
+
+      searchColumns: [
+        { selector: '.searchable' }
+      ],
+      filterConfigs: [
+        {
+          name: 'cultivar',
+          label: '{{ _("Cultivar") }}',
+          getValue: row => row.dataset.cultivar,
+          getDisplayValue: row => row.dataset.cultivar || '{{ _("Sin cultivar") }}'
+        },
+        {
+          name: 'soil',
+          label: '{{ _("Suelo") }}',
+          getValue: row => row.dataset.soil,
+          getDisplayValue: row => row.dataset.soil || '{{ _("Sin suelo") }}'
+        },
+        {
+          name: 'season',
+          label: '{{ _("Temporada") }}',
+          getValue: row => row.dataset.season,
+          getDisplayValue: row => row.dataset.season || '{{ _("Sin temporada") }}'
+        },
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active'
+              ? '{{ _("Habilitado") }}'
+              : '{{ _("Deshabilitado") }}';
+          }
+        }
+      ]
+    });
+    // Configuración para acciones masivas
+    setupBulkActions({
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Dropzone para el modal de agregar configuración
+    const dropZone = document.querySelector('#addSetupModal .dropzone');
+    const fileInput = document.getElementById('file-input-modal');
+    const placeholder = dropZone ? dropZone.querySelector('.dropzone-placeholder') : null;
+    const preview = dropZone ? dropZone.querySelector('.dropzone-preview') : null;
+
+    if (dropZone && fileInput && placeholder && preview) {
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-primary');
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-primary');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-primary');
+        fileInput.files = e.dataTransfer.files;
+        updatePreview();
+      });
+
+      fileInput.addEventListener('change', updatePreview);
+
+      function updatePreview() {
+        preview.innerHTML = '';
+        if (fileInput.files.length > 0) {
+          placeholder.classList.add('d-none');
+          preview.classList.remove('d-none');
+
+          for (const file of fileInput.files) {
+            const filePreview = document.createElement('div');
+            filePreview.className = 'd-flex justify-content-between align-items-center mb-2';
+            filePreview.innerHTML = `
+              <div>
+                <i class="fas fa-file me-2"></i>
+                <span>${file.name}</span>
+                <small class="text-muted ms-2">(${(file.size/1024).toFixed(1)} KB)</small>
+              </div>
+            `;
+            preview.appendChild(filePreview);
+          }
+        } else {
+          placeholder.classList.remove('d-none');
+          preview.classList.add('d-none');
+        }
+      }
+    }
+  });
+</script>
+
+<style>
+  .dropzone {
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .dropzone:hover {
+    background-color: #e9ecef;
+  }
+</style>
+{% endblock %}

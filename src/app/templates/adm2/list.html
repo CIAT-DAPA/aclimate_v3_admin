@@ -1,0 +1,227 @@
+{% extends 'base.html' %} {% block title %}{{_('Divisiones Adm2')}}{% endblock
+%} {% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{_('Divisiones administrativas - Nivel 2')}}</h2>
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addAdm2Modal"
+    >
+      <i class="fas fa-plus"></i> {{_('Agregar')}}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="adm2SearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="adm2FiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adm2FiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="adm2SearchResults" class="text-muted small"></span>
+  </div>
+
+
+  <!-- Contenedor para mensajes -->
+  <div id="noAdm2Results" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if adm2 %}
+  <div id="adm2TableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('adm2.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+        </button>
+        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+        </button>
+      </div>
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+          <th>{{_('Nombre')}}</th>
+          <th>{{_('Adm1 asociado')}}</th>
+          <th>{{_('Estado')}}</th>
+          <th class="text-end">{{_('Acciones')}}</th>
+        </tr>
+      </thead>
+      <tbody id="adm2TableBody">
+        {% for adm in adm2 %}
+        <tr data-adm1="{{ adm.admin_1.name }}" data-status="{% if adm.enable %}active{% else %}inactive{% endif %}">
+          <td><input type="checkbox" name="selected_ids" value="{{ adm.id }}" class="select-row" /></td>
+          <td class="searchable">{{ adm.name }}</td>
+          <td class="searchable">{{ adm.admin_1.name }}</td>
+          <td>{{ 'Habilitado' if adm.enable else 'Deshabilitado' }}</td>
+          <td class="text-end">
+            <a
+              href="{{ url_for('adm2.edit_adm2', id=adm.id) }}"
+              class="btn btn-warning btn-sm me-2"
+              title="Editar"
+            >
+              <i class="fas fa-pen"></i>
+            </a>
+            {% if adm.enable %}
+            <a
+              href="{{ url_for('adm2.delete_adm2', id=adm.id) }}"
+              class="btn btn-danger btn-sm"
+              title="Deshabilitar"
+            >
+              <i class="fas fa-trash"></i>
+            </a>
+            {% else %}
+            <a
+              href="{{ url_for('adm2.reset_adm2', id=adm.id) }}"
+              class="btn btn-success btn-sm"
+              title="Recuperar"
+            >
+              <i class="fas fa-undo"></i>
+            </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </form>
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="adm2ResultsCount"></span> {{ _('resultado (s)') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay divisiones administrativas registradas.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Adm2 -->
+<div
+  class="modal fade"
+  id="addAdm2Modal"
+  tabindex="-1"
+  aria-labelledby="addAdm2Label"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addAdm2Label">
+          {{_('Agregar división Adm2')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }} {{
+          form.name(class="form-control") }} {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.admin_1_id.label(class="form-label") }} {{
+          form.admin_1_id(class="form-select") }} {% for error in
+          form.admin_1_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="form-check mb-2">
+          {{ form.visible(class="form-check-input") }} {{
+          form.visible.label(class="form-check-label") }}
+        </div>
+        <div class="form-check">
+          {{ form.enable(class="form-check-input") }} {{
+          form.enable.label(class="form-check-label") }}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{_('Cancelar')}}
+        </button>
+        <button type="submit" class="btn btn-primary">{{_('Agregar')}}</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Script para llamar la búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración específica para locaciones
+    initTableSearch({
+      searchInputId: 'adm2SearchInput',
+      filtersButtonId: 'adm2FiltersButton',
+      tableContainerId: 'adm2TableContainer',
+      noResultsId: 'noAdm2Results',
+      resultsCountId: 'adm2ResultsCount',
+      tableBodyId: 'adm2TableBody',
+      
+      searchColumns: [
+        { selector: '.searchable' } // Buscar en todas las celdas con clase 'searchable'
+      ],
+      
+      filterConfigs: [
+        {
+          name: 'adm1',
+          label: '{{ _("Nivel administrativo 1") }}',
+          getValue: row => row.dataset.adm1,
+          getDisplayValue: row => row.dataset.adm1
+        },
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active' 
+              ? '{{ _("Habilitado") }}' 
+              : '{{ _("Deshabilitado") }}';
+          }
+        }
+      ]
+    });
+    // Configuración para bulk actions
+    setupBulkActions({
+      // Puedes personalizar los IDs si son diferentes en otras páginas
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+{% endblock %}
