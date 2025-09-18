@@ -38,7 +38,7 @@ def list_location():
             latitude=form.latitude.data,
             longitude=form.longitude.data,
             altitude=form.altitude.data,
-            visible=form.visible.data   
+            enable=True  
             )
         location_service.create(new_location)
         flash('Locación agregada correctamente.', 'success')
@@ -106,7 +106,7 @@ def edit_location(id):
             latitude=form.latitude.data,
             longitude=form.longitude.data,
             altitude=form.altitude.data,
-            visible=form.visible.data     
+            enable=True   
             )
         location_service.update(id=id, obj_in=update_data)
         flash('Locación actualizada.', 'success')

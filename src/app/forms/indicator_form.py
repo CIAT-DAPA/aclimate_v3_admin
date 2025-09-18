@@ -34,12 +34,18 @@ class IndicatorForm(FlaskForm):
         validators=[DataRequired(message=_l('Debe seleccionar un tipo.'))]
     )
 
+    indicator_category_id = SelectField(
+        _l('Categoría'),
+        choices=[],  # Llena dinámicamente en la vista con [(valor, etiqueta), ...]
+        coerce=int,
+        validators=[DataRequired(message=_l('Debe seleccionar una categoría.'))]
+    )
+
     description = TextAreaField(
         _l('Descripción'),
         validators=[Optional()]
     )
 
-    
     enable = BooleanField(_l('¿Está habilitado?'), default=True)
 
     submit = SubmitField(_l('Guardar'))

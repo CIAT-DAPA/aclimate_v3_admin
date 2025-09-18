@@ -1,13 +1,14 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
 from flask_babel import _
-from aclimate_v3_orm.services import MngIndicatorService
+from aclimate_v3_orm.services import MngIndicatorService, MngIndicatorCategoryService
 from aclimate_v3_orm.schemas import IndicatorCreate, IndicatorUpdate
 from aclimate_v3_orm.enums import IndicatorsType
 from app.forms.indicator_form import IndicatorForm
 
 bp = Blueprint('indicator', __name__)
 indicator_service = MngIndicatorService()
+category_service = MngIndicatorCategoryService()
 
 @bp.route('/indicator', methods=['GET', 'POST'])
 @login_required
@@ -15,6 +16,9 @@ def list_indicator():
     form = IndicatorForm()
     # Llenar dinámicamente los tipos desde el Enum
     form.type.choices = [(cat.value, _(cat.value)) for cat in IndicatorsType]
+    # Llenar dinámicamente las categorías
+    categories = category_service.get_all()
+    form.indicator_category_id.choices = [(cat.id, cat.name) for cat in categories]
 
     if form.validate_on_submit():
         new_indicator = IndicatorCreate(
@@ -23,6 +27,8 @@ def list_indicator():
             unit=form.unit.data,
             type=form.type.data,
             description=form.description.data,
+            indicator_category_id=form.indicator_category_id.data,
+            enable=True
         )
         indicator_service.create(new_indicator)
         flash(_('Indicador agregado correctamente.'), 'success')
@@ -42,6 +48,13 @@ def edit_indicator(id):
     form = IndicatorForm(obj=indicator)
     # Llenar dinámicamente los tipos desde el Enum
     form.type.choices = [(cat.value, _(cat.value)) for cat in IndicatorsType]
+    # Llenar dinámicamente las categorías
+    categories = category_service.get_all()
+    form.indicator_category_id.choices = [(cat.id, cat.name) for cat in categories]
+
+    # Preseleccionar la categoría actual
+    if request.method == 'GET' and indicator.indicator_category_id:
+        form.indicator_category_id.data = indicator.indicator_category_id
 
     if form.validate_on_submit():
         update_data = IndicatorUpdate(
@@ -50,6 +63,7 @@ def edit_indicator(id):
             type=form.type.data,
             unit=form.unit.data,
             description=form.description.data,
+            indicator_category_id=form.indicator_category_id.data,
             enable=form.enable.data
         )
         indicator_service.update(id=id, obj_in=update_data)
