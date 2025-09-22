@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Editar Configuración de Simulación') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4">
+
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('setup.list_setup') }}">{{ _('Configuraciones de Simulación') }}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {{ setup.cultivar.name if setup and setup.cultivar else '' }} - {{ setup.soil.name if setup and setup.soil else '' }} - {{ setup.season.id if setup and setup.season else '' }}
+      </li>
+    </ol>
+  </nav>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ _('Editar Configuración de Simulación') }}</h2>
+    <a href="{{ url_for('setup.list_setup') }}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> {{ _('Volver al listado') }}
+    </a>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>{{ _('Información de la Configuración') }}</h4>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          {{ form.cultivar_id.label(class="form-label") }}
+          {{ form.cultivar_id(class="form-select") }}
+          {% for error in form.cultivar_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.soil_id.label(class="form-label") }}
+          {{ form.soil_id(class="form-select") }}
+          {% for error in form.soil_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.season_id.label(class="form-label") }}
+          {{ form.season_id(class="form-select") }}
+          {% for error in form.season_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.frequency.label(class="form-label") }}
+          {{ form.frequency(class="form-control") }}
+          {% for error in form.frequency.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección de archivos de configuración -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>{{ _('Archivos de Configuración') }}</h4>
+      </div>
+      <div class="card-body">
+        <h5>{{ _('Archivos Existentes') }}</h5>
+        {% if setup.configuration_files %}
+          <ul class="list-group mb-4">
+            {% for file in setup.configuration_files %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ file.name }}</span>
+                <a href="{{ url_for('setup.delete_file', file_id=file.id) }}" 
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('{{ _('¿Eliminar este archivo?') }}');">
+                  {{ _('Eliminar') }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>{{ _('No hay archivos de configuración.') }}</p>
+        {% endif %}
+
+        <h5>{{ _('Agregar Nuevos Archivos') }}</h5>
+        <div class="dropzone mb-3 p-4 border rounded text-center">
+          {{ form.config_files(class="d-none", id="file-input") }}
+          <div class="dropzone-placeholder">
+            <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
+            <p>{{ _('Arrastra tus archivos aquí o haz clic para seleccionar') }}</p>
+            <p class="small text-muted">{{ _('Formatos permitidos: .crp, .exp, .sol, .csv, .cul, .eco, .spe') }}</p>
+          </div>
+          <div class="dropzone-preview mt-3 d-none"></div>
+        </div>
+        {% for error in form.config_files.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">{{ _('Guardar Cambios') }}</button>
+    <a href="{{ url_for('setup.list_setup') }}" class="btn btn-secondary">{{ _('Cancelar') }}</a>
+  </form>
+</div>
+
+<!-- Script para la zona de arrastre -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.querySelector('.dropzone');
+    const fileInput = document.getElementById('file-input');
+    const placeholder = document.querySelector('.dropzone-placeholder');
+    const preview = document.querySelector('.dropzone-preview');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-primary');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-primary');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-primary');
+      fileInput.files = e.dataTransfer.files;
+      updatePreview();
+    });
+    
+    fileInput.addEventListener('change', updatePreview);
+    
+    function updatePreview() {
+      preview.innerHTML = '';
+      if (fileInput.files.length > 0) {
+        placeholder.classList.add('d-none');
+        preview.classList.remove('d-none');
+        
+        for (const file of fileInput.files) {
+          const filePreview = document.createElement('div');
+          filePreview.className = 'd-flex justify-content-between align-items-center mb-2';
+          filePreview.innerHTML = `
+            <div>
+              <i class="fas fa-file me-2"></i>
+              <span>${file.name}</span>
+              <small class="text-muted ms-2">(${(file.size/1024).toFixed(1)} KB)</small>
+            </div>
+          `;
+          preview.appendChild(filePreview);
+        }
+      } else {
+        placeholder.classList.remove('d-none');
+        preview.classList.add('d-none');
+      }
+    }
+  });
+</script>
+
+<style>
+  .dropzone {
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .dropzone:hover {
+    background-color: #e9ecef;
+  }
+</style>
+{% endblock %}

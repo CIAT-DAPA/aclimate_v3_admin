@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Categorías de Indicadores') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Categorías de Indicadores') }}</h2>
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addCategoryModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="categorySearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="categoryFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="categoryFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="categorySearchResults" class="text-muted small"></span>
+  </div>
+
+  <!-- Contenedor para mensajes -->
+  <div id="noCategoryResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if categories %}
+  <div id="categoryTableContainer">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('indicator_category.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionadas') }}
+        </button>
+        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionadas') }}
+        </button>
+      </div>
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            <th>{{ _('Nombre') }}</th>
+            <th>{{ _('Descripción') }}</th>
+            <th>{{ _('Estado') }}</th>
+            <th class="text-end">{{ _('Acciones') }}</th>
+          </tr>
+        </thead>
+        <tbody id="categoryTableBody">
+          {% for category in categories %}
+          <tr 
+            data-status="{% if category.enable %}active{% else %}inactive{% endif %}"
+          >
+            <td><input type="checkbox" name="selected_ids" value="{{ category.id }}" class="select-row" /></td>
+            <td class="searchable">{{ category.name }}</td>
+            <td class="searchable">{{ category.description or '' }}</td>
+            <td>
+              {{ _('Habilitada') if category.enable else _('Deshabilitada') }}
+            </td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('indicator_category.edit_indicator_category', id=category.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="{{ _('Editar') }}"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% if category.enable %}
+              <a
+                href="{{ url_for('indicator_category.delete_indicator_category', id=category.id) }}"
+                class="btn btn-danger btn-sm"
+                title="{{ _('Deshabilitar') }}"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% else %}
+              <a
+                href="{{ url_for('indicator_category.reset_indicator_category', id=category.id) }}"
+                class="btn btn-success btn-sm"
+                title="{{ _('Recuperar') }}"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="categoryResultsCount"></span> {{ _('resultados') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay categorías registradas.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Categoría de Indicador -->
+<div
+  class="modal fade"
+  id="addCategoryModal"
+  tabindex="-1"
+  aria-labelledby="addCategoryLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCategoryLabel">
+          {{ _('Agregar categoría de indicador') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Cerrar') }}"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control") }}
+          {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-control") }}
+          {% for error in form.description.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="form-check mb-3">
+          {{ form.enable(class="form-check-input") }}
+          {{ form.enable.label(class="form-check-label") }}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Script para búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración para búsqueda en categorías
+    initTableSearch({
+      searchInputId: 'categorySearchInput',
+      filtersButtonId: 'categoryFiltersButton',
+      tableContainerId: 'categoryTableContainer',
+      noResultsId: 'noCategoryResults',
+      resultsCountId: 'categoryResultsCount',
+      tableBodyId: 'categoryTableBody',
+
+      searchColumns: [
+        { selector: '.searchable' }
+      ],
+      filterConfigs: [
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active'
+              ? '{{ _("Habilitada") }}'
+              : '{{ _("Deshabilitada") }}';
+          }
+        }
+      ]
+    });
+    // Configuración para acciones masivas
+    setupBulkActions({
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+{% endblock %}
+
+
