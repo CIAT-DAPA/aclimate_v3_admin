@@ -12,6 +12,7 @@ class Module(Enum):
     GEOGRAPHIC = "geographic"  # Países, ADM1, ADM2, Localizaciones
     CLIMATE_DATA = "climate_data"  # Datos climáticos 
     CROP_DATA = "crop_data"  # Datos de cultivos 
+    INDICATORS = "indicators_data"  # Datos de indicadores 
     STRESS_DATA = "stress_data"  # Datos de estreses
     PHENOLOGICAL_STAGE = "phenological_stage"  # Etapas fenológicas 
     USER_MANAGEMENT = "user_management"  # Usuarios y roles
@@ -33,6 +34,7 @@ class RolePermissionMapper:
             Module.PHENOLOGICAL_STAGE.value,
             Module.CLIMATE_DATA.value,
             Module.CONFIGURATION.value,
+            Module.INDICATORS.value
         ],
         
         "admin": [
@@ -43,6 +45,7 @@ class RolePermissionMapper:
             Module.PHENOLOGICAL_STAGE.value,
             Module.CLIMATE_DATA.value,
             Module.CONFIGURATION.value,
+            Module.INDICATORS.value
         ],
         
         "webadminsimple": [
@@ -286,6 +289,7 @@ class RolePermissionMapper:
             Module.GEOGRAPHIC: "Módulo Geográfico",
             Module.CLIMATE_DATA: "Datos Climáticos",
             Module.CROP_DATA: "Datos de Cultivos",
+            Module.INDICATORS: "Datos de Indicadores",
             Module.STRESS_DATA: "Datos de Estreses",
             Module.PHENOLOGICAL_STAGE: "Etapas Fenológicas",
             Module.USER_MANAGEMENT: "Gestión de Usuarios",
@@ -306,5 +310,6 @@ class RolePermissionMapper:
             Module.PHENOLOGICAL_STAGE: "Gestión de etapas fenológicas",
             Module.USER_MANAGEMENT: "Administración de usuarios y roles del sistema",
             Module.CONFIGURATION: "Configuración de fuentes de datos",
+            Module.INDICATORS: "Gestión de datos de indicadores",
         }
         return descriptions.get(module, module.value)

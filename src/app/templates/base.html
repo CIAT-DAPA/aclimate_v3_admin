@@ -135,6 +135,48 @@
       id="sidebar"
     >
 
+      <!-- Sección Geográfico -->
+      {% if check_module_access(Module.GEOGRAPHIC)  %}
+      <div class="sidebar-section-collapsible mb-1">
+        <div
+          class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
+          data-bs-toggle="collapse"
+          data-bs-target="#geograficoSection"
+          aria-expanded="false"
+        >
+          <i class="fas fa-globe section-icon me-2 text-center"></i>
+          <span class="section-title fw-semibold text-uppercase flex-grow-1"
+            >{{ _('Geográfico') }}</span
+          >
+          <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
+        </div>
+        <div class="collapse" id="geograficoSection">
+          <nav class="nav flex-column">
+            <a
+              class="nav-link d-flex align-items-center text-dark"
+              href="{{ url_for('country.list_country') }}"
+            >
+              <span>{{ _('Countries') }}</span>
+            </a>
+            <a
+              class="nav-link d-flex align-items-center text-dark"
+              href="{{ url_for('adm1.list_adm1') }}"
+            >
+              <span>{{ _('Adm 1') }}</span>
+            </a>
+            <a
+              class="nav-link d-flex align-items-center text-dark"
+              href="{{ url_for('adm2.list_adm2') }}"
+            >
+              <span>{{ _('Adm 2') }}</span>
+            </a>
+            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('location.list_location') }}">
+              <span>{{ _('Locations') }}</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+      {% endif %}
       <!-- Sección Clima -->
       {% if check_module_access(Module.CLIMATE_DATA)  %}
       <div class="sidebar-section-collapsible mb-1">
@@ -213,48 +255,40 @@
       </div>
       {% endif %}
 
-      <!-- Sección Geográfico -->
-      {% if check_module_access(Module.GEOGRAPHIC)  %}
+      <!-- Sección Indicadores -->
+      {% if check_module_access(Module.INDICATORS)  %}
       <div class="sidebar-section-collapsible mb-1">
         <div
           class="sidebar-section-header d-flex align-items-center bg-light border-bottom"
           data-bs-toggle="collapse"
-          data-bs-target="#geograficoSection"
+          data-bs-target="#indicatorsSection"
           aria-expanded="false"
         >
-          <i class="fas fa-globe section-icon me-2 text-center"></i>
+            <i class="fas fa-chart-line section-icon me-2 text-center"></i>
           <span class="section-title fw-semibold text-uppercase flex-grow-1"
-            >{{ _('Geográfico') }}</span
+            >{{ _('Indicators') }}</span
           >
           <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
-        <div class="collapse" id="geograficoSection">
+        <div class="collapse" id="indicatorsSection">
           <nav class="nav flex-column">
             <a
               class="nav-link d-flex align-items-center text-dark"
-              href="{{ url_for('country.list_country') }}"
+              href="{{ url_for('indicator.list_indicator') }}"
             >
-              <span>{{ _('Countries') }}</span>
+              <span>{{ _('Indicators management') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
-              href="{{ url_for('adm1.list_adm1') }}"
+              href="{{ url_for('indicator_category.list_indicator_category') }}"
             >
-              <span>{{ _('Adm 1') }}</span>
-            </a>
-            <a
-              class="nav-link d-flex align-items-center text-dark"
-              href="{{ url_for('adm2.list_adm2') }}"
-            >
-              <span>{{ _('Adm 2') }}</span>
-            </a>
-            <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('location.list_location') }}">
-              <span>{{ _('Locations') }}</span>
+              <span>{{ _('Indicators category management') }}</span>
             </a>
           </nav>
         </div>
       </div>
       {% endif %}
+
 
 
 
@@ -320,9 +354,9 @@
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
-              href="{{ url_for('indicator.list_indicator') }}"
+              href="{{ url_for('country_indicator.list_country_indicator') }}"
             >
-              <span>{{ _('Indicators') }}</span>
+              <span>{{ _('Country indicator') }}</span>
             </a>
           </nav>
         </div>
