@@ -38,7 +38,7 @@ pipeline {
                             git pull origin main
                             source /opt/anaconda3/etc/profile.d/conda.sh
                             conda activate /home/scalderon/.conda/envs/aclimate_v3_admin
-                            pip install -r src/requirements.txt
+                            pip install -r requirements.txt
                         """
                     } catch (Exception e) {
                         echo "Git Pull Error: ${e.message}"
