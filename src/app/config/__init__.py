@@ -1,3 +1,3 @@
-from .permissions import Module, RolePermissionMapper
+from .permissions import Module
 
-__all__ = ['Module', 'RolePermissionMapper']
+__all__ = ['Module']

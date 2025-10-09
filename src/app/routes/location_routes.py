@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
-from flask_login import login_required
+from flask_login import login_required, current_user
 from aclimate_v3_orm.services import MngAdmin2Service, MngAdmin1Service, MngLocationService, MngCountryService, MngSourceService
 from aclimate_v3_orm.schemas import LocationCreate, LocationUpdate
 from app.forms.location_form import LocationForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 
 bp = Blueprint('location', __name__)
 country_service = MngCountryService()
@@ -15,7 +17,10 @@ source_service = MngSourceService()
 # Ruta: Listar y agregar con modal
 @bp.route('/location', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='read')
 def list_location():
+    can_create = current_user.has_module_access(Module.GEOGRAPHIC.value, 'create')
+    
     form = LocationForm()
     form.country.choices = [(0, '---------')] + [(a.id, a.name) for a in country_service.get_all()]
     # Solo la opción vacía para selects dependientes
@@ -30,6 +35,10 @@ def list_location():
         form.admin_2_id.choices = [(0, '---------')] + [(a.id, a.name) for a in adm2_service.get_by_admin1_id(form.admin_1_id.data)]
 
     if form.validate_on_submit():
+        if not can_create:
+            flash('No tienes permiso para crear locaciones.', 'danger')
+            return redirect(url_for('location.list_location'))
+            
         new_location = LocationCreate(
             admin_2_id=form.admin_2_id.data,
             source_id=form.source_id.data,
@@ -45,7 +54,7 @@ def list_location():
         return redirect(url_for('location.list_location'))
 
     location_list = location_service.get_all()
-    return render_template('location/list.html', location=location_list, form=form)
+    return render_template('location/list.html', location=location_list, form=form, can_create=can_create)
 
 # Ruta: Agregar como pantalla independiente
 @bp.route('/location/add', methods=['GET', 'POST'])
@@ -73,6 +82,7 @@ def add_location():
 # Ruta: Editar locación
 @bp.route('/location/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='update')
 def edit_location(id):
     loc = location_service.get_by_id(id)
     if not loc:
@@ -117,6 +127,7 @@ def edit_location(id):
 # Ruta: Deshabilitar locacion
 @bp.route('/location/delete/<int:id>')
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='delete')
 def delete_location(id):
     if not location_service.delete(id):
         flash('No se pudo deshabilitar la locación.', 'danger')
@@ -127,6 +138,7 @@ def delete_location(id):
 # Ruta: Recuperar locacion
 @bp.route('/location/reset/<int:id>')
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='update')
 def reset_location(id):
     loc = location_service.get_by_id(id)
     if not loc:
@@ -152,6 +164,7 @@ def get_admin2_by_admin1(admin1_id):
 
 @bp.route('/location/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

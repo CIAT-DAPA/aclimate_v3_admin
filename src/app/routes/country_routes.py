@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngCountryService
 from aclimate_v3_orm.schemas import CountryCreate, CountryUpdate
 from app.forms.country_form import CountryForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 
 bp = Blueprint('country', __name__)
 country_service = MngCountryService()
@@ -11,9 +13,16 @@ country_service = MngCountryService()
 # Ruta: Lista de países
 @bp.route('/country', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='read')
 def list_country():
+    can_create = current_user.has_module_access(Module.GEOGRAPHIC.value, 'create')
+    
     form = CountryForm()
     if form.validate_on_submit():
+        if not can_create:
+            flash(_('No tienes permiso para crear países.'), 'danger')
+            return redirect(url_for('country.list_country'))
+            
         new_country = CountryCreate(
             name=form.name.data,
             iso2=form.iso2.data.upper(),
@@ -24,7 +33,7 @@ def list_country():
         return redirect(url_for('country.list_country'))
 
     countries = country_service.get_all()
-    return render_template('country/list.html', countries=countries, form=form)
+    return render_template('country/list.html', countries=countries, form=form, can_create=can_create)
 
 # Ruta: Agregar país
 @bp.route('/country/add', methods=['GET', 'POST'])
@@ -48,6 +57,7 @@ def add_country():
 # Ruta: Editar país
 @bp.route('/country/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='update')
 def edit_country(id):
     existing = country_service.get_by_id(id)
     if not existing:
@@ -71,6 +81,7 @@ def edit_country(id):
 # Ruta: Eliminar (deshabilitar) país
 @bp.route('/country/delete/<int:id>')
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='delete')
 def delete_country(id):
     if not country_service.delete(id):
         flash(_('No se pudo deshabilitar el país.'), 'danger')
@@ -81,6 +92,7 @@ def delete_country(id):
 # Ruta: Recuperar país
 @bp.route('/country/reset/<int:id>')
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='update')
 def reset_country(id):
     existing = country_service.get_by_id(id)
     if not existing:
@@ -93,6 +105,7 @@ def reset_country(id):
 
 @bp.route('/country/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

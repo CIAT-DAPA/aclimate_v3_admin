@@ -50,24 +50,45 @@ class UserForm(FlaskForm):
         ]
     )
 
-    countries = MultiCheckboxField(
-        _l('Países'),
+    role_id = SelectField(
+        _l('Rol'),
         validators=[
-            Optional()
+            DataRequired(message=_l('El rol es obligatorio.'))
         ],
         choices=[],
-        coerce=str,
-        description=_l('Seleccione los países a los que el usuario tendrá acceso.')
+        coerce=int,
+        description=_l('Seleccione el rol del usuario.')
     )
+
+    # NOTA: Los países y módulos ahora se asignan desde "Gestionar permisos"
+    # countries = MultiCheckboxField(
+    #     _l('Países'),
+    #     validators=[
+    #         Optional()
+    #     ],
+    #     choices=[],
+    #     coerce=str,
+    #     description=_l('Seleccione los países a los que el usuario tendrá acceso.')
+    # )
 
     submit = SubmitField(_l('Guardar Usuario'))
 
-    def populate_countries(self, available_countries):
-        """Poblar las opciones de países disponibles"""
-        # Crear choices con formato (valor, etiqueta)
-        self.countries.choices = [
-            (country['name'], country['display_name']) 
-            for country in available_countries
+    # def populate_countries(self, available_countries):
+    #     """Poblar las opciones de países disponibles"""
+    #     # Crear choices con formato (valor, etiqueta)
+    #     self.countries.choices = [
+    #         (country['name'], country['display_name']) 
+    #         for country in available_countries
+    #     ]
+    
+    def populate_roles(self, available_roles):
+        """Poblar las opciones de roles disponibles"""
+        # Crear choices con formato (id, nombre)
+        # available_roles puede ser lista de objetos o diccionarios
+        self.role_id.choices = [
+            (role['id'] if isinstance(role, dict) else role.id, 
+             role['name'] if isinstance(role, dict) else role.name) 
+            for role in available_roles
         ]
 
 class UserEditForm(FlaskForm):

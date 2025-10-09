@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block title %}{{_('Gestionar Permisos')}} - {{ user.get('username', 'Usuario') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">
+        <i class="fas fa-shield-alt me-2"></i>{{_('Gestionar Permisos')}}
+      </h2>
+      <p class="text-muted mb-0">
+        <i class="fas fa-user me-2"></i>
+        <strong>Usuario:</strong> {{ user.get('username', 'N/A') }}
+        ({{ user.get('first_name', '') }} {{ user.get('last_name', '') }})
+      </p>
+      <p class="text-muted mb-0">
+        <i class="fas fa-user-tag me-2"></i>
+        <strong>Rol:</strong> {{ user.get('role_name', 'N/A') }}
+      </p>
+    </div>
+    <a href="{{ url_for('user.list_user') }}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i>{{_('Volver')}}
+    </a>
+  </div>
+
+  <!-- Alert de información -->
+  <div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>{{_('Instrucciones:')}}</strong> 
+    {{_('Selecciona los módulos a los que el usuario tendrá acceso en cada país, y marca los permisos CRUD correspondientes.')}}
+  </div>
+
+  <!-- Formulario de permisos -->
+  <form method="POST" action="{{ url_for('user.manage_permissions', user_id=user.id) }}">
+    <div class="accordion" id="countriesAccordion">
+      {% for country in countries %}
+      <div class="accordion-item mb-3">
+        <h2 class="accordion-header" id="heading{{ country.id }}">
+          <button 
+            class="accordion-button {% if not loop.first %}collapsed{% endif %}" 
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#collapse{{ country.id }}" 
+            aria-expanded="{{ 'true' if loop.first else 'false' }}"
+            aria-controls="collapse{{ country.id }}"
+          >
+            <i class="fas fa-globe me-2"></i>
+            <strong>{{ country.display_name }}</strong>
+          </button>
+        </h2>
+        <div 
+          id="collapse{{ country.id }}" 
+          class="accordion-collapse collapse {% if loop.first %}show{% endif %}" 
+          aria-labelledby="heading{{ country.id }}"
+          data-bs-parent="#countriesAccordion"
+        >
+          <div class="accordion-body">
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 40%">{{_('Módulo')}}</th>
+                    <th class="text-center" style="width: 15%">
+                      <i class="fas fa-check-circle text-success me-1"></i>{{_('Activar')}}
+                    </th>
+                    <th class="text-center" style="width: 11%">
+                      <i class="fas fa-plus-circle me-1"></i>{{_('Crear')}}
+                    </th>
+                    <th class="text-center" style="width: 11%">
+                      <i class="fas fa-eye me-1"></i>{{_('Leer')}}
+                    </th>
+                    <th class="text-center" style="width: 11%">
+                      <i class="fas fa-edit me-1"></i>{{_('Actualizar')}}
+                    </th>
+                    <th class="text-center" style="width: 11%">
+                      <i class="fas fa-trash me-1"></i>{{_('Eliminar')}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for module in modules %}
+                  {% set country_perms = permissions_by_country.get(country.id, {}) %}
+                  {% set module_perms = country_perms.get(module.value, {}) %}
+                  {% set is_active = module.value in country_perms %}
+                  <tr>
+                    <td>
+                      <i class="fas {{ module.icon }} me-2"></i>
+                      <strong>{{ module.name }}</strong>
+                    </td>
+                    <td class="text-center">
+                      <input 
+                        type="checkbox" 
+                        class="form-check-input module-checkbox" 
+                        name="country_{{ country.id }}_module_{{ module.value }}"
+                        id="country_{{ country.id }}_module_{{ module.value }}"
+                        data-country="{{ country.id }}"
+                        data-module="{{ module.value }}"
+                        {% if is_active %}checked{% endif %}
+                      >
+                    </td>
+                    <td class="text-center">
+                      <input 
+                        type="checkbox" 
+                        class="form-check-input crud-checkbox" 
+                        name="country_{{ country.id }}_module_{{ module.value }}_create"
+                        data-country="{{ country.id }}"
+                        data-module="{{ module.value }}"
+                        {% if module_perms.get('create') %}checked{% endif %}
+                        {% if not is_active %}disabled{% endif %}
+                      >
+                    </td>
+                    <td class="text-center">
+                      <input 
+                        type="checkbox" 
+                        class="form-check-input crud-checkbox" 
+                        name="country_{{ country.id }}_module_{{ module.value }}_read"
+                        data-country="{{ country.id }}"
+                        data-module="{{ module.value }}"
+                        {% if module_perms.get('read') %}checked{% endif %}
+                        {% if not is_active %}disabled{% endif %}
+                      >
+                    </td>
+                    <td class="text-center">
+                      <input 
+                        type="checkbox" 
+                        class="form-check-input crud-checkbox" 
+                        name="country_{{ country.id }}_module_{{ module.value }}_update"
+                        data-country="{{ country.id }}"
+                        data-module="{{ module.value }}"
+                        {% if module_perms.get('update') %}checked{% endif %}
+                        {% if not is_active %}disabled{% endif %}
+                      >
+                    </td>
+                    <td class="text-center">
+                      <input 
+                        type="checkbox" 
+                        class="form-check-input crud-checkbox" 
+                        name="country_{{ country.id }}_module_{{ module.value }}_delete"
+                        data-country="{{ country.id }}"
+                        data-module="{{ module.value }}"
+                        {% if module_perms.get('delete') %}checked{% endif %}
+                        {% if not is_active %}disabled{% endif %}
+                      >
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="mt-4 d-flex justify-content-end gap-2">
+      <a href="{{ url_for('user.list_user') }}" class="btn btn-secondary">
+        <i class="fas fa-times me-2"></i>{{_('Cancelar')}}
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-2"></i>{{_('Guardar Permisos')}}
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+// Habilitar/deshabilitar checkboxes CRUD cuando se activa/desactiva un módulo
+document.addEventListener('DOMContentLoaded', function() {
+  const moduleCheckboxes = document.querySelectorAll('.module-checkbox');
+  
+  moduleCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const country = this.dataset.country;
+      const module = this.dataset.module;
+      const isChecked = this.checked;
+      
+      // Encontrar todos los checkboxes CRUD de este módulo
+      const crudCheckboxes = document.querySelectorAll(
+        `.crud-checkbox[data-country="${country}"][data-module="${module}"]`
+      );
+      
+      crudCheckboxes.forEach(crudCheckbox => {
+        crudCheckbox.disabled = !isChecked;
+        if (!isChecked) {
+          crudCheckbox.checked = false;
+        }
+      });
+    });
+  });
+});
+</script>
+{% endblock %}

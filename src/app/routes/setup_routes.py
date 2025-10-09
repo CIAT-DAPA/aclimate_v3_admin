@@ -1,12 +1,14 @@
 import os
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from werkzeug.utils import secure_filename
 from flask import current_app
 from aclimate_v3_orm.services import MngSetupService, MngCultivarService, MngSoilService, MngSeasonService, MngConfigurationFileService
 from aclimate_v3_orm.schemas import SetupCreate, SetupUpdate, ConfigurationFileCreate  
 from app.forms.setup_form import SetupForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 from config import Config
 
 
@@ -18,7 +20,10 @@ season_service = MngSeasonService()
 
 @bp.route('/setup', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='read')
 def list_setup():
+    can_create = current_user.has_module_access(Module.CROP_DATA.value, 'create')
+    
     form = SetupForm()
     # Llenar dinámicamente las opciones de los select
     form.cultivar_id.choices = [(c.id, c.name) for c in cultivar_service.get_all_enable()]
@@ -26,12 +31,16 @@ def list_setup():
     form.season_id.choices = [(se.id) for se in season_service.get_all_enable()]
 
     if form.validate_on_submit():
+        if not can_create:
+            flash(_('No tienes permiso para crear configuraciones.'), 'danger')
+            return redirect(url_for('setup.list_setup'))
+            
         new_setup = SetupCreate(
             cultivar_id=form.cultivar_id.data,
             soil_id=form.soil_id.data,
             season_id=form.season_id.data,
             frequency=form.frequency.data,
-            enable=form.enable.data
+            enable=True
         )
          # Crear el setup
         created_setup = setup_service.create(new_setup)
@@ -45,10 +54,11 @@ def list_setup():
         return redirect(url_for('setup.list_setup'))
 
     setup_list = setup_service.get_all()
-    return render_template('setup/list.html', setup_list=setup_list, form=form)
+    return render_template('setup/list.html', setup_list=setup_list, form=form, can_create=can_create)
 
 @bp.route('/setup/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='update')
 def edit_setup(id):
     setup = setup_service.get_by_id(id)
     if not setup:
@@ -85,6 +95,7 @@ def edit_setup(id):
 
 @bp.route('/setup/delete/<int:id>')
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='delete')
 def delete_setup(id):
     if not setup_service.delete(id):
         flash(_('No se pudo deshabilitar.'), 'danger')
@@ -94,6 +105,7 @@ def delete_setup(id):
 
 @bp.route('/setup/delete_file/<int:file_id>', methods=['POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='delete')
 def delete_file(file_id):
     file_service = MngConfigurationFileService()
     file = file_service.get_by_id(file_id)
@@ -150,6 +162,7 @@ def save_uploaded_files(files, setup_id):
 
 @bp.route('/setup/reset/<int:id>')
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='update')
 def reset_setup(id):
     setup = setup_service.get_by_id(id)
     if not setup:
@@ -162,6 +175,7 @@ def reset_setup(id):
 
 @bp.route('/setup/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

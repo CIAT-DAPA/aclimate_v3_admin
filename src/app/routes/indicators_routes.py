@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngIndicatorService, MngIndicatorCategoryService
 from aclimate_v3_orm.schemas import IndicatorCreate, IndicatorUpdate
 from aclimate_v3_orm.enums import IndicatorsType
 from app.forms.indicator_form import IndicatorForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 
 bp = Blueprint('indicator', __name__)
 indicator_service = MngIndicatorService()
@@ -12,7 +14,10 @@ category_service = MngIndicatorCategoryService()
 
 @bp.route('/indicator', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='read')
 def list_indicator():
+    can_create = current_user.has_module_access(Module.INDICATORS_DATA.value, 'create')
+    
     form = IndicatorForm()
     # Llenar dinámicamente los tipos desde el Enum
     form.type.choices = [(cat.value, _(cat.value)) for cat in IndicatorsType]
@@ -21,6 +26,10 @@ def list_indicator():
     form.indicator_category_id.choices = [(cat.id, cat.name) for cat in categories]
 
     if form.validate_on_submit():
+        if not can_create:
+            flash(_('No tienes permiso para crear indicadores.'), 'danger')
+            return redirect(url_for('indicator.list_indicator'))
+            
         new_indicator = IndicatorCreate(
             name=form.name.data,
             short_name=form.short_name.data,
@@ -35,10 +44,11 @@ def list_indicator():
         return redirect(url_for('indicator.list_indicator'))
 
     indicator_list = indicator_service.get_all()
-    return render_template('indicator/list.html', indicators=indicator_list, form=form)
+    return render_template('indicator/list.html', indicators=indicator_list, form=form, can_create=can_create)
 
 @bp.route('/indicator/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='update')
 def edit_indicator(id):
     indicator = indicator_service.get_by_id(id)
     if not indicator:
@@ -74,6 +84,7 @@ def edit_indicator(id):
 
 @bp.route('/indicator/delete/<int:id>')
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='delete')
 def delete_indicator(id):
     if not indicator_service.delete(id):
         flash(_('No se pudo deshabilitar.'), 'danger')
@@ -83,6 +94,7 @@ def delete_indicator(id):
 
 @bp.route('/indicator/reset/<int:id>')
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='update')
 def reset_indicator(id):
     indicator = indicator_service.get_by_id(id)
     if not indicator:
@@ -95,6 +107,7 @@ def reset_indicator(id):
 
 @bp.route('/indicator/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

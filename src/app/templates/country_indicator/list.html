@@ -4,6 +4,7 @@
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{ _('Relaciones País-Indicador') }}</h2>
+    {% if can_create %}
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
@@ -11,6 +12,7 @@
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
+    {% endif %}
   </div>
 
   <!-- Barra de búsqueda -->
@@ -49,6 +51,7 @@
 
   {% if country_indicators %}
   <div id="countryIndicatorTableContainer">
+    {% if current_user.has_module_access('indicators', 'delete') %}
     <form id="bulk-action-form" method="POST" action="{{ url_for('country_indicator.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
@@ -56,10 +59,13 @@
           <i class="fas fa-trash"></i> {{ _('Eliminar seleccionadas') }}
         </button>
       </div>
+    {% endif %}
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
+            {% if current_user.has_module_access('indicators', 'delete') %}
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            {% endif %}
             <th>{{ _('País') }}</th>
             <th>{{ _('Indicador') }}</th>
             <th>{{ _('Pronóstico espacial') }}</th>
@@ -67,13 +73,17 @@
             <th>{{ _('Pronóstico por ubicación') }}</th>
             <th>{{ _('Clima por ubicación') }}</th>
             <th>{{ _('Criterios') }}</th>
+            {% if current_user.has_module_access('indicators', 'update') or current_user.has_module_access('indicators', 'delete') %}
             <th class="text-end">{{ _('Acciones') }}</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody id="countryIndicatorTableBody">
           {% for ci in country_indicators %}
           <tr>
+            {% if current_user.has_module_access('indicators', 'delete') %}
             <td><input type="checkbox" name="selected_ids" value="{{ ci.id }}" class="select-row" /></td>
+            {% endif %}
             <td class="searchable country">{{ ci.country.name if ci.country else '' }}</td>
             <td class="searchable indicator">{{ ci.indicator.name if ci.indicator else '' }}</td>
             <td class="searchable spatial_forecast">{{ _('Sí') if ci.spatial_forecast else _('No') }}</td>
@@ -81,7 +91,9 @@
             <td class="searchable location_forecast">{{ _('Sí') if ci.location_forecast else _('No') }}</td>
             <td class="searchable location_climate">{{ _('Sí') if ci.location_climate else _('No') }}</td>
             <td class="searchable criteria">{{ ci.criteria or '' }}</td>
+            {% if current_user.has_module_access('indicators', 'update') or current_user.has_module_access('indicators', 'delete') %}
             <td class="text-end">
+              {% if current_user.has_module_access('indicators', 'update') %}
               <a
                 href="{{ url_for('country_indicator.edit_country_indicator', id=ci.id) }}"
                 class="btn btn-warning btn-sm me-2"
@@ -89,6 +101,8 @@
               >
                 <i class="fas fa-pen"></i>
               </a>
+              {% endif %}
+              {% if current_user.has_module_access('indicators', 'delete') %}
               <a
                 href="{{ url_for('country_indicator.delete_country_indicator', id=ci.id) }}"
                 class="btn btn-danger btn-sm"
@@ -96,12 +110,16 @@
               >
                 <i class="fas fa-trash"></i>
               </a>
+              {% endif %}
             </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
       </table>
+    {% if current_user.has_module_access('indicators', 'delete') %}
     </form>
+    {% endif %}
   </div>
   <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">
