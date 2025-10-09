@@ -1,37 +1,48 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngStressService
 from aclimate_v3_orm.schemas import StressCreate, StressUpdate
 from aclimate_v3_orm.enums import StressCategory
 from app.forms.stress_form import StressForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 
 bp = Blueprint('stress', __name__)
 stress_service = MngStressService()
 
 @bp.route('/stress', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='read')
 def list_stress():
+    can_create = current_user.has_module_access(Module.CROP_DATA.value, 'create')
+    
     form = StressForm()
     # Llenar dinámicamente las categorías desde el Enum
     form.category.choices = [(cat.name, _(cat.value)) for cat in StressCategory]
 
     if form.validate_on_submit():
+        if not can_create:
+            flash(_('No tienes permiso para crear estreses.'), 'danger')
+            return redirect(url_for('stress.list_stress'))
+            
         new_stress = StressCreate(
             name=form.name.data,
             short_name=form.short_name.data,
             category=StressCategory[form.category.data],
             description=form.description.data,
+            enable=True
         )
         stress_service.create(new_stress)
         flash(_('Estrés agregado correctamente.'), 'success')
         return redirect(url_for('stress.list_stress'))
 
     stress_list = stress_service.get_all()
-    return render_template('stress/list.html', stresses=stress_list, form=form)
+    return render_template('stress/list.html', stresses=stress_list, form=form, can_create=can_create)
 
 @bp.route('/stress/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='update')
 def edit_stress(id):
     stress = stress_service.get_by_id(id)
     if not stress:
@@ -60,6 +71,7 @@ def edit_stress(id):
 
 @bp.route('/stress/delete/<int:id>')
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='delete')
 def delete_stress(id):
     if not stress_service.delete(id):
         flash(_('No se pudo deshabilitar.'), 'danger')
@@ -69,6 +81,7 @@ def delete_stress(id):
 
 @bp.route('/stress/reset/<int:id>')
 @login_required
+@require_module_access(Module.STRESS_DATA, permission_type='update')
 def reset_stress(id):
     stress = stress_service.get_by_id(id)
     if not stress:
@@ -81,6 +94,7 @@ def reset_stress(id):
 
 @bp.route('/stress/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.STRESS_DATA, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

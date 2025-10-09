@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import PhenologicalStageStressService, MngPhenologicalStageService, MngStressService
 from aclimate_v3_orm.schemas import PhenologicalStageStressCreate, PhenologicalStageStressUpdate
 from app.forms.phenological_stage_stress_form import PhenologicalStageStressForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 
 bp = Blueprint('phenological_stage_stress', __name__)
 pss_service = PhenologicalStageStressService()
@@ -12,6 +14,7 @@ stress_service = MngStressService()
 
 @bp.route('/phenological_stage_stress', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='read')
 def list_phenological_stage_stress():
     form = PhenologicalStageStressForm()
     # Llenar dinámicamente las opciones de estrés y etapa fenológica
@@ -24,17 +27,19 @@ def list_phenological_stage_stress():
             phenological_stage_id=form.phenological_stage_id.data,
             max=form.max.data,
             min=form.min.data,
-            enable=form.enable.data
+            enable=True
         )
         pss_service.create(new_pss)
         flash(_('Parámetro de estrés por etapa agregado correctamente.'), 'success')
         return redirect(url_for('phenological_stage_stress.list_phenological_stage_stress'))
 
     pss_list = pss_service.get_all()
-    return render_template('phenological_stage_stress/list.html', pss_list=pss_list, form=form)
+    can_create = current_user.has_module_access(Module.CROP_DATA.value, 'create')
+    return render_template('phenological_stage_stress/list.html', pss_list=pss_list, form=form, can_create=can_create)
 
 @bp.route('/phenological_stage_stress/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='update')
 def edit_phenological_stage_stress(id):
     pss = pss_service.get_by_id(id)
     if not pss:
@@ -65,6 +70,7 @@ def edit_phenological_stage_stress(id):
 
 @bp.route('/phenological_stage_stress/delete/<int:id>')
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='delete')
 def delete_phenological_stage_stress(id):
     if not pss_service.delete(id):
         flash(_('No se pudo deshabilitar.'), 'danger')
@@ -74,6 +80,7 @@ def delete_phenological_stage_stress(id):
 
 @bp.route('/phenological_stage_stress/reset/<int:id>')
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='update')
 def reset_phenological_stage_stress(id):
     pss = pss_service.get_by_id(id)
     if not pss:
@@ -86,6 +93,7 @@ def reset_phenological_stage_stress(id):
 
 @bp.route('/phenological_stage_stress/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

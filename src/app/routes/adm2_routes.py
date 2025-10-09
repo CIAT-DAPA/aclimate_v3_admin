@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngAdmin2Service, MngAdmin1Service
 from aclimate_v3_orm.schemas import Admin2Create, Admin2Update
 from app.forms.adm2_form import Adm2Form
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 
 bp = Blueprint('adm2', __name__)
 adm2_service = MngAdmin2Service()
@@ -12,11 +14,22 @@ adm1_service = MngAdmin1Service()
 # Ruta: Listar y agregar con modal
 @bp.route('/adm2', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='read')
 def list_adm2():
     form = Adm2Form()
-    form.admin_1_id.choices = [(a.id, a.name) for a in adm1_service.get_all()]
+    
+    # Check if user can create
+    can_create = current_user.has_module_access(Module.GEOGRAPHIC.value, 'create')
+    
+    if can_create:
+        form.admin_1_id.choices = [(a.id, a.name) for a in adm1_service.get_all()]
 
     if form.validate_on_submit():
+        # Verify create permission before creating
+        if not can_create:
+            flash(_('No tienes permisos para crear divisiones administrativas.'), 'danger')
+            return redirect(url_for('adm2.list_adm2'))
+            
         new_adm2 = Admin2Create(
             name=form.name.data,
             admin_1_id=form.admin_1_id.data,
@@ -28,11 +41,12 @@ def list_adm2():
         return redirect(url_for('adm2.list_adm2'))
 
     adm2_list = adm2_service.get_all()
-    return render_template('adm2/list.html', adm2=adm2_list, form=form)
+    return render_template('adm2/list.html', adm2=adm2_list, form=form, can_create=can_create)
 
 # Ruta: Agregar como pantalla independiente
 @bp.route('/adm2/add', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='create')
 def add_adm2():
     form = Adm2Form()
     form.admin_1_id.choices = [(a.id, a.name) for a in adm1_service.get_all()]
@@ -53,6 +67,7 @@ def add_adm2():
 # Ruta: Editar Admin2
 @bp.route('/adm2/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='update')
 def edit_adm2(id):
     adm = adm2_service.get_by_id(id)
     if not adm:
@@ -81,6 +96,7 @@ def edit_adm2(id):
 # Ruta: Deshabilitar Admin2
 @bp.route('/adm2/delete/<int:id>')
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='delete')
 def delete_adm2(id):
     if not adm2_service.delete(id):
         flash(_('No se pudo deshabilitar la división.'), 'danger')
@@ -91,6 +107,7 @@ def delete_adm2(id):
 # Ruta: Recuperar Admin2
 @bp.route('/adm2/reset/<int:id>')
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='update')
 def reset_adm2(id):
     adm = adm2_service.get_by_id(id)
     if not adm:
@@ -103,6 +120,7 @@ def reset_adm2(id):
 
 @bp.route('/adm2/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

@@ -4,6 +4,7 @@
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{ _('Configuración de parámetros de clientes') }}</h2>
+    {% if can_create %}
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
@@ -11,6 +12,7 @@
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
+    {% endif %}
   </div>
 
   <!-- Barra de búsqueda -->
@@ -50,6 +52,7 @@
 
   {% if data_sources %}
   <div id="dataSourceTableContainer">
+    {% if current_user.has_module_access('configuration', 'delete') %}
     <form id="bulk-action-form" method="POST" action="{{ url_for('data_source.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
@@ -60,15 +63,20 @@
           <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
         </button>
       </div>
+    {% endif %}
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
+            {% if current_user.has_module_access('configuration', 'delete') %}
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            {% endif %}
             <th>{{ _('Nombre') }}</th>
             <th>{{ _('Tipo de fuente') }}</th>
             <th>{{ _('País') }}</th>
             <th>{{ _('Estado') }}</th>
+            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
             <th class="text-end">{{ _('Acciones') }}</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody id="dataSourceTableBody">
@@ -76,12 +84,16 @@
           <tr data-type="{{ data_source.type }}"
               data-country="{{ data_source.country.name }}"
               data-status="{% if data_source.enable %}active{% else %}inactive{% endif %}">
+            {% if current_user.has_module_access('configuration', 'delete') %}
             <td><input type="checkbox" name="selected_ids" value="{{ data_source.id }}" class="select-row" /></td>
+            {% endif %}
             <td class="searchable">{{ data_source.name }}</td>
             <td class="searchable">{{ data_source.type }}</td>
             <td class="searchable">{{ data_source.country.name }}</td>
             <td>{{ 'Habilitado' if data_source.enable else 'Deshabilitado' }}</td>
+            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
             <td class="text-end">
+              {% if current_user.has_module_access('configuration', 'update') %}
               <a
                 href="{{ url_for('data_source.edit_data_source', id=data_source.id) }}"
                 class="btn btn-warning btn-sm me-2"
@@ -89,6 +101,8 @@
               >
                 <i class="fas fa-pen"></i>
               </a>
+              {% endif %}
+              {% if current_user.has_module_access('configuration', 'delete') %}
               {% if data_source.enable %}
               <a
                 href="{{ url_for('data_source.delete_data_source', id=data_source.id) }}"
@@ -106,12 +120,16 @@
                 <i class="fas fa-undo"></i>
               </a>
               {% endif %}
+              {% endif %}
             </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
       </table>
+    {% if current_user.has_module_access('configuration', 'delete') %}
     </form>
+    {% endif %}
   </div>
   <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">

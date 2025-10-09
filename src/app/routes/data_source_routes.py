@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngDataSourceService, MngCountryService
 from aclimate_v3_orm.schemas import DataSourceCreate, DataSourceUpdate
 from app.forms.data_source_form import DataSourceForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 
 bp = Blueprint('data_source', __name__)
 data_source_service = MngDataSourceService()
@@ -11,12 +13,19 @@ country_service = MngCountryService()
 
 @bp.route('/data_source', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='read')
 def list_data_source():
+    can_create = current_user.has_module_access(Module.CONFIGURATION.value, 'create')
+    
     form = DataSourceForm()
     # Aquí deberías llenar dinámicamente los países
     form.country_id.choices = [(c.id, c.name) for c in country_service.get_all_enable()]
 
     if form.validate_on_submit():
+        if not can_create:
+            flash(_('No tienes permiso para crear fuentes de datos.'), 'danger')
+            return redirect(url_for('data_source.list_data_source'))
+            
         new_source = DataSourceCreate(
             country_id=form.country_id.data,
             name=form.name.data,
@@ -31,11 +40,12 @@ def list_data_source():
         return redirect(url_for('data_source.list_data_source'))
 
     data_source_list = data_source_service.get_all()
-    return render_template('data_source/list.html', data_sources=data_source_list, form=form)
+    return render_template('data_source/list.html', data_sources=data_source_list, form=form, can_create=can_create)
 
 
 @bp.route('/data_source/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='update')
 def edit_data_source(id):
     data_source = data_source_service.get_by_id(id)
     if not data_source:
@@ -69,6 +79,7 @@ def edit_data_source(id):
 
 @bp.route('/data_source/delete/<int:id>')
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='delete')
 def delete_data_source(id):
     if not data_source_service.delete(id):
         flash(_('No se pudo deshabilitar.'), 'danger')
@@ -79,6 +90,7 @@ def delete_data_source(id):
 
 @bp.route('/data_source/reset/<int:id>')
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='update')
 def reset_data_source(id):
     data_source = data_source_service.get_by_id(id)
     if not data_source:
@@ -91,6 +103,7 @@ def reset_data_source(id):
 
 @bp.route('/data_source/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')
