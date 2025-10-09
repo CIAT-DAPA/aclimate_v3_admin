@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngPhenologicalStageService, MngCropService
 from aclimate_v3_orm.schemas import PhenologicalStageCreate, PhenologicalStageUpdate
 from app.forms.phenological_stage_form import PhenologicalStageForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 
 bp = Blueprint('phenological_stage', __name__)
 stage_service = MngPhenologicalStageService()
@@ -11,12 +13,19 @@ crop_service = MngCropService()
 
 @bp.route('/phenological_stage', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='read')
 def list_phenological_stages():
+    can_create = current_user.has_module_access(Module.CROP_DATA.value, 'create')
+    
     form = PhenologicalStageForm()
     # Llenar dinámicamente las opciones de cultivos
     form.crop.choices = [(crop.id, crop.name) for crop in crop_service.get_all()]
 
     if form.validate_on_submit():
+        if not can_create:
+            flash(_('No tienes permiso para crear etapas fenológicas.'), 'danger')
+            return redirect(url_for('phenological_stage.list_phenological_stages'))
+            
         new_stage = PhenologicalStageCreate(
             crop_id=form.crop.data,
             name=form.name.data,
@@ -31,10 +40,11 @@ def list_phenological_stages():
         return redirect(url_for('phenological_stage.list_phenological_stages'))
 
     stages = stage_service.get_all()
-    return render_template('phenological_stage/list.html', stages=stages, form=form)
+    return render_template('phenological_stage/list.html', stages=stages, form=form, can_create=can_create)
 
 @bp.route('/phenological_stage/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='update')
 def edit_phenological_stage(id):
     stage = stage_service.get_by_id(id)
     if not stage:
@@ -66,6 +76,7 @@ def edit_phenological_stage(id):
 
 @bp.route('/phenological_stage/delete/<int:id>')
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='delete')
 def delete_phenological_stage(id):
     if not stage_service.delete(id):
         flash(_('No se pudo deshabilitar.'), 'danger')
@@ -75,6 +86,7 @@ def delete_phenological_stage(id):
 
 @bp.route('/phenological_stage/reset/<int:id>')
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='update')
 def reset_phenological_stage(id):
     stage = stage_service.get_by_id(id)
     if not stage:
@@ -87,6 +99,7 @@ def reset_phenological_stage(id):
 
 @bp.route('/phenological_stage/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.CROP_DATA, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

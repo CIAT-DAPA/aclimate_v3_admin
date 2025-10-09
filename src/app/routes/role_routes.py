@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask_login import current_user
 from app.forms.role_form import RoleForm, RoleEditForm
 from app.services.role_service import RoleService
 from app.decorators import token_required
 from app.decorators.permissions import require_module_access
-from app.config.permissions import Module, RolePermissionMapper
+from app.config.permissions import Module
 
 bp = Blueprint('role', __name__)
 role_service = RoleService()
@@ -11,42 +12,39 @@ role_service = RoleService()
 # Ruta: Lista de roles
 @bp.route('/role', methods=['GET'])
 @token_required
-@require_module_access(Module.USER_MANAGEMENT)
+@require_module_access(Module.USER_MANAGEMENT, permission_type='read')
 def list_role():
+    # Check create permission for showing add button
+    can_create = current_user.has_module_access(Module.USER_MANAGEMENT.value, 'create')
+    
     form = RoleForm()
     roles = role_service.get_all()
-
-    # Agregar información de sincronización
-    sync_info = role_service.sync_role_modules()
     
     return render_template('role/list.html', 
                          roles=roles, 
                          form=form,
-                         sync_info=sync_info.get('sync_result', {}))
+                         can_create=can_create)
 
 # Ruta: Crear roles con módulos
 @bp.route('/role/create', methods=['POST'])
 @token_required
-@require_module_access(Module.USER_MANAGEMENT)
+@require_module_access(Module.USER_MANAGEMENT, permission_type='create')
 def create_role():
     form = RoleForm()
     
     if form.validate_on_submit():
         try: 
-            print(f"Intentando crear rol: {form.name.data}")
-            print(f"Módulos seleccionados: {form.modules.data}")
+            print(f"Creando rol: {form.name.data}")
 
             result = role_service.create(
-                name=form.name.data,
-                description=form.description.data,
-                modules=form.modules.data
+                name=form.name.data
             )
 
-            if result.get('success'):
+            if result:
                 print(f"Rol creado exitosamente: {result}")
-                flash('Rol agregado exitosamente con acceso a los módulos seleccionados.', 'success')
+                flash('Rol creado exitosamente. Asigna permisos a los usuarios en la Gestión de Usuarios.', 'success')
             else:
-                flash(f'Error al crear rol: {result.get("error", "Error desconocido")}', 'danger')
+                flash('Error al crear rol.', 'danger')
 
         except ValueError as e:
             print(f"Error de validación: {e}")
@@ -68,7 +66,7 @@ def create_role():
 # Ruta: Editar módulos de un rol
 @bp.route('/role/edit/<role_name>', methods=['GET', 'POST'])
 @token_required
-@require_module_access(Module.USER_MANAGEMENT)
+@require_module_access(Module.USER_MANAGEMENT, permission_type='update')
 def edit_role(role_name):
     role_info = role_service.get_role_with_modules(role_name)
     
@@ -111,7 +109,7 @@ def edit_role(role_name):
 # Ruta: Eliminar rol
 @bp.route('/role/delete/<role_id>', methods=['POST'])
 @token_required
-@require_module_access(Module.USER_MANAGEMENT)
+@require_module_access(Module.USER_MANAGEMENT, permission_type='delete')
 def delete_role(role_id):
     try:
         # Obtener nombre del rol antes de eliminarlo
@@ -134,7 +132,7 @@ def delete_role(role_id):
 
 @bp.route('/role/bulk_action', methods=['POST'])
 @token_required
-@require_module_access(Module.USER_MANAGEMENT)
+@require_module_access(Module.USER_MANAGEMENT, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

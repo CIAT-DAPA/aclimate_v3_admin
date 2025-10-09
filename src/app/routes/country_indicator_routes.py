@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngCountryIndicatorService, MngCountryService, MngIndicatorService
 from aclimate_v3_orm.schemas import CountryIndicatorCreate, CountryIndicatorUpdate
 from app.forms.country_indicator_form import CountryIndicatorForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 import json
 
 bp = Blueprint('country_indicator', __name__)
@@ -13,7 +15,10 @@ indicator_service = MngIndicatorService()
 
 @bp.route('/country_indicator', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='read')
 def list_country_indicator():
+    can_create = current_user.has_module_access(Module.INDICATORS_DATA.value, 'create')
+    
     form = CountryIndicatorForm()
     countries = country_service.get_all()
     indicators = indicator_service.get_all()
@@ -21,6 +26,10 @@ def list_country_indicator():
     form.indicator_id.choices = [(i.id, i.name) for i in indicators]
 
     if form.validate_on_submit():
+        if not can_create:
+            flash(_('No tienes permiso para crear relaciones país-indicador.'), 'danger')
+            return redirect(url_for('country_indicator.list_country_indicator'))
+            
         criteria_data = None
         if form.criteria.data:
             try:
@@ -42,10 +51,11 @@ def list_country_indicator():
         return redirect(url_for('country_indicator.list_country_indicator'))
 
     ci_list = country_indicator_service.get_all()
-    return render_template('country_indicator/list.html', country_indicators=ci_list, form=form)
+    return render_template('country_indicator/list.html', country_indicators=ci_list, form=form, can_create=can_create)
 
 @bp.route('/country_indicator/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='update')
 def edit_country_indicator(id):
     ci = country_indicator_service.get_by_id(id)
     if not ci:
@@ -80,6 +90,7 @@ def edit_country_indicator(id):
 
 @bp.route('/country_indicator/delete/<int:id>')
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='delete')
 def delete_country_indicator(id):
     if not country_indicator_service.delete(id):
         flash(_('No se pudo eliminar.'), 'danger')
@@ -89,6 +100,7 @@ def delete_country_indicator(id):
 
 @bp.route('/country_indicator/reset/<int:id>')
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='update')
 def reset_country_indicator(id):
     ci = country_indicator_service.get_by_id(id)
     if not ci:
@@ -101,6 +113,7 @@ def reset_country_indicator(id):
 
 @bp.route('/country_indicator/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.INDICATORS_DATA, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

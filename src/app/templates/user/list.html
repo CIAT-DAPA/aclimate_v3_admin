@@ -4,6 +4,7 @@ block content %}
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{_('Usuarios')}}</h2>
 
+    {% if can_create %}
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
@@ -11,6 +12,7 @@ block content %}
     >
       <i class="fas fa-plus"></i> {{_('Agregar')}}
     </button>
+    {% endif %}
   </div>
 
   <!-- Barra de búsqueda y filtros -->
@@ -47,6 +49,7 @@ block content %}
   </div>
 
   {% if users %}
+  {% if current_user.has_module_access('user_management', 'delete') %}
   <form id="bulk-action-form" method="POST" action="{{ url_for('user.bulk_action') }}">
     <div class="mb-2">
       <input type="hidden" name="action" id="bulk-action-hidden" value="" />
@@ -54,104 +57,128 @@ block content %}
         <i class="fas fa-trash"></i> {{ _('Eliminar seleccionados') }}
       </button>
     </div>
+  {% endif %}
   
     <div id="usersTableContainer">
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
+            {% if current_user.has_module_access('user_management', 'delete') %}
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            {% endif %}
             <th>Usuario</th>
             <th>Nombre Completo</th>
             <th>Email</th>
             <th>Rol</th>
             <th>Países</th>
+            {% if current_user.has_module_access('user_management', 'update') or current_user.has_module_access('user_management', 'delete') %}
             <th class="text-end">Acciones</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody id="usersTableBody">
           {% for user in users %}
           <tr class="user-row {{ 'table-secondary' if not user.get('enabled', True) }}" 
-              data-username="{{ user.username|lower }}"
-              data-fullname="{{ (user.first_name + ' ' + user.last_name)|lower }}"
-              data-email="{{ (user.email or '')|lower }}"
-              data-search="{{ (user.username + ' ' + (user.first_name or '') + ' ' + (user.last_name or '') + ' ' + (user.email or ''))|lower }}"
-              data-user-id="{{ user.id }}"
-              data-can-delete="{{ 'true' if user.username.lower() not in ['admin', 'administrator'] and user.get('enabled', True) else 'false' }}">
+              data-username="{{ user.get('username', '')|lower }}"
+              data-fullname="{{ ((user.get('first_name', '') or '') + ' ' + (user.get('last_name', '') or ''))|lower }}"
+              data-email="{{ (user.get('email', '') or '')|lower }}"
+              data-search="{{ ((user.get('username', '') or '') + ' ' + (user.get('first_name', '') or '') + ' ' + (user.get('last_name', '') or '') + ' ' + (user.get('email', '') or ''))|lower }}"
+              data-user-id="{{ user.get('id', '') }}"
+              data-can-delete="{{ 'true' if (user.get('username', '') or '').lower() not in ['admin', 'administrator'] and user.get('enabled', True) else 'false' }}">
+            {% if current_user.has_module_access('user_management', 'delete') %}
             <td>
-              {% if user.username.lower() not in ['admin', 'administrator'] and user.get('enabled', True) %}
-              <input type="checkbox" class="select-row" value="{{ user.id }}" data-username="{{ user.username }}" name="selected_ids"/>
+              {% if (user.get('username', '') or '').lower() not in ['admin', 'administrator'] and user.get('enabled', True) %}
+              <input type="checkbox" class="select-row" value="{{ user.get('id', '') }}" data-username="{{ user.get('username', '') }}" name="selected_ids"/>
               {% else %}
               <input type="checkbox" class="form-check-input" disabled title="{{_('No se puede seleccionar este usuario')}}" />
               {% endif %}
             </td>
+            {% endif %}
             <td>
               <div class="d-flex align-items-center">
                 <div class="avatar-circle me-2">
                   <i class="fas fa-user"></i>
                 </div>
                 <div>
-                  <strong class="searchable-username">{{ user.username }}</strong>
+                  <strong class="searchable-username">{{ user.get('username', '') }}</strong>
                   <br />
-                  <small class="text-muted">ID: {{ user.id[:8] }}...</small>
+                  <small class="text-muted">ID: {{ (user.get('id', '')|string)[:8] }}...</small>
                 </div>
               </div>
             </td>
             <td>
-              {% if user.first_name or user.last_name %}
-              <span class="searchable-fullname">{{ user.first_name }} {{ user.last_name }}</span>
+              {% if user.get('first_name') or user.get('last_name') %}
+              <span class="searchable-fullname">{{ user.get('first_name', '') }} {{ user.get('last_name', '') }}</span>
               {% else %}
               <span class="text-muted fst-italic">Sin nombre</span>
               {% endif %}
             </td>
             <td>
-              <span class="text-break searchable-email">{{ user.email or 'Sin email' }}</span>
+              <span class="text-break searchable-email">{{ user.get('email') or 'Sin email' }}</span>
             </td>
             <td>
               <span class="badge bg-dark">
-                {% if user.role_name == 'adminsuper' %}
-                <i class="fas fa-crown"></i> Super Admin {% elif user.role_name ==
-                'admin' %} <i class="fas fa-user-shield"></i> Admin {% elif
-                user.role_name == 'Geo Admin' %}
-                <i class="fas fa-map"></i> {{ user.role_name }} {% elif
-                user.role_name == 'Guest' %}
-                <i class="fas fa-eye"></i> {{ user.role_name }} {% else %}
-                <i class="fas fa-user-tag"></i> {{ user.role_name }} {% endif %}
+                {% if user.get('role_name') == 'adminsuper' %}
+                <i class="fas fa-crown"></i> Super Admin 
+                {% elif user.get('role_name') == 'admin' %} 
+                <i class="fas fa-user-shield"></i> Admin 
+                {% elif user.get('role_name') == 'Geo Admin' %}
+                <i class="fas fa-map"></i> {{ user.get('role_name', '') }} 
+                {% elif user.get('role_name') == 'Guest' %}
+                <i class="fas fa-eye"></i> {{ user.get('role_name', '') }} 
+                {% else %}
+                <i class="fas fa-user-tag"></i> {{ user.get('role_name', '') }} 
+                {% endif %}
               </span>
             </td>
             <td>
-              {% if user.countries %}
+              {% if user.get('countries') %}
               <div class="d-flex flex-wrap gap-1">
-                {% for country in user.countries %}
-                <span class="badge bg-dark" title="{{ country.name }}">
-                  <span class="fi fi-{{ country.country_name|get_country_code }} me-2"></span>
-                  <span>{{ country.country_name }}</span>
+                {% for country in user.get('countries', []) %}
+                <span class="badge bg-primary" title="{{ country.name }}">
+                  <i class="fas fa-globe me-1"></i>
+                  {{ country.name }}
                 </span>
                 {% endfor %}
-                {% else %}
-                <span class="text-muted fst-italic">
-                  <i class="fas fa-minus"></i> Sin países asignados
-                </span>
               </div>
+              {% else %}
+              <span class="text-muted fst-italic">
+                <i class="fas fa-minus"></i> Sin países asignados
+              </span>
               {% endif %}
             </td>
+            {% if current_user.has_module_access('user_management', 'update') or current_user.has_module_access('user_management', 'delete') %}
             <td class="text-end">
+              {% if current_user.has_module_access('user_management', 'update') %}
+              <!-- Botón de permisos -->
               <a
-                href="{{ url_for('user.edit_user', user_id=user.id) }}"
+                href="{{ url_for('user.manage_permissions', user_id=user.get('id', '')) }}"
+                class="btn btn-info btn-sm me-1"
+                title="{{_('Gestionar permisos')}}"
+              >
+                <i class="fas fa-shield-alt"></i>
+              </a>
+              <!-- Botón de editar -->
+              <a
+                href="{{ url_for('user.edit_user', user_id=user.get('id', '')) }}"
                 class="btn btn-warning btn-sm me-1"
+                title="{{_('Editar usuario')}}"
               >
                 <i class="fas fa-pen"></i>
               </a>
+              {% endif %}
+              {% if current_user.has_module_access('user_management', 'delete') %}
               {% if user.get('enabled', True) %} 
-              {% if user.username.lower() not in ['admin', 'administrator'] %}
+              {% if (user.get('username', '') or '').lower() not in ['admin', 'administrator'] %}
               <button 
                 type="button"
                 class="btn btn-danger btn-sm"
                 title="Eliminar usuario"
                 data-bs-toggle="modal"
                 data-bs-target="#deleteUserModal"
-                data-user-id="{{ user.id }}"
-                data-username="{{ user.username }}"
-                data-user-name="{{ user.first_name }} {{ user.last_name }}"
+                data-user-id="{{ user.get('id', '') }}"
+                data-username="{{ user.get('username', '') }}"
+                data-user-name="{{ user.get('first_name', '') }} {{ user.get('last_name', '') }}"
               >
                 <i class="fas fa-trash"></i>
               </button>
@@ -167,13 +194,17 @@ block content %}
               {% else %}
               <span class="badge bg-secondary">Eliminado</span>
               {% endif %}
+              {% endif %}
             </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+  {% if current_user.has_module_access('user_management', 'delete') %}
   </form>
+  {% endif %}
   <!-- Mensaje cuando no hay resultados de búsqueda -->
   <div id="noSearchResults" class="alert alert-warning mt-4" style="display: none;">
     <i class="fas fa-search"></i>
@@ -306,53 +337,34 @@ block content %}
             <i class="fas fa-shield-alt me-1"></i>{{_('Crea una contraseña segura para el usuario')}}
           </div>
         </div>
-        <!-- Selección de países -->
+
+        <!-- Rol -->
         <div class="mb-3">
-            <!-- Countries/Groups Selection -->
-            <div class="mb-4">
-              <label class="form-label fw-semibold">
-                <i class="fas fa-flag me-2"></i>{{ form.countries.label.text }}
-              </label>
-              
-              {% if form.countries.errors %}
-              <div class="alert alert-danger">
-                {% for error in form.countries.errors %}
-                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                {% endfor %}
-              </div>
-              {% endif %}
-              
-              <div class="countries-selection-container border rounded p-3" style="max-height: 300px; overflow-y: auto; background-color: #f8f9fa;">
-                {% if countries %}
-                  {% for country in countries %}
-                  <div class="mb-2">
-                    <div class="form-check">
-                      <input 
-                        class="form-check-input" 
-                        type="checkbox" 
-                        name="countries" 
-                        value="{{ country.name }}" 
-                        id="create_country_{{ loop.index }}"
-                      >
-                      <label class="form-check-label p-0" for="create_country_{{ loop.index }}">
-                        <span class="fi fi-{{ country.display_name|get_country_code }} me-2"></span>
-                        <span>{{ country.display_name }}</span>
-                      </label>
-                    </div>
-                  </div>
-                  {% endfor %}
-                {% else %}
-                  <div class="text-muted text-center py-3">
-                    <i class="fas fa-info-circle me-2"></i>{{_('No hay países disponibles')}}
-                  </div>
-                {% endif %}
-              </div>
-              
-              <div class="form-text">
-                <i class="fas fa-info-circle me-1"></i>{{_('Seleccione los países a los que el usuario tendrá acceso')}}
-              </div>
-            </div>
+          <label for="role_id" class="form-label fw-semibold">
+            <i class="fas fa-user-tag me-2"></i>{{ form.role_id.label.text }}
+          </label>
+          {% if form.role_id.errors %}
+          {{ form.role_id(class="form-select is-invalid", id="role_id") }}
+          <div class="invalid-feedback">
+            {% for error in form.role_id.errors %}
+            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+            {% endfor %}
           </div>
+          {% else %}
+          {{ form.role_id(class="form-select", id="role_id") }}
+          {% endif %}
+          <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>{{_('Selecciona el rol del usuario en el sistema')}}
+          </div>
+        </div>
+
+        <!-- Nota sobre permisos -->
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          <strong>{{_('Nota:')}}</strong> 
+          {{_('Los países, módulos y permisos CRUD se asignan después de crear el usuario usando el botón')}} 
+          <i class="fas fa-shield-alt mx-1"></i><strong>{{_('Gestionar permisos')}}</strong>.
+        </div>
       </div>
       
           

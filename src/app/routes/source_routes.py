@@ -1,21 +1,30 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngSourceService
 from aclimate_v3_orm.enums import SourceType
 from aclimate_v3_orm.schemas import SourceCreate, SourceUpdate
 from app.forms.source_form import SourceForm
+from app.decorators.permissions import require_module_access
+from app.config.permissions import Module
 
 bp = Blueprint('source', __name__)
 source_service = MngSourceService()
 
 @bp.route('/source', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='read')
 def list_source():
+    can_create = current_user.has_module_access(Module.CONFIGURATION.value, 'create')
+    
     form = SourceForm()
     form.source_type.choices = [(SourceType.MANUAL.value, "Manual"), (SourceType.AUTOMATIC.value, "Automático")]
 
     if form.validate_on_submit():
+        if not can_create:
+            flash(_('No tienes permiso para crear fuentes.'), 'danger')
+            return redirect(url_for('source.list_source'))
+            
         new_source = SourceCreate(
             name=form.name.data,
             source_type=form.source_type.data,
@@ -26,11 +35,12 @@ def list_source():
         return redirect(url_for('source.list_source'))
 
     source_list = source_service.get_all()
-    return render_template('source/list.html', sources=source_list, form=form)
+    return render_template('source/list.html', sources=source_list, form=form, can_create=can_create)
 
 
 @bp.route('/source/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='update')
 def edit_source(id):
     source = source_service.get_by_id(id)
     if not source:
@@ -59,6 +69,7 @@ def edit_source(id):
 
 @bp.route('/source/delete/<int:id>')
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='delete')
 def delete_source(id):
     if not source_service.delete(id):
         flash(_('No se pudo deshabilitar.'), 'danger')
@@ -69,6 +80,7 @@ def delete_source(id):
 
 @bp.route('/source/reset/<int:id>')
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='update')
 def reset_source(id):
     source = source_service.get_by_id(id)
     if not source:
@@ -81,6 +93,7 @@ def reset_source(id):
 
 @bp.route('/source/bulk_action', methods=['POST'])
 @login_required
+@require_module_access(Module.CONFIGURATION, permission_type='delete')
 def bulk_action():
     ids = request.form.getlist('selected_ids')
     action = request.form.get('action')

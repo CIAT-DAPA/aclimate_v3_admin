@@ -3,6 +3,7 @@
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{ _('Locaciones') }}</h2>
+    {% if can_create %}
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
@@ -10,6 +11,7 @@
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
+    {% endif %}
   </div>
 
  <!-- Barra de búsqueda -->
@@ -51,12 +53,14 @@
     <form id="bulk-action-form" method="POST" action="{{ url_for('location.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        {% if current_user.has_module_access('geographic', 'delete') %}
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
           <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
         </button>
         <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
           <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
         </button>
+        {% endif %}
       </div>
       <table class="table table-hover align-middle">
         <thead class="table-light">
@@ -87,6 +91,7 @@
             <td class="searchable">{{ loc.admin_2.admin_1.country.name }}</td>
             <td>{{ _('Habilitado') if loc.enable else _('Deshabilitado') }}</td>
             <td class="text-end">
+              {% if current_user.has_module_access('geographic', 'update') %}
               <a
                 href="{{ url_for('location.edit_location', id=loc.id) }}"
                 class="btn btn-warning btn-sm me-2"
@@ -94,22 +99,27 @@
               >
                 <i class="fas fa-pen"></i>
               </a>
+              {% endif %}
               {% if loc.enable %}
-              <a
-                href="{{ url_for('location.delete_location', id=loc.id) }}"
-                class="btn btn-danger btn-sm"
-                title="{{ _('Deshabilitar') }}"
-              >
-                <i class="fas fa-trash"></i>
-              </a>
+                {% if current_user.has_module_access('geographic', 'delete') %}
+                <a
+                  href="{{ url_for('location.delete_location', id=loc.id) }}"
+                  class="btn btn-danger btn-sm"
+                  title="{{ _('Deshabilitar') }}"
+                >
+                  <i class="fas fa-trash"></i>
+                </a>
+                {% endif %}
               {% else %}
-              <a
-                href="{{ url_for('location.reset_location', id=loc.id) }}"
-                class="btn btn-success btn-sm"
-                title="{{ _('Recuperar') }}"
-              >
-                <i class="fas fa-undo"></i>
-              </a>
+                {% if current_user.has_module_access('geographic', 'delete') %}
+                <a
+                  href="{{ url_for('location.reset_location', id=loc.id) }}"
+                  class="btn btn-success btn-sm"
+                  title="{{ _('Recuperar') }}"
+                >
+                  <i class="fas fa-undo"></i>
+                </a>
+                {% endif %}
               {% endif %}
             </td>
           </tr>
@@ -129,6 +139,7 @@
   {% endif %}
 </div>
 
+{% if can_create %}
 <!-- Modal para agregar Locación -->
 <div
   class="modal fade"
@@ -369,6 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 </script>
+{% endif %}
 <!-- Incluye Leaflet.js -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="

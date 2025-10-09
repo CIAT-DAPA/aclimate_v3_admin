@@ -3,7 +3,6 @@ from flask_login import login_user, logout_user, current_user
 from flask_babel import _
 from app.models.User import User
 from app.services.oauth_service import OAuthService
-from app.services.user_service import UserService
 from app import login_manager
 from app.decorators import token_required
 import logging
@@ -71,21 +70,27 @@ def auth_callback():
         
         # Obtener información del usuario
         user_info = oauth_service.get_user_info(token_data)
+        print("user_info:", user_info)
         
         if not user_info:
             logger.error("Failed to get user information")
             flash(_('Failed to get user information'), 'error')
             return redirect(url_for('main.login'))
         
-        # Enriquecer información del usuario con roles desde la API
-        user_info_enriched = enrich_user_with_roles(token_data, user_info)
+        # Get Keycloak user ID
+        keycloak_id = user_info.get('sub')
+        if not keycloak_id:
+            logger.error("No 'sub' (user ID) found in Keycloak user info")
+            flash(_('Invalid user information'), 'error')
+            return redirect(url_for('main.login'))
         
-        # Autenticar usuario con información enriquecida
-        user = User.authenticate_oauth(token_data, user_info_enriched)
+        # Autenticar usuario con información de Keycloak
+        # Nota: El usuario debe existir en BD ya que se crea desde el panel admin
+        user = User.authenticate_oauth(token_data, user_info)
         
         if user:
             login_user(user)
-            logger.info(f"User {user.username} logged in successfully with roles: {user.roles}")
+            logger.info(f"User {user.username} logged in successfully")
             flash(_('Login successful!'), 'success')
             return redirect(url_for('main.home'))
         else:
@@ -97,118 +102,6 @@ def auth_callback():
         logger.error(f"Auth callback error: {e}")
         flash(_('Authentication error occurred'), 'error')
         return redirect(url_for('main.login'))
-
-def enrich_user_with_roles(token_data, user_info):
-    """
-    Enriquece la información del usuario con roles obtenidos de la API
-    ya que Keycloak no los incluye en el token/userinfo
-    """
-    try:
-        logger.info("Enriching user information with roles from API...")
-        
-        # Obtener user ID desde el user_info
-        user_id = (user_info.get('sub') or 
-                  user_info.get('id') or 
-                  user_info.get('preferred_username'))
-        
-        if not user_id:
-            logger.warning("Could not determine user ID for role enrichment")
-            return user_info
-        
-        logger.info(f"Enriching roles for user ID: {user_id}")
-        
-        # Guardar temporalmente el token en la sesión para que el UserService pueda usarlo
-        current_access_token = session.get('access_token')
-        session['access_token'] = token_data.get('access_token')
-        
-        try:
-            # Obtener información completa del usuario desde la API
-            user_service = UserService()
-            complete_user_data = user_service.get_by_id(user_id)
-            
-            logger.info(f"Retrieved complete user data from API: {complete_user_data}")
-            
-            # Extraer roles de diferentes fuentes en la respuesta de la API
-            api_roles = []
-            
-            # 1. Extraer del campo 'role_name' directo
-            role_name = complete_user_data.get('role_name')
-            if role_name:
-                api_roles.append(role_name)
-                logger.info(f"Found role from 'role_name': {role_name}")
-            
-            # 2. Extraer de 'client_roles' array
-            client_roles = complete_user_data.get('client_roles', [])
-            if client_roles:
-                logger.info(f"Processing client_roles: {client_roles}")
-                for role in client_roles:
-                    if isinstance(role, dict):
-                        role_name = role.get('name')
-                        if role_name and role_name not in api_roles:
-                            api_roles.append(role_name)
-                            logger.info(f"Found role from 'client_roles': {role_name}")
-                    elif isinstance(role, str):
-                        if role not in api_roles:
-                            api_roles.append(role)
-                            logger.info(f"Found role from 'client_roles' (string): {role}")
-            
-            # 3. Extraer de cualquier otro campo 'roles' si existe
-            roles_array = complete_user_data.get('roles', [])
-            if roles_array:
-                logger.info(f"Processing roles array: {roles_array}")
-                for role in roles_array:
-                    if isinstance(role, str) and role not in api_roles:
-                        api_roles.append(role)
-                        logger.info(f"Found role from 'roles' array: {role}")
-            
-            logger.info(f"Final extracted roles from API: {api_roles}")
-            
-            # Enriquecer user_info con los roles
-            enriched_user_info = user_info.copy()
-            
-            # Agregar roles en diferentes ubicaciones para compatibilidad
-            enriched_user_info['roles'] = api_roles
-            enriched_user_info['client_roles'] = client_roles
-            
-            # También agregar en realm_access para compatibilidad con el código existente
-            if 'realm_access' not in enriched_user_info:
-                enriched_user_info['realm_access'] = {}
-            enriched_user_info['realm_access']['roles'] = api_roles
-            
-            # Agregar campos adicionales del API para mayor información
-            enriched_user_info['role_name'] = complete_user_data.get('role_name')
-            enriched_user_info['role_id'] = complete_user_data.get('role_id')
-            
-            # Agregar información adicional del usuario si está disponible
-            if complete_user_data.get('first_name'):
-                enriched_user_info['given_name'] = complete_user_data.get('first_name')
-            if complete_user_data.get('last_name'):
-                enriched_user_info['family_name'] = complete_user_data.get('last_name')
-            if complete_user_data.get('email'):
-                enriched_user_info['email'] = complete_user_data.get('email')
-            if complete_user_data.get('username'):
-                enriched_user_info['preferred_username'] = complete_user_data.get('username')
-            
-            logger.info(f"Successfully enriched user info with roles: {api_roles}")
-            logger.info(f"Enriched user_info keys: {list(enriched_user_info.keys())}")
-            
-            return enriched_user_info
-            
-        except Exception as api_error:
-            logger.error(f"Error fetching user data from API: {api_error}")
-            # Si falla la llamada a la API, devolver la información original
-            return user_info
-            
-        finally:
-            # Restaurar el token anterior en la sesión
-            if current_access_token is not None:
-                session['access_token'] = current_access_token
-            elif 'access_token' in session:
-                del session['access_token']
-                
-    except Exception as e:
-        logger.error(f"Error in role enrichment: {e}")
-        return user_info
 
 @bp.route('/logout')
 @token_required

@@ -4,6 +4,7 @@ block content %}
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{_('Roles')}}</h2>
 
+    {% if can_create %}
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
@@ -11,6 +12,7 @@ block content %}
     >
       <i class="fas fa-plus"></i> {{_('Agregar')}}
     </button>
+    {% endif %}
   </div>
 
   <!-- Barra de búsqueda y filtros -->
@@ -47,6 +49,7 @@ block content %}
   </div>
 
   {% if roles %}
+  {% if current_user.has_module_access('user_management', 'delete') %}
   <form id="bulk-action-form" method="POST" action="{{ url_for('role.bulk_action') }}">
     <div class="mb-2">
       <input type="hidden" name="action" id="bulk-action-hidden" value="" />
@@ -54,48 +57,30 @@ block content %}
         <i class="fas fa-trash"></i> {{ _('Eliminar seleccionados') }}
       </button>
     </div>
+  {% endif %}
     <div id="rolesTableContainer" class="table-responsive">
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
+            {% if current_user.has_module_access('user_management', 'delete') %}
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            {% endif %}
             <th style="min-width: 180px">{{_('Nombre del Rol')}}</th>
-            <th style="min-width: 200px">{{_('Descripción')}}</th>
-            <!-- Columnas dinámicas para módulos -->
-            <th class="text-center module-header" title="{{_('Módulo Geográfico - Gestión de países, adm1, adm2 y localizaciones')}}" data-bs-toggle="tooltip">
-              <i class="fas fa-globe me-1"></i>
-              <div class="module-title">{{_('Módulo Geográfico')}}</div>
-            </th>
-            <th class="text-center module-header" title="{{_('Datos Climáticos - Gestión de datos climáticos')}}" data-bs-toggle="tooltip">
-              <i class="fas fa-cloud-sun me-1"></i>
-              <div class="module-title">{{_('Datos Climáticos')}}</div>
-            </th>
-            <th class="text-center module-header" title="{{_('Datos de Cultivos - Gestión de datos de cultivos')}}" data-bs-toggle="tooltip">
-              <i class="fas fa-seedling me-1"></i>
-              <div class="module-title">{{_('Datos de Cultivos')}}</div>
-            </th>
-            <th class="text-center module-header" title="{{_('Gestión de Usuarios - Administración de usuarios y roles del sistema')}}" data-bs-toggle="tooltip">
-              <i class="fas fa-users me-1"></i>
-              <div class="module-title">{{_('Gestión de Usuarios')}}</div>
-            </th>
+            <th style="min-width: 200px">{{_('Aplicación')}}</th>
+            {% if current_user.has_module_access('user_management', 'update') or current_user.has_module_access('user_management', 'delete') %}
             <th class="text-end" style="min-width: 120px">{{_('Acciones')}}</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody id="rolesTableBody">
           {% for role in roles %}
-          {% set role_modules = role.get('modules', []) %}
-          {% set module_values = role_modules | map(attribute='value') | list %}
-          {% set has_geographic = 'geographic' in module_values %}
-          {% set has_climate = 'climate_data' in module_values %}
-          {% set has_crop = 'crop_data' in module_values %}
-          {% set has_users = 'user_management' in module_values %}
-          
           <tr class="role-row" 
               data-rolename="{{ role.name|lower }}"
-              data-description="{{ (role.description or '')|lower }}"
-              data-search="{{ (role.name + ' ' + (role.description or ''))|lower }}"
+              data-app="{{ (role.app or '')|lower }}"
+              data-search="{{ (role.name + ' ' + (role.app or ''))|lower }}"
               data-role-id="{{ role.id }}"
               data-can-delete="{{ 'true' if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] else 'false' }}">
+            {% if current_user.has_module_access('user_management', 'delete') %}
             <td>
               {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
               <input type="checkbox" class="select-row" value="{{ role.id }}" data-rolename="{{ role.name }}" name="selected_ids"/>
@@ -103,6 +88,7 @@ block content %}
               <input type="checkbox" class="form-check-input" disabled title="{{_('No se puede seleccionar este rol del sistema')}}" />
               {% endif %}
             </td>
+            {% endif %}
             <td>
               <div class="d-flex align-items-center">
                 <div class="role-icon me-2">
@@ -119,82 +105,30 @@ block content %}
                   {% endif %}
                 </div>
                 <div>
-                  <strong class="searchable-rolename">{{ role.display_name }}</strong>
+                  <strong class="searchable-rolename">{{ role.name }}</strong>
                   <br />
-                  <small class="text-muted">ID: {{ role.id[:8] }}...</small>
+                  <small class="text-muted">ID: {{ role.id }}</small>
                 </div>
               </div>
             </td>
             <td>
-              {% if role.description %}
-              <span class="searchable-description">{{ role.description }}</span>
-              {% else %}
-              <span class="text-muted fst-italic">{{_('Sin descripción')}}</span>
-              {% endif %}
+              <span class="badge bg-primary">{{ role.app }}</span>
             </td>
             
-            <!-- Columna Módulo Geográfico -->
-            <td class="text-center">
-              {% if has_geographic %}
-                <span class="access-indicator access-granted">
-                  <i class="fas fa-check-circle text-success"></i>
-                </span>
-              {% else %}
-                <span class="access-indicator access-denied" >
-                  <i class="fas fa-times-circle text-danger"></i>
-                </span>
-              {% endif %}
-            </td>
-            
-            <!-- Columna Datos Climáticos -->
-            <td class="text-center">
-              {% if has_climate %}
-                <span class="access-indicator access-granted" >
-                  <i class="fas fa-check-circle text-success"></i>
-                </span>
-              {% else %}
-                <span class="access-indicator access-denied">
-                  <i class="fas fa-times-circle text-danger"></i>
-                </span>
-              {% endif %}
-            </td>
-            
-            <!-- Columna Datos de Cultivos -->
-            <td class="text-center">
-              {% if has_crop %}
-                <span class="access-indicator access-granted" >
-                  <i class="fas fa-check-circle text-success"></i>
-                </span>
-              {% else %}
-                <span class="access-indicator access-denied" >
-                  <i class="fas fa-times-circle text-danger"></i>
-                </span>
-              {% endif %}
-            </td>
-            
-            <!-- Columna Gestión de Usuarios -->
-            <td class="text-center">
-              {% if has_users %}
-                <span class="access-indicator access-granted" >
-                  <i class="fas fa-check-circle text-success"></i>
-                </span>
-              {% else %}
-                <span class="access-indicator access-denied" >
-                  <i class="fas fa-times-circle text-danger"></i>
-                </span>
-              {% endif %}
-            </td>
-            
+            {% if current_user.has_module_access('user_management', 'update') or current_user.has_module_access('user_management', 'delete') %}
             <td class="text-end">
                 <!-- Botón para editar módulos (enlace a página separada) -->
+                {% if current_user.has_module_access('user_management', 'update') %}
                 <a
                   href="{{ url_for('role.edit_role', role_name=role.name) }}"
                   class="btn btn-warning btn-sm me-1"
                 >
                   <i class="fas fa-pen"></i>
                 </a>
+                {% endif %}
                 
                 <!-- Botón para eliminar rol -->
+                {% if current_user.has_module_access('user_management', 'delete') %}
                 {% if not role.name.lower() in ['admin', 'super-admin', 'system', 'adminsuper'] %}
                 <button 
                   type="button"
@@ -204,7 +138,6 @@ block content %}
                   data-bs-target="#deleteRolModal"
                   data-role-id="{{ role.id }}"
                   data-rolename="{{ role.name }}"
-                  data-role-description="{{ role.description or 'Sin descripción' }}"
                 >
                   <i class="fas fa-trash"></i>
                 </button>
@@ -217,13 +150,17 @@ block content %}
                   <i class="fas fa-shield-alt"></i>
                 </button>
                 {% endif %}
+                {% endif %}
             </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+  {% if current_user.has_module_access('user_management', 'delete') %}
   </form>
+  {% endif %}
   <!-- Mensaje cuando no hay resultados de búsqueda -->
   <div id="noSearchResults" class="alert alert-warning mt-4" style="display: none;">
     <i class="fas fa-search"></i>
@@ -282,76 +219,8 @@ block content %}
           </div>
         </div>
 
-        <div class="mb-3">
-          <label for="description" class="form-label fw-semibold">
-            <i class="fas fa-align-left me-2"></i>{{ form.description.label.text }}
-          </label>
-          {% if form.description.errors %}
-          {{ form.description(class="form-control is-invalid", id="description", placeholder=_('Describe las funciones de este rol'), rows="3") }}
-          <div class="invalid-feedback">
-            {% for error in form.description.errors %}
-            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-            {% endfor %}
-          </div>
-          {% else %}
-          {{ form.description(class="form-control", id="description", placeholder=_('Describe las funciones de este rol'), rows="3") }}
-          {% endif %}
-        </div>
-
-        <!-- Sección de módulos -->
-        <div class="mb-3">
-          <label class="form-label fw-semibold">
-            <i class="fas fa-puzzle-piece me-2"></i>{{_('Módulos de Acceso')}}
-          </label>
-          {% if form.modules.errors %}
-          <div class="alert alert-danger">
-            {% for error in form.modules.errors %}
-            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-            {% endfor %}
-          </div>
-          {% endif %}
-          
-                    <div class="modules-simple-list">
-            {% for value, label_info in form.modules.choices %}
-              {% set parts = label_info.split(' - ') %}
-              {% set module_name = parts[0] %}
-              {% set module_description = parts[1] if parts|length > 1 else '' %}
-              <div class="form-check mb-3 px-4 py-3 border rounded">
-                <input class="form-check-input" type="checkbox" 
-                       value="{{ value }}" 
-                       id="module_{{ value }}" 
-                       name="modules"
-                       {% if value in (form.modules.data or []) %}checked{% endif %}>
-                <label class="form-check-label w-100" for="module_{{ value }}">
-                  <div class="d-flex align-items-start">
-                    <div class="me-3 mt-1">
-                      {% if value == 'geographic' %}
-                        <i class="fas fa-globe fs-5"></i>
-                      {% elif value == 'climate_data' %}
-                        <i class="fas fa-cloud-sun fs-5"></i>
-                      {% elif value == 'crop_data' %}
-                        <i class="fas fa-seedling fs-5"></i>
-                      {% elif value == 'user_management' %}
-                        <i class="fas fa-users fs-5"></i>
-                      {% else %}
-                        <i class="fas fa-puzzle-piece fs-5"></i>
-                      {% endif %}
-                    </div>
-                    <div class="flex-grow-1">
-                      <div class="fw-semibold text-dark mb-1">{{ module_name }}</div>
-                      {% if module_description %}
-                        <div class="text-muted small">{{ module_description }}</div>
-                      {% endif %}
-                    </div>
-                  </div>
-                </label>
-              </div>
-            {% endfor %}
-          </div>
-          
-          <div class="form-text">
-            <i class="fas fa-info-circle me-1"></i>{{_('Selecciona los módulos a los que este rol tendrá acceso.')}}
-          </div>
+        <div class="form-text">
+          <i class="fas fa-info-circle me-1"></i>{{_('El rol se creará para la aplicación aclimate_admin. Los módulos se asignan por usuario y país.')}}
         </div>
       </div>
       <div class="modal-footer">
@@ -391,12 +260,9 @@ block content %}
         <p class="text-start mb-3">
           {{_('¿Está seguro de que desea eliminar el rol')}} <strong class="deleteRolName"></strong>?
         </p>
-        <div class="mb-3">
-          <strong>{{_('Información del rol:')}}</strong>
-          <ul class="list-unstyled mt-2">
-            <li><i class="fas fa-user me-2"></i><strong>{{_('Rol:')}} </strong><span class="deleteRolName"></span></li>
-            <li><i class="fas fa-id-card me-2"></i><strong>{{_('Descripcion:')}} </strong><span id="deleteRolDescription"></span></li>
-          </ul>
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{_('Esta acción no se puede deshacer. Se eliminarán todos los permisos asociados a este rol.')}}
         </div>
       </div>
       <div class="modal-footer">
@@ -634,15 +500,12 @@ document.addEventListener('DOMContentLoaded', function() {
       const button = event.relatedTarget;
       const roleId = button.getAttribute('data-role-id');
       const roleName = button.getAttribute('data-rolename');
-      const roleDescription = button.getAttribute('data-role-description');
       
       const modalRoleName = deleteModal.querySelectorAll('.deleteRolName');
-      const modalRoleDescription = deleteModal.querySelector('#deleteRolDescription');
       const deleteForm = deleteModal.querySelector('#deleteRoleForm');
       const roleNameInput = deleteModal.querySelector('input[name="role_name"]');
       
       modalRoleName.forEach(el => el.textContent = roleName);
-      modalRoleDescription.textContent = roleDescription;
       roleNameInput.value = roleName;
       
       // Actualizar la URL del formulario con el ID del rol
@@ -660,7 +523,6 @@ window.translations = {
     roles: "{{_('roles')}}",
     of: "{{_('de')}}",
     total: "{{_('Total')}}",
-    noDescription: "{{_('Sin descripción')}}",
     search: "{{_('Buscar')}}",
     clear: "{{_('Limpiar búsqueda')}}",
     selectAll: "{{_('Seleccionar todos')}}",

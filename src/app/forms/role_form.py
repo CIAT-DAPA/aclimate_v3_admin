@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_babel import lazy_gettext as _l
 from wtforms import StringField, TextAreaField, SelectMultipleField, widgets, SubmitField
 from wtforms.validators import DataRequired, Length
-from app.config.permissions import Module, RolePermissionMapper
+from app.config.permissions import get_modules_info
 
 class MultiCheckboxField(SelectMultipleField):
     """Campo personalizado para múltiples checkboxes"""
@@ -17,30 +17,12 @@ class RoleForm(FlaskForm):
                       ],
                       render_kw={"placeholder": _l("Ej: Editor, Administrador, Visualizador")})
     
-    description = TextAreaField(_l('Descripción'),
-                               validators=[
-                                   Length(max=255, message=_l('La descripción no puede exceder 255 caracteres'))
-                               ],
-                               render_kw={
-                                   "placeholder": _l("Describe las responsabilidades de este rol..."),
-                                   "rows": 3
-                               })
-    
-    modules = MultiCheckboxField(_l('Módulos de Acceso'),
-                                validators=[
-                                    DataRequired(message=_l('Debe seleccionar al menos un módulo'))
-                                ],
-                                choices=[],  # Se llenará dinámicamente
-                                coerce=str)
+    # NOTA: 'description' y 'modules' eliminados del formulario
+    # Los permisos ahora se manejan en user_access (por usuario, país y módulo)
+    # No se asignan módulos directamente a roles
     
     def __init__(self, *args, **kwargs):
         super(RoleForm, self).__init__(*args, **kwargs)
-        # Llenar choices de módulos dinámicamente
-        modules_info = RolePermissionMapper.get_modules_info()
-        self.modules.choices = [
-            (module_value, f"{info['name']} - {info['description']}")
-            for module_value, info in modules_info.items()
-        ]
     
 class RoleEditForm(FlaskForm):
     """Formulario para editar roles existentes - solo módulos"""
@@ -57,8 +39,8 @@ class RoleEditForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(RoleEditForm, self).__init__(*args, **kwargs)
-        # Llenar choices de módulos dinámicamente
-        modules_info = RolePermissionMapper.get_modules_info()
+        # Llenar choices de módulos dinámicamente con información descriptiva
+        modules_info = get_modules_info()
         self.modules.choices = [
             (module_value, f"{info['name']} - {info['description']}")
             for module_value, info in modules_info.items()

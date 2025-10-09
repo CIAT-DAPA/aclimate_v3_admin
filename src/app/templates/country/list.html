@@ -4,6 +4,7 @@ block content %}
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{_('Países')}}</h2>
 
+    {% if can_create %}
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
@@ -11,6 +12,7 @@ block content %}
     >
       <i class="fas fa-plus"></i> {{_('Agregar')}}
     </button>
+    {% endif %}
   </div>
 
   <!-- Barra de búsqueda -->
@@ -53,12 +55,14 @@ block content %}
     <form id="bulk-action-form" method="POST" action="{{ url_for('country.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        {% if current_user.has_module_access('geographic', 'delete') %}
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
           <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
         </button>
         <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
           <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
         </button>
+        {% endif %}
       </div>
     <table class="table table-hover align-middle">
       <thead class="table-light">
@@ -78,6 +82,7 @@ block content %}
           <td class="searchable">{{ c.iso2 }}</td>
           <td>{{ _('Habilitado') if c.enable else _('Deshabilitado') }}</td>
           <td class="text-end">
+            {% if current_user.has_module_access('geographic', 'update') %}
             <a
               href="{{ url_for('country.edit_country', id=c.id) }}"
               class="btn btn-warning btn-sm me-2"
@@ -85,22 +90,27 @@ block content %}
             >
               <i class="fas fa-pen"></i>
             </a>
+            {% endif %}
             {% if c.enable %}
-            <a
-              href="{{ url_for('country.delete_country', id=c.id) }}"
-              class="btn btn-danger btn-sm"
-              title="Eliminar"
-            >
-              <i class="fas fa-trash"></i>
-            </a>
+              {% if current_user.has_module_access('geographic', 'delete') %}
+              <a
+                href="{{ url_for('country.delete_country', id=c.id) }}"
+                class="btn btn-danger btn-sm"
+                title="Eliminar"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% endif %}
             {% else %}
-            <a
-              href="{{ url_for('country.reset_country', id=c.id) }}"
-              class="btn btn-success btn-sm"
-              title="Recuperar"
-            >
-              <i class="fas fa-undo"></i>
-            </a>
+              {% if current_user.has_module_access('geographic', 'delete') %}
+              <a
+                href="{{ url_for('country.reset_country', id=c.id) }}"
+                class="btn btn-success btn-sm"
+                title="Recuperar"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
             {% endif %}
           </td>
         </tr>
@@ -120,6 +130,7 @@ block content %}
   {% endif %}
 </div>
 
+{% if can_create %}
 <!-- Modal para agregar país -->
 <div
   class="modal fade"
@@ -169,6 +180,7 @@ block content %}
     </form>
   </div>
 </div>
+{% endif %}
 
 <!-- Script para llamar la búsqueda y acciones masivas -->
 <script type="module">
