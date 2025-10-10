@@ -123,7 +123,6 @@ def edit_location(id):
         location_service.update(id=id, obj_in=update_data)
         flash('Locación actualizada.', 'success')
         return redirect(url_for('location.list_location'))
-    print(form)
     return render_template('location/edit.html', form=form, loc=loc)
 
 # Ruta: Deshabilitar locacion
@@ -228,6 +227,9 @@ def import_location():
             
         if stats['adm2_created'] > 0:
             flash(f"✓ {stats['adm2_created']} división(es) administrativa(s) nivel 2 creada(s)", 'info')
+        
+        if stats['sources_created'] > 0:
+            flash(f"✓ {stats['sources_created']} fuente(s) de datos creada(s)", 'info')
         
         if stats['locations_skipped'] > 0:
             flash(f"⚠ {stats['locations_skipped']} locación(es) omitida(s)", 'warning')

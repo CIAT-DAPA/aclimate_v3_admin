@@ -12,7 +12,8 @@ from aclimate_v3_orm.services import (
     MngSourceService,
     MngCountryService
 )
-from aclimate_v3_orm.schemas import LocationCreate, Admin1Create, Admin2Create
+from aclimate_v3_orm.schemas import LocationCreate, Admin1Create, Admin2Create, SourceCreate
+from aclimate_v3_orm.enums import SourceType
 
 
 class LocationImportService:
@@ -48,6 +49,7 @@ class LocationImportService:
             'locations_skipped': 0,
             'adm1_created': 0,
             'adm2_created': 0,
+            'sources_created': 0,
             'errors': []
         }
         
@@ -127,12 +129,24 @@ class LocationImportService:
                         stats['locations_skipped'] += 1
                         continue
                     
-                    # Obtener o buscar source
+                    # Obtener o crear source
                     source_name = row['source_name'].strip()
-                    source_id = self._get_source_id(source_name, cache=source_cache)
+                    source_type = row.get('type_of_source', '').strip()
+                    source_id, error = self._get_or_create_source(
+                        name=source_name,
+                        source_type=source_type,
+                        cache=source_cache,
+                        stats=stats
+                    )
+                    
+                    # Si hay error con la fuente, omitir esta locación
+                    if error:
+                        stats['errors'].append(f"Fila {row_number}: {error}")
+                        stats['locations_skipped'] += 1
+                        continue
                     
                     if not source_id:
-                        stats['errors'].append(f"Fila {row_number}: Fuente '{source_name}' no encontrada")
+                        stats['errors'].append(f"Fila {row_number}: No se pudo obtener/crear fuente '{source_name}'")
                         stats['locations_skipped'] += 1
                         continue
                     
@@ -277,6 +291,53 @@ class LocationImportService:
         except Exception as e:
             current_app.logger.error(f"Error creando ADM2 '{name}': {e}")
             return None
+    
+    def _get_or_create_source(self, name: str, source_type: str, cache: Dict, stats: Dict) -> tuple:
+        """
+        Obtiene o crea una fuente de datos
+        
+        Returns:
+            tuple: (source_id, error_message) - error_message es None si no hay error
+        """
+        cache_key = (name, source_type)
+        
+        # Verificar cache
+        if cache_key in cache:
+            return (cache[cache_key], None)
+        
+        # Buscar fuente existente por nombre
+        sources = self.source_service.get_all()
+        for source in sources:
+            if source.name.upper() == name.upper():
+                cache[cache_key] = source.id
+                return (source.id, None)
+        
+        # Fuente no existe, validar tipo antes de crear
+        try:
+            source_type_enum = SourceType(source_type.upper())
+        except ValueError:
+            # Tipo inválido - retornar error
+            valid_types = ', '.join([st.value for st in SourceType])
+            error_msg = f"Tipo de fuente inválido '{source_type}'. Valores válidos: {valid_types}"
+            current_app.logger.error(f"Fuente '{name}': {error_msg}")
+            return (None, error_msg)
+        
+        # Crear fuente con tipo válido
+        try:
+            new_source = SourceCreate(
+                name=name,
+                source_type=source_type_enum,
+                enable=True
+            )
+            created = self.source_service.create(new_source)
+            stats['sources_created'] += 1
+            cache[cache_key] = created.id
+            current_app.logger.info(f"Fuente creada: {name} (tipo: {source_type_enum.value})")
+            return (created.id, None)
+        except Exception as e:
+            error_msg = f"Error creando fuente '{name}': {str(e)}"
+            current_app.logger.error(error_msg)
+            return (None, error_msg)
     
     def _get_source_id(self, source_name: str, cache: Dict) -> int:
         """Obtiene el ID de una fuente por nombre"""

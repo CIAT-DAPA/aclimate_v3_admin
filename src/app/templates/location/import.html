@@ -33,8 +33,10 @@
                         <li><strong>ext_id_level_1</strong>: {{ _('Código externo del departamento - Ej: 27 para Chocó (opcional)') }}</li>
                         <li><strong>admin_level_2</strong>: {{ _('Nombre de la división administrativa nivel 2 - Municipio (requerido)') }}</li>
                         <li><strong>ext_id_level_2</strong>: {{ _('Código externo del municipio - Ej: 27001 para Quibdó (opcional)') }}</li>
-                        <li><strong>source_name</strong>: {{ _('Nombre de la fuente de datos (debe existir previamente)') }}</li>
-                        <li><strong>type_of_source</strong>: {{ _('Tipo de fuente: MA (Manual), AU (Automática), SP (Espacial), PL (Pluviómetro), TP (Termopluviómetro)') }}</li>
+                        <li><strong>source_name</strong>: {{ _('Nombre de la fuente de datos') }}</li>
+                        <li><strong>type_of_source</strong>: {{ _('Tipo de fuente: MA (Manual), AU (Automática), SP (Espacial), PL (Pluviómetro), TP (Termopluviómetro)') }} 
+                            <span class="badge bg-danger">{{ _('REQUERIDO') }}</span>
+                        </li>
                     </ul>
                     
                     <div class="alert alert-warning mt-3">
@@ -42,9 +44,10 @@
                         <strong>{{ _('Nota importante:') }}</strong>
                         <ul class="mb-0 mt-2">
                             <li>{{ _('Si una división administrativa (ADM1 o ADM2) no existe, se creará automáticamente.') }}</li>
+                            <li>{{ _('Si una fuente de datos no existe, se creará automáticamente (solo si el tipo es válido).') }}</li>
                             <li>{{ _('El sistema buscará primero por código externo (ext_id), y si no lo encuentra, por nombre.') }}</li>
                             <li>{{ _('Las locaciones con ext_id duplicado serán omitidas.') }}</li>
-                            <li>{{ _('La fuente de datos debe existir en el sistema antes de importar.') }}</li>
+                            <li>{{ _('Si el type_of_source <strong>NO</strong> es válido, la fila completa será rechazada') }}</li>
                         </ul>
                     </div>
 
@@ -120,18 +123,25 @@
                                 <p class="mb-0">{{ _('Locaciones Creadas') }}</p>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="p-3 bg-info bg-opacity-10 rounded">
                                 <i class="fas fa-map fa-2x text-info mb-2"></i>
                                 <h3 class="text-info">{{ stats.adm1_created }}</h3>
-                                <p class="mb-0">{{ _('Departamentos Creados') }}</p>
+                                <p class="mb-0">{{ _('Departamentos') }}</p>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="p-3 bg-info bg-opacity-10 rounded">
                                 <i class="fas fa-map-marked fa-2x text-info mb-2"></i>
                                 <h3 class="text-info">{{ stats.adm2_created }}</h3>
-                                <p class="mb-0">{{ _('Municipios Creados') }}</p>
+                                <p class="mb-0">{{ _('Municipios') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="p-3 bg-primary bg-opacity-10 rounded">
+                                <i class="fas fa-database fa-2x text-primary mb-2"></i>
+                                <h3 class="text-primary">{{ stats.sources_created }}</h3>
+                                <p class="mb-0">{{ _('Fuentes Creadas') }}</p>
                             </div>
                         </div>
                         <div class="col-md-3">
