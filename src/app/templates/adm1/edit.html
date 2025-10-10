@@ -21,6 +21,15 @@ block content %}
     </div>
 
     <div class="mb-3">
+      {{ form.ext_id.label(class="form-label") }}
+      <small class="text-muted d-block">{{ form.ext_id.description }}</small>
+      {{ form.ext_id(class="form-control", placeholder=_('Ej: 27 para Chocó')) }}
+      {% for error in form.ext_id.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
       {{ form.country_id.label(class="form-label") }} {{
       form.country_id(class="form-select") }} {% for error in
       form.country_id.errors %}

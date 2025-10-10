@@ -102,14 +102,16 @@ class User(UserMixin):
         Check if user has access to a specific module with a specific permission
         
         Args:
-            module_value: Module enum value (e.g., 'geographic', 'crop_data')
+            module_value: Module enum value (e.g., 'geographic', 'GEOGRAPHIC', 'crop_data', 'CROP_DATA')
             permission_type: Type of permission ('create', 'read', 'update', 'delete')
         
         Returns:
             True if user has the specified permission for the module
         """
+        # Convertir a mayúsculas para comparación case-insensitive
+        module_value_upper = module_value.upper()
         for access in self.user_accesses:
-            if access.get('module') == module_value:
+            if access.get('module', '').upper() == module_value_upper:
                 return access.get(permission_type, False)
         return False
     
@@ -132,8 +134,10 @@ class User(UserMixin):
         Returns:
             Dict with 'create', 'read', 'update', 'delete' permissions
         """
+        # Convertir a mayúsculas para comparación case-insensitive
+        module_value_upper = module_value.upper()
         for access in self.user_accesses:
-            if access.get('module') == module_value:
+            if access.get('module', '').upper() == module_value_upper:
                 return {
                     'create': access.get('create', False),
                     'read': access.get('read', False),

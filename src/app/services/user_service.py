@@ -1,9 +1,12 @@
 from typing import List, Dict, Optional
 from flask import current_app, session
+from sqlalchemy.orm import joinedload
 from aclimate_v3_orm.services.user_service import UserService as ORMUserService
 from aclimate_v3_orm.services.user_access_service import UserAccessService
 from aclimate_v3_orm.services.role_service import RoleService as ORMRoleService
 from aclimate_v3_orm.schemas import UserRead, UserCreate, UserUpdate, UserAccessRead
+from aclimate_v3_orm.models import User, UserAccess
+from aclimate_v3_orm.database import get_db
 from app.services.keycloak_api_service import KeycloakAPIService
 
 class UserService:
@@ -63,16 +66,28 @@ class UserService:
     
     def get_all(self, enabled_only: bool = True) -> List[Dict]:
         """
-        Obtener todos los usuarios con información de Keycloak
+        Obtener todos los usuarios con información de Keycloak y relaciones cargadas
         
         Args:
             enabled_only: Si True, solo devuelve usuarios habilitados
         """
         try:
-            users = self.orm_service.get_all_enable(enabled=enabled_only)
+            # Usar query directa con joinedload para cargar las relaciones
+            with get_db() as db:
+                users = db.query(User).options(
+                    joinedload(User.role),
+                    joinedload(User.accesses).joinedload(UserAccess.country),
+                    joinedload(User.accesses).joinedload(UserAccess.role)
+                ).filter(
+                    User.enable == enabled_only
+                ).all()
+                
+                # Convertir a schemas
+                users_read = [UserRead.model_validate(user) for user in users]
+            
             normalized_users = []
             
-            for user in users:
+            for user in users_read:
                 user_dict = self._user_to_dict(user)
                 
                 # Enriquecer con datos de Keycloak
@@ -103,17 +118,59 @@ class UserService:
             return normalized_users
         except Exception as e:
             current_app.logger.error(f"Error getting users: {e}")
+            import traceback
+            traceback.print_exc()
             return []
     
     def get_by_id(self, user_id: int) -> Optional[Dict]:
-        """Obtener usuario por ID de base de datos"""
+        """Obtener usuario por ID de base de datos con información de Keycloak"""
         try:
-            user = self.orm_service.get_by_id(user_id)
-            if user:
-                return self._user_to_dict(user)
-            return None
+            # Usar query directa con joinedload para cargar las relaciones
+            with get_db() as db:
+                user = db.query(User).options(
+                    joinedload(User.role),
+                    joinedload(User.accesses).joinedload(UserAccess.country),
+                    joinedload(User.accesses).joinedload(UserAccess.role)
+                ).filter(
+                    User.id == user_id
+                ).first()
+                
+                if not user:
+                    return None
+                
+                # Convertir a schema
+                user_read = UserRead.model_validate(user)
+            
+            # Convertir a dict
+            user_dict = self._user_to_dict(user_read)
+            
+            # Enriquecer con datos de Keycloak
+            try:
+                keycloak_user = self.keycloak_api.get_user_by_id(user_read.keycloak_ext_id)
+                if keycloak_user:
+                    user_dict.update({
+                        'username': keycloak_user.get('username'),
+                        'email': keycloak_user.get('email'),
+                        'first_name': keycloak_user.get('firstName'),
+                        'last_name': keycloak_user.get('lastName'),
+                        'enabled': keycloak_user.get('enabled', True)
+                    })
+            except Exception as e:
+                current_app.logger.warning(f"Could not fetch Keycloak data for user {user_id}: {e}")
+                # Si no se puede obtener de Keycloak, poner valores por defecto
+                user_dict.update({
+                    'username': f'user_{user_id}',
+                    'email': None,
+                    'first_name': None,
+                    'last_name': None,
+                    'enabled': user_read.enable
+                })
+            
+            return user_dict
         except Exception as e:
             current_app.logger.error(f"Error getting user {user_id}: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def get_by_keycloak_id(self, keycloak_id: str) -> Optional[Dict]:

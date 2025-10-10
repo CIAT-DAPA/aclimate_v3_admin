@@ -31,6 +31,7 @@ def list_adm1():
             
         new_adm1 = Admin1Create(
             name=form.name.data,
+            ext_id=form.ext_id.data or '',
             country_id=form.country_id.data,
             enable=form.enable.data
         )
@@ -60,6 +61,7 @@ def edit_adm1(id):
     if form.validate_on_submit():
         update_data = Admin1Update(
             name=form.name.data,
+            ext_id=form.ext_id.data or '',
             country_id=form.country_id.data,
             enable=form.enable.data
         )
