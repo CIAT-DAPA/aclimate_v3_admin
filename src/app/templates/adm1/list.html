@@ -74,6 +74,7 @@
           <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
           {% endif %}
           <th>{{ _('Nombre') }}</th>
+          <th>{{ _('ID Externo') }}</th>
           <th>{{ _('País') }}</th>
           <th>{{ _('Estado') }}</th>
           <th class="text-end">{{ _('Acciones') }}</th>
@@ -87,6 +88,13 @@
           <td><input type="checkbox" name="selected_ids" value="{{ adm.id }}" class="select-row" /></td>
           {% endif %}
           <td class="searchable">{{ adm.name }}</td>
+          <td class="searchable">
+            {% if adm.ext_id %}
+              <span class="badge bg-info">{{ adm.ext_id }}</span>
+            {% else %}
+              <span class="text-muted fst-italic">{{ _('Sin ID') }}</span>
+            {% endif %}
+          </td>
           <td class="searchable">{{ adm.country.name }}</td>
           <td>{{ _('Habilitado') if adm.enable else _('Deshabilitado') }}</td>
           <td class="text-end">
@@ -165,6 +173,14 @@
         <div class="mb-3">
           {{ form.name.label(class="form-label") }} {{
           form.name(class="form-control") }} {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.ext_id.label(class="form-label") }}
+          <small class="text-muted d-block">{{ form.ext_id.description }}</small>
+          {{ form.ext_id(class="form-control", placeholder=_('Ej: 27 para Chocó')) }}
+          {% for error in form.ext_id.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>

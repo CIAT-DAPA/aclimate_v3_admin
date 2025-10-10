@@ -7,14 +7,14 @@ logger = logging.getLogger(__name__)
 
 class Module(Enum):
     """Módulos disponibles en la aplicación - debe coincidir con el enum en ORM"""
-    GEOGRAPHIC = "geographic"
-    CLIMATE_DATA = "climate_data"
-    CROP_DATA = "crop_data"
-    INDICATORS_DATA = "indicators_data"
-    STRESS_DATA = "stress_data"
-    PHENOLOGICAL_STAGE = "phenological_stage"
-    USER_MANAGEMENT = "user_management"
-    CONFIGURATION = "configuration"
+    GEOGRAPHIC = "GEOGRAPHIC"
+    CLIMATE_DATA = "CLIMATE_DATA"
+    CROP_DATA = "CROP_DATA"
+    INDICATORS_DATA = "INDICATORS_DATA"
+    STRESS_DATA = "STRESS_DATA"
+    PHENOLOGICAL_STAGE = "PHENOLOGICAL_STAGE"
+    USER_MANAGEMENT = "USER_MANAGEMENT"
+    CONFIGURATION = "CONFIGURATION"
 
 
 # Información de los módulos con nombres y descripciones

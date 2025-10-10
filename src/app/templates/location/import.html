@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Importar Locaciones') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>
+                    <i class="fas fa-file-import text-primary"></i>
+                    {{ _('Importar Locaciones desde CSV') }}
+                </h1>
+                <a href="{{ url_for('location.list_location') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> {{ _('Volver a Locaciones') }}
+                </a>
+            </div>
+
+            <!-- Instrucciones -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-info-circle"></i> {{ _('Instrucciones') }}
+                </div>
+                <div class="card-body">
+                    <h5>{{ _('Formato del archivo CSV') }}</h5>
+                    <p>{{ _('El archivo debe contener las siguientes columnas en este orden:') }}</p>
+                    <ul>
+                        <li><strong>ext_id</strong>: {{ _('Código externo de la locación (único, requerido)') }}</li>
+                        <li><strong>name</strong>: {{ _('Nombre de la locación (requerido)') }}</li>
+                        <li><strong>latitude</strong>: {{ _('Latitud en grados decimales (requerido)') }}</li>
+                        <li><strong>longitude</strong>: {{ _('Longitud en grados decimales (requerido)') }}</li>
+                        <li><strong>altitude</strong>: {{ _('Altitud en metros (requerido)') }}</li>
+                        <li><strong>admin_level_1</strong>: {{ _('Nombre de la división administrativa nivel 1 - Departamento (requerido)') }}</li>
+                        <li><strong>ext_id_level_1</strong>: {{ _('Código externo del departamento - Ej: 27 para Chocó (opcional)') }}</li>
+                        <li><strong>admin_level_2</strong>: {{ _('Nombre de la división administrativa nivel 2 - Municipio (requerido)') }}</li>
+                        <li><strong>ext_id_level_2</strong>: {{ _('Código externo del municipio - Ej: 27001 para Quibdó (opcional)') }}</li>
+                        <li><strong>source_name</strong>: {{ _('Nombre de la fuente de datos (debe existir previamente)') }}</li>
+                        <li><strong>type_of_source</strong>: {{ _('Tipo de fuente: MA (Manual), AU (Automática), SP (Espacial), PL (Pluviómetro), TP (Termopluviómetro)') }}</li>
+                    </ul>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>{{ _('Nota importante:') }}</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>{{ _('Si una división administrativa (ADM1 o ADM2) no existe, se creará automáticamente.') }}</li>
+                            <li>{{ _('El sistema buscará primero por código externo (ext_id), y si no lo encuentra, por nombre.') }}</li>
+                            <li>{{ _('Las locaciones con ext_id duplicado serán omitidas.') }}</li>
+                            <li>{{ _('La fuente de datos debe existir en el sistema antes de importar.') }}</li>
+                        </ul>
+                    </div>
+
+                    <h6 class="mt-3">{{ _('Ejemplo de formato CSV:') }}</h6>
+                    <pre class="bg-light p-3 rounded"><code>ext_id,name,latitude,longitude,altitude,admin_level_1,ext_id_level_1,admin_level_2,ext_id_level_2,source_name,type_of_source
+27001001,Estación Quibdó,5.6919,-76.6583,43,Chocó,27,Quibdó,27001,IDEAM,AU
+27001002,Estación Tutunendo,5.7633,-76.5317,80,Chocó,27,Quibdó,27001,IDEAM,AU</code></pre>
+                </div>
+            </div>
+
+            <!-- Formulario de importación -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-upload"></i> {{ _('Cargar Archivo CSV') }}
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.country_id.id }}" class="form-label">
+                                    {{ form.country_id.label.text }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.country_id(class="form-select" + (" is-invalid" if form.country_id.errors else "")) }}
+                                {% if form.country_id.description %}
+                                    <small class="form-text text-muted">{{ form.country_id.description }}</small>
+                                {% endif %}
+                                {% if form.country_id.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.country_id.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.csv_file.id }}" class="form-label">
+                                    {{ form.csv_file.label.text }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.csv_file(class="form-control" + (" is-invalid" if form.csv_file.errors else ""), accept=".csv") }}
+                                {% if form.csv_file.description %}
+                                    <small class="form-text text-muted">{{ form.csv_file.description }}</small>
+                                {% endif %}
+                                {% if form.csv_file.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.csv_file.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-upload"></i> {{ form.submit.label.text }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Resultados de la importación -->
+            {% if stats %}
+            <div class="card mt-4">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-chart-bar"></i> {{ _('Resultados de la Importación') }}
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="p-3 bg-success bg-opacity-10 rounded">
+                                <i class="fas fa-map-marker-alt fa-2x text-success mb-2"></i>
+                                <h3 class="text-success">{{ stats.locations_created }}</h3>
+                                <p class="mb-0">{{ _('Locaciones Creadas') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-info bg-opacity-10 rounded">
+                                <i class="fas fa-map fa-2x text-info mb-2"></i>
+                                <h3 class="text-info">{{ stats.adm1_created }}</h3>
+                                <p class="mb-0">{{ _('Departamentos Creados') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-info bg-opacity-10 rounded">
+                                <i class="fas fa-map-marked fa-2x text-info mb-2"></i>
+                                <h3 class="text-info">{{ stats.adm2_created }}</h3>
+                                <p class="mb-0">{{ _('Municipios Creados') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-warning bg-opacity-10 rounded">
+                                <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                <h3 class="text-warning">{{ stats.locations_skipped }}</h3>
+                                <p class="mb-0">{{ _('Locaciones Omitidas') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if stats.errors %}
+                    <div class="mt-4">
+                        <h5 class="text-danger">
+                            <i class="fas fa-times-circle"></i> {{ _('Errores Encontrados') }} ({{ stats.errors|length }})
+                        </h5>
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                {% for error in stats.errors[:10] %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                                {% if stats.errors|length > 10 %}
+                                    <li><em>{{ _('... y %(count)s error(es) más', count=(stats.errors|length - 10)) }}</em></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
