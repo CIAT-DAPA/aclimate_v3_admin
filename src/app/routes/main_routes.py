@@ -70,7 +70,6 @@ def auth_callback():
         
         # Obtener información del usuario
         user_info = oauth_service.get_user_info(token_data)
-        print("user_info:", user_info)
         
         if not user_info:
             logger.error("Failed to get user information")
