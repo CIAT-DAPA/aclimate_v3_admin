@@ -2,6 +2,11 @@
 # =============================================================================
 # Script para actualizar traducciones en Linux (Producción)
 # Uso: ./update_translations.sh
+# 
+# Modo: NO INTERACTIVO (apto para CI/CD pipelines)
+# - No pide confirmaciones
+# - Solo falla si hay errores CRÍTICOS
+# - Advertencias no detienen la ejecución
 # =============================================================================
 
 set -e  # Salir si hay error
@@ -55,7 +60,7 @@ echo ""
 # =============================================================================
 echo "✅ Paso 4/7: Validando traducciones..."
 if [ -f "validate_translations.py" ]; then
-    python validate_translations.py > validation_report.txt 2>&1 || true
+    python3 validate_translations.py > validation_report.txt 2>&1 || true
     
     # Contar errores y advertencias
     ERRORS=$(grep -c "❌ Errores:" validation_report.txt || echo "0")
@@ -73,31 +78,43 @@ fi
 echo ""
 
 # =============================================================================
-# 5. PREGUNTAR SI CONTINUAR
+# 5. CORRECCIÓN AUTOMÁTICA (SI HAY PROBLEMAS SOSPECHOSOS)
 # =============================================================================
-if [ $TOTAL_FUZZY -gt 0 ]; then
-    echo "⚠️  ¿Deseas continuar con la compilación?"
-    echo "   - Hay $TOTAL_FUZZY marcadores fuzzy que NO se compilarán"
-    echo "   - Revisa los archivos .po antes de continuar"
-    echo ""
-    read -p "Continuar? (s/n): " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[SsYy]$ ]]; then
-        echo "❌ Compilación cancelada"
-        echo ""
-        echo "Acciones sugeridas:"
-        echo "  1. Revisar marcadores fuzzy: grep -r '#, fuzzy' app/translations/"
-        echo "  2. Ejecutar script de corrección: python fix_fuzzy_translations.py"
-        echo "  3. Editar manualmente los archivos .po"
-        echo "  4. Volver a ejecutar este script"
-        exit 1
+echo "🔧 Paso 5/7: Verificando si hay problemas críticos..."
+
+# Contar traducciones sospechosas
+SUSPICIOUS_COUNT=$(grep -c "SUSPICIOUS_PATTERN" validation_report.txt 2>/dev/null || echo "0")
+
+if [ $SUSPICIOUS_COUNT -gt 0 ]; then
+    echo "   ⚠️  Detectados $SUSPICIOUS_COUNT patrones sospechosos"
+    
+    if [ -f "fix_suspicious_translations.py" ]; then
+        echo "   🔧 Aplicando correcciones automáticas..."
+        python3 fix_suspicious_translations.py > fix_report.txt 2>&1 || true
+        
+        # Verificar si se hicieron correcciones
+        CORRECTIONS=$(grep -c "traducciones corregidas" fix_report.txt 2>/dev/null || echo "0")
+        if [ "$CORRECTIONS" -gt 0 ]; then
+            echo "   ✅ Correcciones automáticas aplicadas"
+            echo "   📝 Ver detalles en: fix_report.txt"
+        fi
+    else
+        echo "   ⚠️  Script de corrección no encontrado (fix_suspicious_translations.py)"
+        echo "   ℹ️  Continuando con traducciones actuales..."
     fi
 fi
+
+# Advertir sobre fuzzy pero NO detener ejecución
+if [ $TOTAL_FUZZY -gt 0 ]; then
+    echo "   ⚠️  Hay $TOTAL_FUZZY marcadores fuzzy (no se compilarán)"
+    echo "   ℹ️  Continuando con compilación..."
+fi
+echo ""
 
 # =============================================================================
 # 6. COMPILAR TRADUCCIONES
 # =============================================================================
-echo "🔨 Paso 5/7: Compilando traducciones..."
+echo "🔨 Paso 6/7: Compilando traducciones..."
 pybabel compile -d app/translations
 echo "   ✅ Archivos .mo compilados"
 echo ""
@@ -105,7 +122,7 @@ echo ""
 # =============================================================================
 # 7. VERIFICAR ARCHIVOS .mo
 # =============================================================================
-echo "🔍 Paso 6/7: Verificando archivos compilados..."
+echo "🔍 Paso 7/7: Verificando archivos compilados..."
 if [ -f "app/translations/es_CO/LC_MESSAGES/messages.mo" ] && \
    [ -f "app/translations/es_GT/LC_MESSAGES/messages.mo" ] && \
    [ -f "app/translations/en_US/LC_MESSAGES/messages.mo" ]; then
@@ -135,26 +152,41 @@ echo ""
 echo "📊 Resumen:"
 echo "   - Textos extraídos: ✅"
 echo "   - Catálogos actualizados: ✅"
+echo "   - Traducciones sospechosas: $SUSPICIOUS_COUNT"
 echo "   - Marcadores fuzzy: $TOTAL_FUZZY"
 echo "   - Compilación: ✅"
 echo ""
-echo "🔄 Próximos pasos:"
-echo "   1. Reiniciar el servidor de aplicación"
-echo "      • systemctl restart tu-servicio"
-echo "      • supervisorctl restart tu-app"
-echo "      • O el comando correspondiente"
-echo ""
-echo "   2. Limpiar caché del navegador (Ctrl + Shift + R)"
-echo ""
-echo "   3. Probar las traducciones en la aplicación"
-echo ""
 
-if [ $TOTAL_FUZZY -gt 0 ]; then
-    echo "⚠️  Advertencia:"
-    echo "   - Hay $TOTAL_FUZZY traducciones fuzzy que NO se compilaron"
-    echo "   - Revisa validation_report.txt para más detalles"
-    echo "   - Ejecuta fix_fuzzy_translations.py para corregirlas"
+# Verificar si hay errores CRÍTICOS que deban detener el deployment
+CRITICAL_ERRORS=$(grep -c "❌ Errores:" validation_report.txt 2>/dev/null || echo "0")
+
+if [ "$CRITICAL_ERRORS" -gt 0 ]; then
+    echo "❌ ERRORES CRÍTICOS DETECTADOS"
+    echo "   Se encontraron $CRITICAL_ERRORS errores que deben corregirse"
+    echo "   Ver detalles en: validation_report.txt"
+    echo ""
+    echo "   Errores comunes:"
+    echo "   - Traducciones faltantes (msgstr vacío)"
+    echo "   - Placeholders incorrectos (%(variable)s)"
+    echo ""
+    exit 1  # FALLAR el pipeline si hay errores críticos
+fi
+
+# Advertencias no detienen el pipeline
+if [ $TOTAL_FUZZY -gt 0 ] || [ $SUSPICIOUS_COUNT -gt 0 ]; then
+    echo "⚠️  Advertencias (NO críticas):"
+    if [ $TOTAL_FUZZY -gt 0 ]; then
+        echo "   - $TOTAL_FUZZY marcadores fuzzy (traducciones no compiladas)"
+    fi
+    if [ $SUSPICIOUS_COUNT -gt 0 ]; then
+        echo "   - $SUSPICIOUS_COUNT patrones sospechosos detectados"
+    fi
+    echo "   📝 Ver detalles en: validation_report.txt"
+    echo "   ℹ️  Pipeline puede continuar (advertencias no son críticas)"
     echo ""
 fi
+
+echo "✅ Pipeline puede continuar - Traducciones compiladas exitosamente"
+echo ""
 
 echo "================================================================================"
