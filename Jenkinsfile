@@ -47,6 +47,24 @@ pipeline {
                 }
             }
         }
+        stage('Update Translations') {
+            steps {
+                script {
+                    try {
+                        sshCommand remote: remote, command: """
+                            cd /var/www/aclimate/aclimate_v3_admin/aclimate_v3_admin/
+                            source /opt/anaconda3/etc/profile.d/conda.sh
+                            conda activate /home/scalderon/.conda/envs/aclimate_v3_admin
+                            chmod +x update_translations.sh
+                            ./update_translations.sh
+                        """
+                    } catch (Exception e) {
+                        echo "Translations error: ${e.message}"
+                        error("Failed to update translations: ${e.message}")
+                    }
+                }
+            }
+        }
         stage('Restart API service') {
             steps {
                 script {
@@ -80,4 +98,4 @@ pipeline {
         }
     }
 }
- 
+
