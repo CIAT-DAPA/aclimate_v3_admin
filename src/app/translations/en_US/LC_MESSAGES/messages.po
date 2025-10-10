@@ -2035,13 +2035,13 @@ msgstr "External municipality code - E.g.: 27001 for Quibdó (optional)"
 
 #: app/templates/location/import.html:36
 msgid "Nombre de la fuente de datos"
-msgstr "No data sources registered."
+msgstr "Data source name"
 
 #: app/templates/location/import.html:37
 msgid ""
 "Tipo de fuente: MA (Manual), AU (Automática), SP (Espacial), PL "
 "(Pluviómetro), TP (Termopluviómetro)"
-msgstr "Data source name"
+msgstr "Source type: MA (Manual), AU (Automatic), SP (Spatial), PL (Pluviometer), TP (Thermopluviometer) (required)"
 
 #: app/templates/location/import.html:38
 msgid "REQUERIDO"
@@ -2055,19 +2055,19 @@ msgstr "Important note:"
 msgid ""
 "Si una división administrativa (ADM1 o ADM2) no existe, se creará "
 "automáticamente."
-msgstr "Important note:"
+msgstr "If an administrative division (ADM1 or ADM2) does not exist, it will be created automatically."
 
 #: app/templates/location/import.html:47
 msgid ""
 "Si una fuente de datos no existe, se creará automáticamente (solo si el "
 "tipo es válido)."
-msgstr "Important note:"
+msgstr "If a data source does not exist, it will be created automatically (only if the type is valid)."
 
 #: app/templates/location/import.html:48
 msgid ""
 "El sistema buscará primero por código externo (ext_id), y si no lo "
 "encuentra, por nombre."
-msgstr "Important note:"
+msgstr "The system will search first by external code (ext_id), and if not found, by name."
 
 #: app/templates/location/import.html:49
 msgid "Las locaciones con ext_id duplicado serán omitidas."
@@ -2077,7 +2077,7 @@ msgstr "Locations with duplicate ext_id will be skipped."
 msgid ""
 "Si el type_of_source <strong>NO</strong> es válido, la fila completa será"
 " rechazada"
-msgstr "Locations with duplicate ext_id will be skipped."
+msgstr "If the type_of_source is <strong>NOT</strong> valid, the entire row will be rejected"
 
 #: app/templates/location/import.html:54
 msgid "Ejemplo de formato CSV:"
