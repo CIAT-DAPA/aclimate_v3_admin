@@ -78,10 +78,29 @@ fi
 echo ""
 
 # =============================================================================
-# 5. CORRECCIÓN AUTOMÁTICA (SI HAY PROBLEMAS SOSPECHOSOS)
+# 5. CORRECCIÓN AUTOMÁTICA DE ERRORES CRÍTICOS
 # =============================================================================
-echo "🔧 Paso 5/7: Verificando si hay problemas críticos..."
+echo "🔧 Paso 5/7: Corrigiendo errores críticos..."
 
+# PRIMERO: Corregir errores críticos (fuzzy, vacíos, placeholders)
+if [ -f "fix_critical_errors.py" ]; then
+    echo "   🔧 Eliminando marcadores fuzzy y rellenando traducciones vacías..."
+    python3 fix_critical_errors.py > critical_fixes.txt 2>&1 || true
+    
+    # Verificar si se hicieron correcciones
+    CRITICAL_FIXES=$(grep -c "AUTO-FIXED" app/translations/*/LC_MESSAGES/messages.po 2>/dev/null || echo "0")
+    if [ "$CRITICAL_FIXES" -gt 0 ]; then
+        echo "   ✅ $CRITICAL_FIXES correcciones críticas aplicadas"
+        echo "   📝 Ver detalles en: critical_fixes.txt"
+        echo "   ⚠️  IMPORTANTE: Revisa las traducciones marcadas 'AUTO-FIXED' después del deploy"
+    fi
+else
+    echo "   ⚠️  Script de corrección crítica no encontrado (fix_critical_errors.py)"
+fi
+echo ""
+
+# SEGUNDO: Verificar patrones sospechosos
+echo "   🔍 Verificando patrones sospechosos..."
 # Contar traducciones sospechosas
 SUSPICIOUS_COUNT=$(grep -c "SUSPICIOUS_PATTERN" validation_report.txt 2>/dev/null || echo "0")
 
@@ -104,9 +123,15 @@ if [ $SUSPICIOUS_COUNT -gt 0 ]; then
     fi
 fi
 
-# Advertir sobre fuzzy pero NO detener ejecución
+# Re-contar fuzzy después de las correcciones
+FUZZY_COUNT_CO=$(grep -c "#, fuzzy" app/translations/es_CO/LC_MESSAGES/messages.po || true)
+FUZZY_COUNT_GT=$(grep -c "#, fuzzy" app/translations/es_GT/LC_MESSAGES/messages.po || true)
+FUZZY_COUNT_US=$(grep -c "#, fuzzy" app/translations/en_US/LC_MESSAGES/messages.po || true)
+TOTAL_FUZZY=$((FUZZY_COUNT_CO + FUZZY_COUNT_GT + FUZZY_COUNT_US))
+
+# Advertir sobre fuzzy restantes pero NO detener ejecución
 if [ $TOTAL_FUZZY -gt 0 ]; then
-    echo "   ⚠️  Hay $TOTAL_FUZZY marcadores fuzzy (no se compilarán)"
+    echo "   ⚠️  Aún quedan $TOTAL_FUZZY marcadores fuzzy (no se compilarán)"
     echo "   ℹ️  Continuando con compilación..."
 fi
 echo ""
@@ -163,7 +188,11 @@ CRITICAL_ERRORS=$(grep -c "❌ Errores:" validation_report.txt 2>/dev/null || ec
 if [ "$CRITICAL_ERRORS" -gt 0 ]; then
     echo "❌ ERRORES CRÍTICOS DETECTADOS"
     echo "   Se encontraron $CRITICAL_ERRORS errores que deben corregirse"
-    echo "   Ver detalles en: validation_report.txt"
+    echo ""
+    echo "   📋 DETALLES DE LOS ERRORES:"
+    echo "   =========================================="
+    cat validation_report.txt
+    echo "   =========================================="
     echo ""
     echo "   Errores comunes:"
     echo "   - Traducciones faltantes (msgstr vacío)"
