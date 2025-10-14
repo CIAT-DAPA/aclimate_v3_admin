@@ -1,0 +1,172 @@
+name: CI/CD AClimate V3 Admin
+
+on:
+  push:
+    branches: [ "stage", "main" ]
+  pull_request:
+    branches: [ "stage", "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+
+# ------- START BUILD AND TEST -------- #
+
+  build-and-validate:
+    name: Build and Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+
+      - name: Create virtual environment
+        run: |
+          python -m venv env
+          source env/bin/activate
+          python --version
+
+      - name: Install dependencies
+        run: |
+          source env/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate Python syntax
+        run: |
+          source env/bin/activate
+          python -m py_compile src/run.py
+          find src/app -name "*.py" -exec python -m py_compile {} \;
+
+      - name: Check for critical files
+        run: |
+          test -f src/run.py || (echo "Missing run.py" && exit 1)
+          test -f requirements.txt || (echo "Missing requirements.txt" && exit 1)
+          test -f src/config.py || (echo "Missing config.py" && exit 1)
+          echo "✓ All critical files present"
+
+# ------- END BUILD AND TEST -------- #
+
+# ------- START MERGE TO MAIN -------- #
+
+  merge-to-main:
+    name: Merge Stage to Main
+    needs: [build-and-validate]
+    if: github.ref == 'refs/heads/stage' && github.event_name == 'push'
+    permissions: write-all
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Merge stage -> main
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          head_to_merge: ${{ github.ref }}
+          target_branch: main
+          github_token: ${{ github.token }}
+
+# ------- END MERGE TO MAIN -------- #
+
+# ------- START RELEASE -------- #
+
+  create-release:
+    name: Create Release
+    needs: [build-and-validate]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions: write-all
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Prepare release artifact
+        run: |
+          # Crear directorio de release
+          mkdir -p release
+          
+          # Copiar archivos necesarios
+          cp -r src release/
+          cp requirements.txt release/
+          cp README.md release/
+          cp update_translations.sh release/
+          cp Jenkinsfile release/
+          
+          # Crear zip
+          cd release
+          zip -r ../aclimate_v3_admin.zip . -x "*.pyc" -x "*__pycache__*" -x "*.git*"
+          cd ..
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aclimate-v3-admin
+          path: aclimate_v3_admin.zip
+          retention-days: 90
+
+      - name: Generate tag name
+        id: tag_version
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DRY_RUN: true
+          DEFAULT_BUMP: patch
+          RELEASE_BRANCHES: main
+          INITIAL_VERSION: 3.0.0
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          release_name: AClimate V3 Admin ${{ steps.tag_version.outputs.new_tag }}
+          body: |
+            ## 🚀 Release ${{ steps.tag_version.outputs.new_tag }}
+            
+            ### Cambios
+            ${{ github.event.head_commit.message }}
+            
+            ### 📦 Instalación
+            1. Descargar `aclimate_v3_admin.zip`
+            2. Descomprimir en el servidor
+            3. Ejecutar `pip install -r requirements.txt`
+            4. Configurar variables de entorno (.env)
+            5. Ejecutar traducciones: `./update_translations.sh`
+            6. Iniciar: `gunicorn -w 4 -b 0.0.0.0:3003 run:app`
+            
+            Ver [README.md](https://github.com/CIAT-DAPA/aclimate_v3_admin/blob/main/README.md) para más detalles.
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./aclimate_v3_admin.zip
+          asset_name: aclimate_v3_admin.zip
+          asset_content_type: application/zip
+
+# ------- END RELEASE -------- #

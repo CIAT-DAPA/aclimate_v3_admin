@@ -1995,11 +1995,11 @@ msgstr "Formato del archivo CSV"
 
 #: app/templates/location/import.html:25
 msgid "El archivo debe contener las siguientes columnas en este orden:"
-msgstr ""
+msgstr "El archivo debe contener las siguientes columnas en este orden:"
 
 #: app/templates/location/import.html:27
 msgid "Código externo de la locación (único, requerido)"
-msgstr ""
+msgstr "Código externo de la locación (único, requerido)"
 
 #: app/templates/location/import.html:28
 msgid "Nombre de la locación (requerido)"
@@ -2007,15 +2007,15 @@ msgstr "Nombre de la locación (requerido)"
 
 #: app/templates/location/import.html:29
 msgid "Latitud en grados decimales (requerido)"
-msgstr ""
+msgstr "Latitud en grados decimales (requerido)"
 
 #: app/templates/location/import.html:30
 msgid "Longitud en grados decimales (requerido)"
-msgstr ""
+msgstr "Longitud en grados decimales (requerido)"
 
 #: app/templates/location/import.html:31
 msgid "Altitud en metros (requerido)"
-msgstr ""
+msgstr "Altitud en metros (requerido)"
 
 #: app/templates/location/import.html:32
 msgid "Nombre de la división administrativa nivel 1 - Departamento (requerido)"
@@ -2023,7 +2023,7 @@ msgstr "Nombre de la división administrativa nivel 1 - Departamento (requerido)
 
 #: app/templates/location/import.html:33
 msgid "Código externo del departamento - Ej: 27 para Chocó (opcional)"
-msgstr ""
+msgstr "Código externo del departamento - Ej: 27 para Chocó (opcional)"
 
 #: app/templates/location/import.html:34
 msgid "Nombre de la división administrativa nivel 2 - Municipio (requerido)"
@@ -2031,57 +2031,57 @@ msgstr "Nombre de la división administrativa nivel 2 - Municipio (requerido)"
 
 #: app/templates/location/import.html:35
 msgid "Código externo del municipio - Ej: 27001 para Quibdó (opcional)"
-msgstr ""
+msgstr "Código externo del municipio - Ej: 27001 para Quibdó (opcional)"
 
 #: app/templates/location/import.html:36
 msgid "Nombre de la fuente de datos"
-msgstr "No hay fuentes de datos registradas."
+msgstr "Nombre de la fuente de datos"
 
 #: app/templates/location/import.html:37
 msgid ""
 "Tipo de fuente: MA (Manual), AU (Automática), SP (Espacial), PL "
 "(Pluviómetro), TP (Termopluviómetro)"
-msgstr ""
+msgstr "Tipo de fuente: MA (Manual), AU (Automática), SP (Espacial), PL (Pluviómetro), TP (Termopluviómetro)"
 
 #: app/templates/location/import.html:38
 msgid "REQUERIDO"
-msgstr ""
+msgstr "REQUERIDO"
 
 #: app/templates/location/import.html:44
 msgid "Nota importante:"
-msgstr ""
+msgstr "Nota importante:"
 
 #: app/templates/location/import.html:46
 msgid ""
 "Si una división administrativa (ADM1 o ADM2) no existe, se creará "
 "automáticamente."
-msgstr ""
+msgstr "Si una división administrativa (ADM1 o ADM2) no existe, se creará automáticamente."
 
 #: app/templates/location/import.html:47
 msgid ""
 "Si una fuente de datos no existe, se creará automáticamente (solo si el "
 "tipo es válido)."
-msgstr ""
+msgstr "Si una fuente de datos no existe, se creará automáticamente (solo si el tipo es válido)."
 
 #: app/templates/location/import.html:48
 msgid ""
 "El sistema buscará primero por código externo (ext_id), y si no lo "
 "encuentra, por nombre."
-msgstr ""
+msgstr "El sistema buscará primero por código externo (ext_id), y si no lo encuentra, por nombre."
 
 #: app/templates/location/import.html:49
 msgid "Las locaciones con ext_id duplicado serán omitidas."
-msgstr ""
+msgstr "Las locaciones con ext_id duplicado serán omitidas."
 
 #: app/templates/location/import.html:50
 msgid ""
 "Si el type_of_source <strong>NO</strong> es válido, la fila completa será"
 " rechazada"
-msgstr ""
+msgstr "Si el type_of_source <strong>NO</strong> es válido, la fila completa será rechazada"
 
 #: app/templates/location/import.html:54
 msgid "Ejemplo de formato CSV:"
-msgstr ""
+msgstr "Ejemplo de formato CSV:"
 
 #: app/templates/location/import.html:64
 msgid "Cargar Archivo CSV"
@@ -2089,7 +2089,7 @@ msgstr "Cargar Archivo CSV"
 
 #: app/templates/location/import.html:115
 msgid "Resultados de la Importación"
-msgstr ""
+msgstr "Resultados de la Importación"
 
 #: app/templates/location/import.html:123
 msgid "Locaciones Creadas"
@@ -2101,11 +2101,11 @@ msgstr "Departamentos"
 
 #: app/templates/location/import.html:137
 msgid "Municipios"
-msgstr ""
+msgstr "Municipios"
 
 #: app/templates/location/import.html:144
 msgid "Fuentes Creadas"
-msgstr "Fuente reactivada."
+msgstr "Fuentes Creadas"
 
 #: app/templates/location/import.html:151
 msgid "Locaciones Omitidas"
@@ -2118,11 +2118,11 @@ msgstr "Errores Encontrados"
 #: app/templates/location/import.html:167
 #, python-format
 msgid "... y %(count)s error(es) más"
-msgstr ""
+msgstr "... y %(count)s error(es) más"
 
 #: app/templates/location/list.html:9
 msgid "Importar CSV"
-msgstr ""
+msgstr "Importar CSV"
 
 #: app/templates/location/list.html:76
 msgid "Locación"
