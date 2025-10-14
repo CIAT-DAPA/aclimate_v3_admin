@@ -79,27 +79,36 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Mapeo de rutas a secciones del sidebar
+    // IMPORTANTE: Rutas más específicas primero (ej: country_indicator antes de country)
     const routeSectionMap = {
+      // Geográfico
+      country_indicator: "configurationSection",  // Debe ir ANTES de country
       country: "geograficoSection",
       adm1: "geograficoSection",
       adm2: "geograficoSection",
       location: "geograficoSection",
+      // Clima
+      weather: "climaSection",
+      climate: "climaSection",
+      // Cultivos
+      phenological_stage: "cultivosSection",  // Debe ir antes que otros para evitar matches parciales
       crop: "cultivosSection",
       stress: "cultivosSection",
       cultivar: "cultivosSection",
       soil: "cultivosSection",
       season: "cultivosSection",
       setup: "cultivosSection",
-      phenological_stage: "cultivosSection",
       simulation: "cultivosSection",
       parameter: "cultivosSection",
-      weather: "climaSection",
-      climate: "climaSection",
+      // Indicadores
+      indicator_category: "indicatorsSection",  // Debe ir ANTES de indicator
+      indicator: "indicatorsSection",
+      // Usuarios
       user: "usuariosSection",
       role: "usuariosSection",
-      source: "configurationSection",
+      // Configuración
       data_source: "configurationSection",
-      indicator: "configurationSection",
+      source: "configurationSection",
     };
 
     for (const [route, section] of Object.entries(routeSectionMap)) {

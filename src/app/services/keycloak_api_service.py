@@ -14,6 +14,8 @@ class KeycloakAPIService:
     
     def __init__(self):
         self.api_base_url = None
+        self._service_token = None
+        self._service_token_expires_at = 0
     
     def _get_api_url(self) -> str:
         """Obtener la URL base de la API desde la configuración"""
@@ -27,6 +29,58 @@ class KeycloakAPIService:
             'Authorization': f'Bearer {token}',
             'Content-Type': 'application/json'
         }
+    
+    def _get_service_token(self) -> Optional[str]:
+        """
+        Obtener token de servicio usando client credentials
+        Cachea el token hasta que expire
+        """
+        import time
+        
+        # Si hay token cacheado y no ha expirado, usarlo
+        if self._service_token and time.time() < self._service_token_expires_at:
+            return self._service_token
+        
+        try:
+            # Obtener credenciales del cliente
+            keycloak_server = current_app.config.get('KEYCLOAK_SERVER_URL')
+            realm = current_app.config.get('KEYCLOAK_REALM')
+            client_id = current_app.config.get('KEYCLOAK_CLIENT_ID')
+            client_secret = current_app.config.get('KEYCLOAK_CLIENT_SECRET')
+            
+            logger.info(f"Requesting service token - Server: {keycloak_server}, Realm: {realm}, Client: {client_id}")
+            
+            token_url = f"{keycloak_server}/realms/{realm}/protocol/openid-connect/token"
+            
+            # Solicitar token usando client credentials
+            data = {
+                'grant_type': 'client_credentials',
+                'client_id': client_id,
+                'client_secret': client_secret
+            }
+            
+            response = requests.post(token_url, data=data, timeout=30)
+            
+            logger.info(f"Service token response: {response.status_code}")
+            
+            if response.status_code == 200:
+                token_data = response.json()
+                self._service_token = token_data['access_token']
+                # Guardar tiempo de expiración (con 60 segundos de margen)
+                expires_in = token_data.get('expires_in', 300)
+                self._service_token_expires_at = time.time() + expires_in - 60
+                
+                logger.info("Service token obtained successfully")
+                return self._service_token
+            else:
+                logger.error(f"Failed to get service token: {response.status_code} - {response.text}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error getting service token: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
     
     # ==================== USUARIOS ====================
     
@@ -203,6 +257,7 @@ class KeycloakAPIService:
     def get_user_by_id(self, user_id: str) -> Optional[Dict]:
         """
         Obtener información de un usuario de Keycloak por su ID
+        Llama directamente a la API Admin de Keycloak (solo para leer datos de los usuarios)
         
         Args:
             user_id: ID del usuario en Keycloak
@@ -211,28 +266,29 @@ class KeycloakAPIService:
             Dict con la información del usuario o None si no se encuentra
         """
         try:
-            # Necesitamos un token de admin para hacer esta consulta
-            # Por ahora usaremos el token del usuario actual de la sesión
-            from flask import session
-            token = session.get('access_token')
-            
-            if not token:
-                logger.warning("No access token available to get user from Keycloak")
+            # Usar token de servicio para consultar Keycloak directamente
+            service_token = self._get_service_token()
+                
+            if not service_token:
+                logger.warning("No service token available to get user from Keycloak")
                 return None
             
-            url = f"{self._get_api_url()}/users/get-user/{user_id}"
+            # Llamar directamente a la API Admin de Keycloak
+            keycloak_server = current_app.config.get('KEYCLOAK_SERVER_URL')
+            realm = current_app.config.get('KEYCLOAK_REALM')
+            url = f"{keycloak_server}/admin/realms/{realm}/users/{user_id}"
             
-            logger.info(f"Getting user from Keycloak: {user_id}")
+            logger.debug(f"Getting user from Keycloak Admin API: {user_id}")
             
             response = requests.get(
                 url,
-                headers=self._get_headers(token),
+                headers=self._get_headers(service_token),
                 timeout=30
             )
             
             if response.status_code == 200:
                 user = response.json()
-                logger.info(f"User retrieved from Keycloak: {user_id}")
+                logger.debug(f"User retrieved from Keycloak: {user_id}")
                 return user
             else:
                 logger.warning(f"Could not retrieve user {user_id}: {response.status_code} - {response.text}")
@@ -240,6 +296,8 @@ class KeycloakAPIService:
                 
         except Exception as e:
             logger.error(f"Error getting user from Keycloak: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def assign_role_to_user(self, token: str, user_id: str, role_id: str) -> bool:

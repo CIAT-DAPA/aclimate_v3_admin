@@ -32,6 +32,7 @@ def list_adm2():
             
         new_adm2 = Admin2Create(
             name=form.name.data,
+            ext_id=form.ext_id.data or '',
             admin_1_id=form.admin_1_id.data,
             visible=form.visible.data,
             enable=form.enable.data
@@ -83,6 +84,7 @@ def edit_adm2(id):
     if form.validate_on_submit():
         update_data = Admin2Update(
             name=form.name.data,
+            ext_id=form.ext_id.data or '',
             admin_1_id=form.admin_1_id.data,
             visible=form.visible.data,
             enable=form.enable.data

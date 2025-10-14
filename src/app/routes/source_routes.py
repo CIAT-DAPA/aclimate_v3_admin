@@ -18,7 +18,7 @@ def list_source():
     can_create = current_user.has_module_access(Module.CONFIGURATION.value, 'create')
     
     form = SourceForm()
-    form.source_type.choices = [(SourceType.MANUAL.value, "Manual"), (SourceType.AUTOMATIC.value, "Automático")]
+    form.source_type.choices = [(SourceType.MANUAL.value, "Manual"), (SourceType.AUTOMATIC.value, "Automático"), (SourceType.SPATIAL.value, "Espacial"), (SourceType.PLUVIOMETER.value, "Pluviómetro"), (SourceType.THERMOPLUVIOMETER.value, "Termopluviómetro")]
 
     if form.validate_on_submit():
         if not can_create:

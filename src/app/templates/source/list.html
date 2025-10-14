@@ -1,27 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}{{ _('Fuentes') }}{% endblock %}
 {% block content %}
-<div class="conta              {% else %}
-              <a
-                href="{{ url_for('source.reset_source', id=source.id) }}"
-                class="btn btn-success btn-sm"
-                title="Recuperar"
-              >
-                <i class="fas fa-undo"></i>
-              </a>
-              {% endif %}
-              {% endif %}
-            </td>
-            {% endif %}
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% if current_user.has_module_access('configuration', 'delete') %}
-    </form>
-    {% endif %}
-  </div>
-  <!-- Mensaje de contador de resultados -->style="margin-bottom: 100px">
+<div class="container-fluid" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{ _('Fuentes') }}</h2>
     {% if can_create %}
@@ -73,7 +53,7 @@
   {% if sources %}
   <div id="sourceTableContainer">
     {% if current_user.has_module_access('configuration', 'delete') %}
-    <form id="bulk-action-form" method="POST" action="{{ url_for('data_source.bulk_action') }}">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('source.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
@@ -143,12 +123,16 @@
                 <i class="fas fa-undo"></i>
               </a>
               {% endif %}
+              {% endif %}
             </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
       </table>
+    {% if current_user.has_module_access('configuration', 'delete') %}
     </form>
+    {% endif %}
   </div>
  <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">

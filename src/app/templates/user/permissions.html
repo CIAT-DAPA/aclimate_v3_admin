@@ -56,6 +56,61 @@
           data-bs-parent="#countriesAccordion"
         >
           <div class="accordion-body">
+            <!-- Botones de acciones masivas -->
+            <div class="mb-3 d-flex gap-2 flex-wrap">
+              <button 
+                type="button" 
+                class="btn btn-sm btn-outline-success"
+                onclick="toggleAllModules({{ country.id }}, true)"
+              >
+                <i class="fas fa-check-double me-1"></i>{{_('Activar Todos los Módulos')}}
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-outline-danger"
+                onclick="toggleAllModules({{ country.id }}, false)"
+              >
+                <i class="fas fa-times-circle me-1"></i>{{_('Desactivar Todos')}}
+              </button>
+              <div class="vr"></div>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-outline-primary"
+                onclick="toggleAllCRUD({{ country.id }}, 'create')"
+              >
+                <i class="fas fa-plus-circle me-1"></i>{{_('Marcar Todos: Crear')}}
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-outline-primary"
+                onclick="toggleAllCRUD({{ country.id }}, 'read')"
+              >
+                <i class="fas fa-eye me-1"></i>{{_('Marcar Todos: Leer')}}
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-outline-primary"
+                onclick="toggleAllCRUD({{ country.id }}, 'update')"
+              >
+                <i class="fas fa-edit me-1"></i>{{_('Marcar Todos: Actualizar')}}
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-outline-primary"
+                onclick="toggleAllCRUD({{ country.id }}, 'delete')"
+              >
+                <i class="fas fa-trash me-1"></i>{{_('Marcar Todos: Eliminar')}}
+              </button>
+              <div class="vr"></div>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-success"
+                onclick="setFullAccess({{ country.id }})"
+              >
+                <i class="fas fa-crown me-1"></i>{{_('Acceso Completo')}}
+              </button>
+            </div>
+
             <div class="table-responsive">
               <table class="table table-bordered">
                 <thead class="table-light">
@@ -191,5 +246,58 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+// Función para activar/desactivar todos los módulos de un país
+function toggleAllModules(countryId, enable) {
+  const moduleCheckboxes = document.querySelectorAll(
+    `.module-checkbox[data-country="${countryId}"]`
+  );
+  
+  moduleCheckboxes.forEach(checkbox => {
+    checkbox.checked = enable;
+    // Disparar evento change para actualizar los checkboxes CRUD
+    checkbox.dispatchEvent(new Event('change'));
+  });
+}
+
+// Función para marcar/desmarcar todos los permisos CRUD de un tipo específico
+function toggleAllCRUD(countryId, permission) {
+  // Primero, obtener todos los módulos activos
+  const activeModules = document.querySelectorAll(
+    `.module-checkbox[data-country="${countryId}"]:checked`
+  );
+  
+  activeModules.forEach(moduleCheckbox => {
+    const module = moduleCheckbox.dataset.module;
+    const crudCheckbox = document.querySelector(
+      `input[name="country_${countryId}_module_${module}_${permission}"]`
+    );
+    
+    if (crudCheckbox && !crudCheckbox.disabled) {
+      crudCheckbox.checked = !crudCheckbox.checked;
+    }
+  });
+}
+
+// Función para dar acceso completo (todos los módulos con todos los permisos CRUD)
+function setFullAccess(countryId) {
+  // Activar todos los módulos
+  toggleAllModules(countryId, true);
+  
+  // Esperar un momento para que se actualicen los estados
+  setTimeout(() => {
+    // Marcar todos los permisos CRUD
+    const permissions = ['create', 'read', 'update', 'delete'];
+    permissions.forEach(permission => {
+      const crudCheckboxes = document.querySelectorAll(
+        `input[name^="country_${countryId}_module_"][name$="_${permission}"]:not(:disabled)`
+      );
+      
+      crudCheckboxes.forEach(checkbox => {
+        checkbox.checked = true;
+      });
+    });
+  }, 100);
+}
 </script>
 {% endblock %}

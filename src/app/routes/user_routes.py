@@ -459,16 +459,16 @@ def manage_permissions(user_id):
                 'delete': access.delete,
             }
         
-        # Módulos disponibles
+        # Módulos disponibles (usar MAYUSCULAS para coincidir con el enum del ORM)
         available_modules = [
-            {'value': 'geographic', 'name': 'Módulo Geográfico', 'icon': 'fa-globe'},
-            {'value': 'climate_data', 'name': 'Datos Climáticos', 'icon': 'fa-cloud-sun'},
-            {'value': 'crop_data', 'name': 'Datos de Cultivos', 'icon': 'fa-seedling'},
-            {'value': 'stress_data', 'name': 'Datos de Estrés', 'icon': 'fa-exclamation-triangle'},
-            {'value': 'phenological_stage', 'name': 'Etapas Fenológicas', 'icon': 'fa-calendar-alt'},
-            {'value': 'indicators_data', 'name': 'Indicadores', 'icon': 'fa-chart-line'},
-            {'value': 'user_management', 'name': 'Gestión de Usuarios', 'icon': 'fa-users'},
-            {'value': 'configuration', 'name': 'Configuración', 'icon': 'fa-cog'},
+            {'value': 'GEOGRAPHIC', 'name': 'Módulo Geográfico', 'icon': 'fa-globe'},
+            {'value': 'CLIMATE_DATA', 'name': 'Datos Climáticos', 'icon': 'fa-cloud-sun'},
+            {'value': 'CROP_DATA', 'name': 'Datos de Cultivos', 'icon': 'fa-seedling'},
+            {'value': 'STRESS_DATA', 'name': 'Datos de Estrés', 'icon': 'fa-exclamation-triangle'},
+            {'value': 'PHENOLOGICAL_STAGE', 'name': 'Etapas Fenológicas', 'icon': 'fa-calendar-alt'},
+            {'value': 'INDICATORS_DATA', 'name': 'Indicadores', 'icon': 'fa-chart-line'},
+            {'value': 'USER_MANAGEMENT', 'name': 'Gestión de Usuarios', 'icon': 'fa-users'},
+            {'value': 'CONFIGURATION', 'name': 'Configuración', 'icon': 'fa-cog'},
         ]
         
         if request.method == 'POST':

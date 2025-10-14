@@ -3,8 +3,10 @@ from flask_login import login_required, current_user
 from aclimate_v3_orm.services import MngAdmin2Service, MngAdmin1Service, MngLocationService, MngCountryService, MngSourceService
 from aclimate_v3_orm.schemas import LocationCreate, LocationUpdate
 from app.forms.location_form import LocationForm
+from app.forms.location_import_form import LocationImportForm
 from app.decorators.permissions import require_module_access
 from app.config.permissions import Module
+from app.services.location_import_service import LocationImportService
 
 bp = Blueprint('location', __name__)
 country_service = MngCountryService()
@@ -121,7 +123,6 @@ def edit_location(id):
         location_service.update(id=id, obj_in=update_data)
         flash('Locación actualizada.', 'success')
         return redirect(url_for('location.list_location'))
-    print(form)
     return render_template('location/edit.html', form=form, loc=loc)
 
 # Ruta: Deshabilitar locacion
@@ -192,3 +193,54 @@ def bulk_action():
     else:
         flash('Acción no reconocida.', 'danger')
     return redirect(url_for('location.list_location'))
+
+
+# Ruta: Importar locaciones desde CSV
+@bp.route('/location/import', methods=['GET', 'POST'])
+@login_required
+@require_module_access(Module.GEOGRAPHIC, permission_type='create')
+def import_location():
+    form = LocationImportForm()
+    
+    # Obtener lista de países para el select
+    countries = country_service.get_all()
+    form.country_id.choices = [(c.id, c.name) for c in countries]
+    
+    if form.validate_on_submit():
+        # Leer el archivo
+        file = form.csv_file.data
+        file_content = file.read()
+        
+        # Importar usando el servicio
+        import_service = LocationImportService()
+        stats = import_service.import_from_csv(
+            file_content=file_content,
+            country_id=form.country_id.data
+        )
+        
+        # Mostrar resultados
+        if stats['locations_created'] > 0:
+            flash(f"✓ {stats['locations_created']} locación(es) creada(s)", 'success')
+        
+        if stats['adm1_created'] > 0:
+            flash(f"✓ {stats['adm1_created']} división(es) administrativa(s) nivel 1 creada(s)", 'info')
+            
+        if stats['adm2_created'] > 0:
+            flash(f"✓ {stats['adm2_created']} división(es) administrativa(s) nivel 2 creada(s)", 'info')
+        
+        if stats['sources_created'] > 0:
+            flash(f"✓ {stats['sources_created']} fuente(s) de datos creada(s)", 'info')
+        
+        if stats['locations_skipped'] > 0:
+            flash(f"⚠ {stats['locations_skipped']} locación(es) omitida(s)", 'warning')
+        
+        if stats['errors']:
+            flash(f"✗ {len(stats['errors'])} error(es) encontrado(s)", 'danger')
+            for error in stats['errors'][:10]:  # Mostrar solo los primeros 10 errores
+                flash(error, 'danger')
+            if len(stats['errors']) > 10:
+                flash(f"... y {len(stats['errors']) - 10} error(es) más", 'danger')
+        
+        return render_template('location/import.html', form=form, stats=stats)
+    
+    return render_template('location/import.html', form=form, stats=None)
