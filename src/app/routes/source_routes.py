@@ -28,7 +28,7 @@ def list_source():
         new_source = SourceCreate(
             name=form.name.data,
             source_type=form.source_type.data,
-            enable=form.enable.data
+            enable=True
         )
         source_service.create(new_source)
         flash(_('Fuente agregada correctamente.'), 'success')

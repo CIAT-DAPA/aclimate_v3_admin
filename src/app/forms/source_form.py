@@ -19,6 +19,6 @@ class SourceForm(FlaskForm):
         choices=[]  # Llena dinámicamente en la vista
     )
 
-    enable = BooleanField(_l('¿Está habilitado?'), default=True)
+    #enable = BooleanField(_l('¿Está habilitado?'), default=True)
 
     submit = SubmitField(_l('Guardar'))

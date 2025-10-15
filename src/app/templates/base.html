@@ -388,24 +388,21 @@
             {% else %}alert-primary{% endif %} 
             alert-dismissible fade show auto-dismiss-alert mb-2" 
           role="alert"
-          style="max-width: 300px;"
+          style="max-width: 400px; min-width: 300px;"
         >
-          <div
-            class="pe-4"
-            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
-          >
+          <div class="d-flex align-items-start pe-4">
             {% if category == 'error' %}
-              <i class="fas fa-exclamation-triangle me-2 flex-shrink-0"></i>
+              <i class="fas fa-exclamation-triangle me-2 flex-shrink-0 mt-1"></i>
             {% elif category == 'success' %}
-              <i class="fas fa-check-circle me-2 flex-shrink-0"></i>
+              <i class="fas fa-check-circle me-2 flex-shrink-0 mt-1"></i>
             {% elif category == 'info' %}
-              <i class="fas fa-info-circle me-2 flex-shrink-0"></i>
+              <i class="fas fa-info-circle me-2 flex-shrink-0 mt-1"></i>
             {% elif category == 'warning' %}
-              <i class="fas fa-exclamation-circle me-2 flex-shrink-0"></i>
+              <i class="fas fa-exclamation-circle me-2 flex-shrink-0 mt-1"></i>
             {% else %}
-              <i class="fas fa-bell me-2 flex-shrink-0"></i>
+              <i class="fas fa-bell me-2 flex-shrink-0 mt-1"></i>
             {% endif %}
-            <span style="overflow: hidden; text-overflow: ellipsis">
+            <span style="word-break: break-word;">
               {{ message }}
             </span>
           </div>
