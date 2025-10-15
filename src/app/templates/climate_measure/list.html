@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Variables Climáticas') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Variables Climáticas') }}</h2>
+    {% if can_create %}
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addMeasureModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="measureSearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="measureFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="measureFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="measureSearchResults" class="text-muted small"></span>
+  </div>
+
+  <!-- Contenedor para mensajes -->
+  <div id="noMeasureResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if measures %}
+  <div id="measureTableContainer">
+    {% if current_user.has_module_access('indicators_data', 'delete') %}
+    <form id="bulk-action-form" method="POST" action="{{ url_for('climate_measure.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionadas') }}
+        </button>
+        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionadas') }}
+        </button>
+      </div>
+    {% endif %}
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            {% if current_user.has_module_access('indicators_data', 'delete') %}
+            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            {% endif %}
+            <th>{{ _('Nombre') }}</th>
+            <th>{{ _('Nombre corto') }}</th>
+            <th>{{ _('Unidad') }}</th>
+            <th>{{ _('Descripción') }}</th>
+            <th>{{ _('Estado') }}</th>
+            {% if current_user.has_module_access('indicators_data', 'update') or current_user.has_module_access('indicators_data', 'delete') %}
+            <th class="text-end">{{ _('Acciones') }}</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody id="measureTableBody">
+          {% for m in measures %}
+          <tr 
+            data-status="{% if m.enable %}active{% else %}inactive{% endif %}"
+          >
+            {% if current_user.has_module_access('indicators_data', 'delete') %}
+            <td><input type="checkbox" name="selected_ids" value="{{ m.id }}" class="select-row" /></td>
+            {% endif %}
+            <td class="searchable">{{ m.name }}</td>
+            <td class="searchable">{{ m.short_name }}</td>
+            <td class="searchable">{{ m.unit }}</td>
+            <td class="searchable">{{ m.description or '' }}</td>
+            <td>
+              {{ _('Habilitada') if m.enable else _('Deshabilitada') }}
+            </td>
+            {% if current_user.has_module_access('indicators_data', 'update') or current_user.has_module_access('indicators_data', 'delete') %}
+            <td class="text-end">
+              {% if current_user.has_module_access('indicators_data', 'update') %}
+              <a
+                href="{{ url_for('climate_measure.edit_climate_measure', id=m.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="{{ _('Editar') }}"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% endif %}
+              {% if current_user.has_module_access('indicators_data', 'delete') %}
+              {% if m.enable %}
+              <a
+                href="{{ url_for('climate_measure.delete_climate_measure', id=m.id) }}"
+                class="btn btn-danger btn-sm"
+                title="{{ _('Deshabilitar') }}"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% else %}
+              <a
+                href="{{ url_for('climate_measure.reset_climate_measure', id=m.id) }}"
+                class="btn btn-success btn-sm"
+                title="{{ _('Recuperar') }}"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
+              {% endif %}
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% if current_user.has_module_access('indicators_data', 'delete') %}
+    </form>
+    {% endif %}
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="measureResultsCount"></span> {{ _('resultados') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay variables registradas.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Medida -->
+<div
+  class="modal fade"
+  id="addMeasureModal"
+  tabindex="-1"
+  aria-labelledby="addMeasureLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addMeasureLabel">
+          {{ _('Agregar medida climática') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Cerrar') }}"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control") }}
+          {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.short_name.label(class="form-label") }}
+          {{ form.short_name(class="form-control") }}
+          {% for error in form.short_name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.unit.label(class="form-label") }}
+          {{ form.unit(class="form-control") }}
+          {% for error in form.unit.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-control") }}
+          {% for error in form.description.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Script para búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración para búsqueda en variables climáticas
+    initTableSearch({
+      searchInputId: 'measureSearchInput',
+      filtersButtonId: 'measureFiltersButton',
+      tableContainerId: 'measureTableContainer',
+      noResultsId: 'noMeasureResults',
+      resultsCountId: 'measureResultsCount',
+      tableBodyId: 'measureTableBody',
+
+      searchColumns: [
+        { selector: '.searchable' }
+      ],
+      filterConfigs: [
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active'
+              ? '{{ _("Habilitada") }}'
+              : '{{ _("Deshabilitada") }}';
+          }
+        }
+      ]
+    });
+    // Configuración para acciones masivas
+    setupBulkActions({
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+{% endblock %}
