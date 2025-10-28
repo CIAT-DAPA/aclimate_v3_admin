@@ -40,7 +40,7 @@ class DataSourceForm(FlaskForm):
         ]
     )
 
-    enable = BooleanField(_l('¿Está habilitado?'), default=True)
+    #enable = BooleanField(_l('¿Está habilitado?'), default=True)
 
     template = SelectField(
         _l('Plantilla JSON'),

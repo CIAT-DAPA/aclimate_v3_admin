@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Fuentes') }}{% endblock %}
+{% block title %}{{ _('Variables Climáticas') }}{% endblock %}
 {% block content %}
-<div class="container-fluid" style="margin-bottom: 100px">
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ _('Fuentes') }}</h2>
+    <h2>{{ _('Variables Climáticas') }}</h2>
     {% if can_create %}
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
-      data-bs-target="#addSourceModal"
+      data-bs-target="#addMeasureModal"
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
@@ -20,7 +20,7 @@
     <input
       type="text"
       class="form-control me-2"
-      id="sourceSearchInput"
+      id="measureSearchInput"
       placeholder="{{ _('Buscar...') }}"
       style="max-width: 300px"
     />
@@ -28,7 +28,7 @@
       <button 
         class="btn btn-outline-secondary dropdown-toggle" 
         type="button" 
-        id="sourceFiltersButton" 
+        id="measureFiltersButton" 
         data-bs-toggle="dropdown" 
         data-bs-auto-close="outside"
         aria-expanded="false"
@@ -37,88 +37,88 @@
       >
         <i class="fas fa-filter"></i> {{ _('Filtros') }}
       </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sourceFiltersButton" style="min-width: 250px;">
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="measureFiltersButton" style="min-width: 250px;">
         <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
       </ul>
     </div>
-    <span id="sourceSearchResults" class="text-muted small"></span>
+    <span id="measureSearchResults" class="text-muted small"></span>
   </div>
 
-
   <!-- Contenedor para mensajes -->
-  <div id="noSourceResults" class="alert alert-info mt-4" style="display: none;">
+  <div id="noMeasureResults" class="alert alert-info mt-4" style="display: none;">
     {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
   </div>
 
-  {% if sources %}
-  <div id="sourceTableContainer">
-    {% if current_user.has_module_access('configuration', 'delete') %}
-    <form id="bulk-action-form" method="POST" action="{{ url_for('source.bulk_action') }}">
+  {% if measures %}
+  <div id="measureTableContainer">
+    {% if current_user.has_module_access('indicators_data', 'delete') %}
+    <form id="bulk-action-form" method="POST" action="{{ url_for('climate_measure.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
-          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionadas') }}
         </button>
         <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
-          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionadas') }}
         </button>
       </div>
     {% endif %}
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
-            {% if current_user.has_module_access('configuration', 'delete') %}
+            {% if current_user.has_module_access('indicators_data', 'delete') %}
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
             {% endif %}
             <th>{{ _('Nombre') }}</th>
-            <th>{{ _('Tipo de fuente') }}</th>
+            <th>{{ _('Nombre corto') }}</th>
+            <th>{{ _('Unidad') }}</th>
+            <th>{{ _('Descripción') }}</th>
             <th>{{ _('Estado') }}</th>
-            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
+            {% if current_user.has_module_access('indicators_data', 'update') or current_user.has_module_access('indicators_data', 'delete') %}
             <th class="text-end">{{ _('Acciones') }}</th>
             {% endif %}
           </tr>
         </thead>
-        <tbody id="sourceTableBody">
-          {% for source in sources %}
-          <tr data-type="{% if source.source_type == 'AU' %}Automático{% else %}Manual{% endif %}"
-              data-status="{% if source.enable %}active{% else %}inactive{% endif %}">
-            {% if current_user.has_module_access('configuration', 'delete') %}
-            <td><input type="checkbox" name="selected_ids" value="{{ source.id }}" class="select-row" /></td>
+        <tbody id="measureTableBody">
+          {% for m in measures %}
+          <tr 
+            data-status="{% if m.enable %}active{% else %}inactive{% endif %}"
+          >
+            {% if current_user.has_module_access('indicators_data', 'delete') %}
+            <td><input type="checkbox" name="selected_ids" value="{{ m.id }}" class="select-row" /></td>
             {% endif %}
-            <td class="searchable">{{ source.name }}</td>
-            <td class="searchable">
-              {% if source.source_type == 'AU' %}
-                Automático
-              {% else %}
-                Manual
-              {% endif %}
+            <td class="searchable">{{ m.name }}</td>
+            <td class="searchable">{{ m.short_name }}</td>
+            <td class="searchable">{{ m.unit }}</td>
+            <td class="searchable">{{ m.description or '' }}</td>
+            <td>
+              {{ _('Habilitada') if m.enable else _('Deshabilitada') }}
             </td>
-            <td>{{ 'Habilitado' if source.enable else 'Deshabilitado' }}</td>
-            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
+            {% if current_user.has_module_access('indicators_data', 'update') or current_user.has_module_access('indicators_data', 'delete') %}
             <td class="text-end">
-              {% if current_user.has_module_access('configuration', 'update') %}
+              {% if current_user.has_module_access('indicators_data', 'update') %}
               <a
-                href="{{ url_for('source.edit_source', id=source.id) }}"
+                href="{{ url_for('climate_measure.edit_climate_measure', id=m.id) }}"
                 class="btn btn-warning btn-sm me-2"
-                title="Editar"
+                title="{{ _('Editar') }}"
               >
                 <i class="fas fa-pen"></i>
               </a>
               {% endif %}
-              {% if current_user.has_module_access('configuration', 'delete') %}
-              {% if source.enable %}
+              {% if current_user.has_module_access('indicators_data', 'delete') %}
+              {% if m.enable %}
               <a
-                href="{{ url_for('source.delete_source', id=source.id) }}"
+                href="{{ url_for('climate_measure.delete_climate_measure', id=m.id) }}"
                 class="btn btn-danger btn-sm"
-                title="Deshabilitar"
+                title="{{ _('Deshabilitar') }}"
               >
                 <i class="fas fa-trash"></i>
               </a>
               {% else %}
               <a
-                href="{{ url_for('source.reset_source', id=source.id) }}"
+                href="{{ url_for('climate_measure.reset_climate_measure', id=m.id) }}"
                 class="btn btn-success btn-sm"
-                title="Recuperar"
+                title="{{ _('Recuperar') }}"
               >
                 <i class="fas fa-undo"></i>
               </a>
@@ -130,41 +130,41 @@
           {% endfor %}
         </tbody>
       </table>
-    {% if current_user.has_module_access('configuration', 'delete') %}
+    {% if current_user.has_module_access('indicators_data', 'delete') %}
     </form>
     {% endif %}
   </div>
- <!-- Mensaje de contador de resultados -->
+  <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">
-    {{ _('Mostrando') }} <span id="sourceResultsCount"></span> {{ _('resultado (s)') }}
+    {{ _('Mostrando') }} <span id="measureResultsCount"></span> {{ _('resultados') }}
   </div>
   {% else %}
   <div class="alert alert-info mt-4">
-    {{ _('No hay fuentes de datos registradas.') }}
+    {{ _('No hay variables registradas.') }}
   </div>
   {% endif %}
 </div>
 
-<!-- Modal para agregar Fuente -->
+<!-- Modal para agregar Medida -->
 <div
   class="modal fade"
-  id="addSourceModal"
+  id="addMeasureModal"
   tabindex="-1"
-  aria-labelledby="addSourceLabel"
+  aria-labelledby="addMeasureLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <form method="POST" class="modal-content">
       {{ form.hidden_tag() }}
       <div class="modal-header">
-        <h5 class="modal-title" id="addSourceLabel">
-          {{ _('Agregar fuente') }}
+        <h5 class="modal-title" id="addMeasureLabel">
+          {{ _('Agregar medida climática') }}
         </h5>
         <button
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Cerrar"
+          aria-label="{{ _('Cerrar') }}"
         ></button>
       </div>
       <div class="modal-body">
@@ -176,13 +176,26 @@
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.source_type.label(class="form-label") }}
-          {{ form.source_type(class="form-select") }}
-          {% for error in form.source_type.errors %}
+          {{ form.short_name.label(class="form-label") }}
+          {{ form.short_name(class="form-control") }}
+          {% for error in form.short_name.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
-      
+        <div class="mb-3">
+          {{ form.unit.label(class="form-label") }}
+          {{ form.unit(class="form-control") }}
+          {% for error in form.unit.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-control") }}
+          {% for error in form.description.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -193,48 +206,40 @@
     </form>
   </div>
 </div>
-<!-- Script para llamar la búsqueda y acciones masivas -->
+
+<!-- Script para búsqueda y acciones masivas -->
 <script type="module">
   import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
   import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
 
-
   document.addEventListener('DOMContentLoaded', function() {
-    // Configuración específica para locaciones
+    // Configuración para búsqueda en variables climáticas
     initTableSearch({
-      searchInputId: 'sourceSearchInput',
-      filtersButtonId: 'sourceFiltersButton',
-      tableContainerId: 'sourceTableContainer',
-      noResultsId: 'noSourceResults',
-      resultsCountId: 'sourceResultsCount',
-      tableBodyId: 'sourceTableBody',
+      searchInputId: 'measureSearchInput',
+      filtersButtonId: 'measureFiltersButton',
+      tableContainerId: 'measureTableContainer',
+      noResultsId: 'noMeasureResults',
+      resultsCountId: 'measureResultsCount',
+      tableBodyId: 'measureTableBody',
 
       searchColumns: [
-        { selector: '.searchable' } // Buscar en todas las celdas con clase 'searchable'
+        { selector: '.searchable' }
       ],
-      
       filterConfigs: [
-        {
-          name: 'type',
-          label: '{{ _("Tipo de fuente") }}',
-          getValue: row => row.dataset.type,
-          getDisplayValue: row => row.dataset.type
-        },
         {
           name: 'status',
           label: '{{ _("Estado") }}',
           getValue: row => row.dataset.status,
           getDisplayValue: row => {
-            return row.dataset.status === 'active' 
-              ? '{{ _("Habilitado") }}' 
-              : '{{ _("Deshabilitado") }}';
+            return row.dataset.status === 'active'
+              ? '{{ _("Habilitada") }}'
+              : '{{ _("Deshabilitada") }}';
           }
         }
       ]
     });
-    // Configuración para bulk actions
+    // Configuración para acciones masivas
     setupBulkActions({
-      // Puedes personalizar los IDs si son diferentes en otras páginas
       selectAllId: 'select-all',
       rowCheckboxClass: 'select-row',
       disableBtnId: 'bulk-disable',
@@ -245,5 +250,3 @@
   });
 </script>
 {% endblock %}
-
-

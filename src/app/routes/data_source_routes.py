@@ -26,18 +26,23 @@ def list_data_source():
             flash(_('No tienes permiso para crear fuentes de datos.'), 'danger')
             return redirect(url_for('data_source.list_data_source'))
             
-        new_source = DataSourceCreate(
-            country_id=form.country_id.data,
-            name=form.name.data,
-            description=form.description.data,
-            type=form.type.data,
-            enable=form.enable.data,
-            content=form.content.data
-        )
-        data_source_service.create(new_source)
-        form.template.data = ''
-        flash(_('Fuente de datos agregada correctamente.'), 'success')
-        return redirect(url_for('data_source.list_data_source'))
+        try:
+            new_source = DataSourceCreate(
+                country_id=form.country_id.data,
+                name=form.name.data,
+                description=form.description.data,
+                type=form.type.data,
+                enable=True,
+                content=form.content.data
+            )
+            data_source_service.create(new_source)
+            form.template.data = ''
+            flash(_('Fuente de datos agregada correctamente.'), 'success')
+            return redirect(url_for('data_source.list_data_source'))
+        except ValueError as e:
+            flash(str(e), 'danger')
+        except Exception as e:
+            flash(_('Error al crear la fuente de datos: %(error)s', error=str(e)), 'danger')
 
     data_source_list = data_source_service.get_all()
     return render_template('data_source/list.html', data_sources=data_source_list, form=form, can_create=can_create)
@@ -61,18 +66,23 @@ def edit_data_source(id):
         form.country_id.data = data_source.country_id
 
     if form.validate_on_submit():
-        update_data = DataSourceUpdate(
-            country_id=form.country_id.data,
-            name=form.name.data,
-            description=form.description.data,
-            type=form.type.data,
-            enable=form.enable.data,
-            content=form.content.data
-        )
+        try:
+            update_data = DataSourceUpdate(
+                country_id=form.country_id.data,
+                name=form.name.data,
+                description=form.description.data,
+                type=form.type.data,
+                enable=form.enable.data,
+                content=form.content.data
+            )
 
-        data_source_service.update(id=id, obj_in=update_data)
-        flash(_('Fuente actualizada.'), 'success')
-        return redirect(url_for('data_source.list_data_source'))
+            data_source_service.update(id=id, obj_in=update_data)
+            flash(_('Fuente actualizada.'), 'success')
+            return redirect(url_for('data_source.list_data_source'))
+        except ValueError as e:
+            flash(str(e), 'danger')
+        except Exception as e:
+            flash(_('Error al actualizar la fuente de datos: %(error)s', error=str(e)), 'danger')
 
     return render_template('data_source/edit.html', form=form, data_source=data_source)
 
