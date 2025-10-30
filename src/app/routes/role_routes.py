@@ -116,8 +116,8 @@ def delete_role(role_id):
         role_name = request.form.get('role_name')
         
         print(f"Intentando eliminar rol ID: {role_id}, Nombre: {role_name}")
-        
-        success = role_service.delete(role_id, role_name)
+        # El servicio de roles elimina por ID; el nombre solo se usa para logs
+        success = role_service.delete(role_id)
         
         if success:
             flash('Rol eliminado exitosamente de Keycloak y configuración local.', 'success')

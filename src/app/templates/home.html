@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}Dashboard - AClimate Admin{% endblock
+{% extends "base.html" %} {% block title %}Panel - AClimate Admin{% endblock
 %} {% block content %}
 <div class="container-fluid">
   <!-- Header Section -->
@@ -6,10 +6,10 @@
     <div class="col-12">
       <div class="bg-dark text-white rounded p-4 shadow">
         <h1 class="display-5 fw-bold mb-2">
-          <i class="fas fa-cloud-sun me-3"></i>{{_('AClimate Admin')}}
+          <i class="fas fa-cloud-sun me-3"></i>{{_('Administrador de AClimate')}}
         </h1>
         <p class="lead mb-0">
-          {{_('Manage all necessary AClimate parameters from this system, try any of the modules listed below.')}}
+          {{_('Administre todos los parámetros necesarios de AClimate desde este sistema. Pruebe cualquiera de los módulos listados abajo.')}}
         </p>
       </div>
     </div>
@@ -20,7 +20,7 @@
     <div class="col-12">
       <div class="d-flex align-items-center mb-3">
         <i class="fas fa-globe-americas text-primary me-2"></i>
-        <h4 class="fw-semibold mb-0">{{_('Geographic')}}</h4>
+  <h4 class="fw-semibold mb-0">{{_('Geográfico')}}</h4>
       </div>
       <div class="row g-3">
         <div class="col-lg-3 col-md-6">
@@ -36,9 +36,9 @@
                 >
                   <i class="fas fa-flag fa-lg text-primary"></i>
                 </div>
-                <h6 class="fw-semibold text-dark mb-3">{{_('Country')}}</h6>
+                <h6 class="fw-semibold text-dark mb-3">{{_('País')}}</h6>
                 <span class="btn btn-outline-primary btn-sm"
-                  >{{_('Manage')}}</span
+                  >{{_('Gestionar')}}</span
                 >
               </div>
             </div>
@@ -58,10 +58,10 @@
                   <i class="fas fa-sitemap fa-lg text-primary"></i>
                 </div>
                 <h6 class="fw-semibold text-dark mb-3">
-                  {{_('Administrative level 1')}}
+                  {{_('Nivel administrativo 1')}}
                 </h6>
                 <span class="btn btn-outline-primary btn-sm"
-                  >{{_('Manage')}}</span
+                  >{{_('Gestionar')}}</span
                 >
               </div>
             </div>
@@ -81,10 +81,10 @@
                   <i class="fas fa-layer-group fa-lg text-primary"></i>
                 </div>
                 <h6 class="fw-semibold text-dark mb-3">
-                  {{_('Administrative level 2')}}
+                  {{_('Nivel administrativo 2')}}
                 </h6>
                 <span class="btn btn-outline-primary btn-sm"
-                  >{{_('Manage')}}</span
+                  >{{_('Gestionar')}}</span
                 >
               </div>
             </div>
@@ -100,9 +100,9 @@
                 >
                   <i class="fas fa-map-marker-alt fa-lg text-primary"></i>
                 </div>
-                <h6 class="fw-semibold text-dark mb-3">{{_('Locations')}}</h6>
+                <h6 class="fw-semibold text-dark mb-3">{{_('Locaciones')}}</h6>
                 <span class="btn btn-outline-primary btn-sm"
-                  >{{_('Manage')}}</span
+                  >{{_('Gestionar')}}</span
                 >
               </div>
             </div>
@@ -117,7 +117,7 @@
     <div class="col-12">
       <div class="d-flex align-items-center mb-3">
         <i class="fas fa-seedling text-success me-2"></i>
-        <h4 class="fw-semibold mb-0">{{_('Crops')}}</h4>
+        <h4 class="fw-semibold mb-0">{{_('Cultivos')}}</h4>
       </div>
       <div class="row g-3">
         <div class="col-lg-3 col-md-6">
@@ -130,9 +130,9 @@
                 >
                   <i class="fas fa-play-circle fa-lg text-success"></i>
                 </div>
-                <h6 class="fw-semibold text-dark mb-3">{{_('Simulations')}}</h6>
+                <h6 class="fw-semibold text-dark mb-3">{{_('Simulaciones')}}</h6>
                 <span class="btn btn-outline-success btn-sm"
-                  >{{_('Manage')}}</span
+                  >{{_('Gestionar')}}</span
                 >
               </div>
             </div>
@@ -148,9 +148,9 @@
                 >
                   <i class="fas fa-sliders-h fa-lg text-success"></i>
                 </div>
-                <h6 class="fw-semibold text-dark mb-3">{{_('Parameters')}}</h6>
+                <h6 class="fw-semibold text-dark mb-3">{{_('Parámetros')}}</h6>
                 <span class="btn btn-outline-success btn-sm"
-                  >{{_('Manage')}}</span
+                  >{{_('Gestionar')}}</span
                 >
               </div>
             </div>
@@ -165,7 +165,7 @@
     <div class="col-12">
       <div class="d-flex align-items-center mb-3">
         <i class="fas fa-cloud-rain text-info me-2"></i>
-        <h4 class="fw-semibold mb-0">{{_('Weather')}}</h4>
+        <h4 class="fw-semibold mb-0">{{_('Clima')}}</h4>
       </div>
       <div class="row g-3">
         <div class="col-lg-3 col-md-6">
@@ -178,8 +178,8 @@
                 >
                   <i class="fas fa-thermometer-half fa-lg text-info"></i>
                 </div>
-                <h6 class="fw-semibold text-dark mb-3">{{_('Parameters')}}</h6>
-                <span class="btn btn-outline-info btn-sm">{{_('Manage')}}</span>
+                <h6 class="fw-semibold text-dark mb-3">{{_('Parámetros')}}</h6>
+                <span class="btn btn-outline-info btn-sm">{{_('Administrar')}}</span>
               </div>
             </div>
           </a>
@@ -193,7 +193,7 @@
     <div class="col-12">
       <div class="d-flex align-items-center mb-3">
         <i class="fas fa-users text-warning me-2"></i>
-        <h4 class="fw-semibold mb-0">{{_('Users')}}</h4>
+  <h4 class="fw-semibold mb-0">{{_('Usuarios')}}</h4>
       </div>
       <div class="row g-3">
         <div class="col-lg-3 col-md-6">
@@ -211,7 +211,7 @@
                 </div>
                 <h6 class="fw-semibold text-dark mb-3">{{_('Roles')}}</h6>
                 <span class="btn btn-outline-warning btn-sm"
-                  >{{_('Manage')}}</span
+                  >{{_('Gestionar')}}</span
                 >
               </div>
             </div>
@@ -227,9 +227,9 @@
                 >
                   <i class="fas fa-user-friends fa-lg text-warning"></i>
                 </div>
-                <h6 class="fw-semibold text-dark mb-3">{{_('Users')}}</h6>
+                <h6 class="fw-semibold text-dark mb-3">{{_('Usuarios')}}</h6>
                 <span class="btn btn-outline-warning btn-sm"
-                  >{{_('Manage')}}</span
+                  >{{_('Gestionar')}}</span
                 >
               </div>
             </div>

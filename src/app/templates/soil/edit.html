@@ -13,7 +13,7 @@
     </ol>
   </nav>
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Editar Suelo</h2>
+    <h2>{{ _(\'Editar Suelo\') }}</h2>
     <a href="{{ url_for('soil.list_soil') }}" class="btn btn-secondary">
       <i class="fas fa-arrow-left"></i> Volver al listado
     </a>
@@ -54,7 +54,7 @@
       {{ form.enable.label(class="form-check-label") }}
     </div>
     {{ form.submit(class="btn btn-success") }}
-    <a href="{{ url_for('soil.list_soil') }}" class="btn btn-outline-secondary">Cancelar</a>
+    <a href="{{ url_for('soil.list_soil') }}" class="btn btn-outline-secondary">{{ _(\'Cancelar\') }}</a>
   </form>
 </div>
 {% endblock %}
