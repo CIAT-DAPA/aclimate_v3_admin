@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}{{ _('Admin Panel') }}{% endblock %}</title>
+  <title>{% block title %}{{ _('Panel de Administración') }}{% endblock %}</title>
     <link
       rel="icon"
       href="{{ url_for('static', filename='favicon.ico') }}"
@@ -74,7 +74,7 @@
             class="img-fluid me-2"
             alt="AClimate Logo"
             style="max-height: 35px"
-          />{{ _('AClimate Admin') }}
+          />{{ _('Administrador de AClimate') }}
         </a>
 
         <button
@@ -156,22 +156,22 @@
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('country.list_country') }}"
             >
-              <span>{{ _('Countries') }}</span>
+              <span>{{ _('Países') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('adm1.list_adm1') }}"
             >
-              <span>{{ _('Adm 1') }}</span>
+              <span>{{ _('ADM 1') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('adm2.list_adm2') }}"
             >
-              <span>{{ _('Adm 2') }}</span>
+              <span>{{ _('ADM 2') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('location.list_location') }}">
-              <span>{{ _('Locations') }}</span>
+              <span>{{ _('Ubicaciones') }}</span>
             </a>
           </nav>
         </div>
@@ -195,13 +195,13 @@
         <div class="collapse" id="climaSection">
           <nav class="nav flex-column">
             <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>{{ _('Weather') }}</span>
+              <span>{{ _('Clima') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="#">
-              <span>{{ _('Parameters') }}</span>
+              <span>{{ _('Parámetros') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('climate_measure.list_climate_measure') }}">
-              <span>{{ _('Measures') }}</span>
+              <span>{{ _('Medidas') }}</span>
             </a>
           </nav>
         </div>
@@ -226,32 +226,32 @@
         <div class="collapse" id="cultivosSection">
           <nav class="nav flex-column">
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('crop.list_crop') }}">
-              <span>{{ _('Crops') }}</span>
+              <span>{{ _('Cultivos') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('stress.list_stress') }}">
-              <span>{{ _('Stresses') }}</span>
+              <span>{{ _('Estreses') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('phenological_stage.list_phenological_stages') }}">
-              <span>{{ _('Phenological stages') }}</span>
+              <span>{{ _('Etapas fenológicas') }}</span>
             </a>
 
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('soil.list_soil') }}">
-              <span>{{ _('Soils') }}</span>
+              <span>{{ _('Suelos') }}</span>
             </a>
 
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('cultivar.list_cultivar') }}">
-              <span>{{ _('Cultivars') }}</span>
+              <span>{{ _('Cultivares') }}</span>
             </a>
 
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('season.list_season') }}">
-              <span>{{ _('Seasons') }}</span>
+              <span>{{ _('Temporadas') }}</span>
             </a>
 
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('setup.list_setup') }}">
-              <span>{{ _('Setup simulations crops') }}</span>
+              <span>{{ _('Configuración de simulaciones de cultivos') }}</span>
             </a>
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('phenological_stage_stress.list_phenological_stage_stress') }}">
-              <span>{{ _('Stress parameters') }}</span>
+              <span>{{ _('Parámetros de estrés') }}</span>
             </a>
           </nav>
         </div>
@@ -269,7 +269,7 @@
         >
             <i class="fas fa-chart-line section-icon me-2 text-center"></i>
           <span class="section-title fw-semibold text-uppercase flex-grow-1"
-            >{{ _('Indicators') }}</span
+            >{{ _('Indicadores') }}</span
           >
           <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
@@ -279,13 +279,13 @@
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('indicator.list_indicator') }}"
             >
-              <span>{{ _('Indicators management') }}</span>
+              <span>{{ _('Gestión de indicadores') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('indicator_category.list_indicator_category') }}"
             >
-              <span>{{ _('Indicators category management') }}</span>
+              <span>{{ _('Gestión de categorías de indicadores') }}</span>
             </a>
           </nav>
         </div>
@@ -313,7 +313,7 @@
         <div class="collapse" id="usuariosSection">
           <nav class="nav flex-column">
             <a class="nav-link d-flex align-items-center text-dark" href="{{ url_for('user.list_user') }}">
-              <span>{{ _('Users') }}</span>
+              <span>{{ _('Usuarios') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
@@ -337,7 +337,7 @@
         >
           <i class="fas fa-cogs section-icon me-2 text-center"></i>
           <span class="section-title fw-semibold text-uppercase flex-grow-1"
-            >{{ _('Configuration') }}</span
+            >{{ _('Configuración') }}</span
           >
           <i class="fas fa-chevron-down collapse-icon text-secondary"></i>
         </div>
@@ -347,19 +347,19 @@
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('source.list_source') }}"
             >
-              <span>{{ _('Sources') }}</span>
+              <span>{{ _('Fuentes') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('data_source.list_data_source') }}"
             >
-              <span>{{ _('Client parameters') }}</span>
+              <span>{{ _('Parámetros de clientes') }}</span>
             </a>
             <a
               class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('country_indicator.list_country_indicator') }}"
             >
-              <span>{{ _('Country indicator') }}</span>
+              <span>{{ _('Indicadores por país') }}</span>
             </a>
           </nav>
         </div>
@@ -410,7 +410,7 @@
             type="button"
             class="btn-close"
             data-bs-dismiss="alert"
-            aria-label="{{ _('Close') }}"
+            aria-label="{{ _('Cerrar') }}"
           ></button>
         </div>
       {% endfor %}

@@ -19,7 +19,7 @@ def require_module_access(module: Module, permission_type: str = 'read'):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if not current_user.is_authenticated:
-                flash(_('Please log in to access this page.'), 'info')
+                flash(_('Por favor inicia sesión para acceder a esta página.'), 'info')
                 return redirect(url_for('main.login'))
             
             # Verificar acceso al módulo con el permiso específico
@@ -27,7 +27,7 @@ def require_module_access(module: Module, permission_type: str = 'read'):
                 logger.warning(
                     f"User {current_user.username} denied {permission_type} access to module {module.value}"
                 )
-                flash(_('You do not have permission to access this module.'), 'error')
+                flash(_('No tienes permiso para acceder a este módulo.'), 'error')
                 abort(403)
             
             return f(*args, **kwargs)

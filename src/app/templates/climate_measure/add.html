@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Agregar variable climática</h2>
+    <h2>{{ _(\'Agregar variable climática\') }}</h2>
     <a href="{{ url_for('climate_measure.list_climate_measure') }}" class="btn btn-secondary">
       <i class="fas fa-arrow-left"></i> Volver al listado
     </a>
@@ -51,7 +51,7 @@
     </div>
 
     {{ form.submit(class="btn btn-primary") }}
-    <a href="{{ url_for('climate_measure.list_climate_measure') }}" class="btn btn-outline-secondary">Cancelar</a>
+    <a href="{{ url_for('climate_measure.list_climate_measure') }}" class="btn btn-outline-secondary">{{ _(\'Cancelar\') }}</a>
   </form>
 </div>
 {% endblock %}

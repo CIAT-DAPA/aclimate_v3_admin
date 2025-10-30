@@ -61,84 +61,32 @@
           </div>
         </div>
 
-        <!-- Edit Form -->
+        <!-- Edit Info (No-op) -->
         <div class="col-md-8">
-          <h5 class="mb-3">{{_('Editar Módulos de Acceso')}}</h5>
-          
-          <form method="POST" action="{{ url_for('role.edit_role', role_name=role.name) }}">
-            {{ form.hidden_tag() }}
-            
-            <!-- Module Selection -->
-            <div class="mb-3">
-              <label class="form-label fw-bold">
-                <i class="fas fa-puzzle-piece me-2"></i>{{_('Módulos de Acceso')}}
-                <span class="badge bg-info ms-2">{{_('Editable')}}</span>
-              </label>
-              
-              {% if form.modules.errors %}
-                <div class="alert alert-danger">
-                  {% for error in form.modules.errors %}
-                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
-              
-              <!-- Modules Grid -->
-              <div class="row">
-                {% for value, label_info in form.modules.choices %}
-                  {% set parts = label_info.split(' - ') %}
-                  {% set module_name = parts[0] %}
-                  {% set module_description = parts[1] if parts|length > 1 else '' %}
-                  <div class="col-md-6 mb-3">
-                    <div class="border rounded p-3 h-100">
-                      <div class="form-check">
-                        <input class="form-check-input" 
-                               type="checkbox" 
-                               value="{{ value }}" 
-                               id="module_{{ value }}" 
-                               name="modules"
-                               {% if value in (form.modules.data or []) %}checked{% endif %}>
-                        <label class="form-check-label w-100" for="module_{{ value }}">
-                          <div class="d-flex align-items-start">
-                            <div class="me-3">
-                              {% if value == 'geographic' %}
-                                <i class="fas fa-globe text-primary fs-4"></i>
-                              {% elif value == 'climate_data' %}
-                                <i class="fas fa-cloud-sun text-warning fs-4"></i>
-                              {% elif value == 'crop_data' %}
-                                <i class="fas fa-seedling text-success fs-4"></i>
-                              {% elif value == 'user_management' %}
-                                <i class="fas fa-users text-info fs-4"></i>
-                              {% else %}
-                                <i class="fas fa-puzzle-piece text-secondary fs-4"></i>
-                              {% endif %}
-                            </div>
-                            <div>
-                              <div class="fw-bold mb-1">{{ module_name }}</div>
-                              {% if module_description %}
-                                <small class="text-muted">{{ module_description }}</small>
-                              {% endif %}
-                            </div>
-                          </div>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                {% endfor %}
-              </div>
-              
-              <div class="form-text">
-                <i class="fas fa-info-circle me-1"></i>{{_('Selecciona los módulos a los que este rol tendrá acceso.')}}
-              </div>
-            </div>
+          <h5 class="mb-3">{{_('Permisos por Usuario')}}</h5>
 
-            <!-- Submit Button -->
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary btn-lg">
-                <i class="fas fa-save me-2"></i>{{_('Guardar Cambios')}}
-              </button>
+          <div class="alert alert-info d-flex align-items-start" role="alert">
+            <i class="fas fa-info-circle me-2 mt-1"></i>
+            <div>
+              <div class="fw-bold mb-1">{{_('Los permisos ya no se asignan al rol.')}}</div>
+              <div class="mb-0">{{_('Ahora los permisos se gestionan por usuario, país y módulo desde la vista de Gestión de Usuarios.')}}</div>
             </div>
-          </form>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <p class="mb-3">{{_('Para asignar o modificar permisos, ve a Gestión de Usuarios y usa el botón "Gestionar permisos" del usuario correspondiente.')}}</p>
+
+              <div class="d-flex gap-2">
+                <a href="{{ url_for('user.list_user') }}" class="btn btn-primary">
+                  <i class="fas fa-users-cog me-2"></i>{{_('Ir a Gestión de Usuarios')}}
+                </a>
+                <a href="{{ url_for('role.list_role') }}" class="btn btn-secondary">
+                  <i class="fas fa-arrow-left me-2"></i>{{_('Volver al Listado de Roles')}}
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

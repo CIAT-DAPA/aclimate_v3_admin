@@ -41,7 +41,7 @@ block content %}
       </button>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filtersDropdown" style="min-width: 250px;">
         <!-- Content will be generated dynamically by JavaScript -->
-        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> Cargando filtros...</div></li>
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
       </ul>
     </div>
 
@@ -65,10 +65,10 @@ block content %}
             {% if current_user.has_module_access('user_management', 'delete') %}
             <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
             {% endif %}
-            <th style="min-width: 180px">{{_('Nombre del Rol')}}</th>
-            <th style="min-width: 200px">{{_('Aplicación')}}</th>
+            <th style="min-width: 180px">{{ _('Nombre del Rol') }}</th>
+            <th style="min-width: 200px">{{ _('Aplicación') }}</th>
             {% if current_user.has_module_access('user_management', 'update') or current_user.has_module_access('user_management', 'delete') %}
-            <th class="text-end" style="min-width: 120px">{{_('Acciones')}}</th>
+            <th class="text-end" style="min-width: 120px">{{ _('Acciones') }}</th>
             {% endif %}
           </tr>
         </thead>
@@ -163,16 +163,16 @@ block content %}
   {% endif %}
   <!-- Mensaje cuando no hay resultados de búsqueda -->
   <div id="noSearchResults" class="alert alert-warning mt-4" style="display: none;">
-    <i class="fas fa-search"></i>
-    <span id="noResultsText">{{_('No se encontraron roles que coincidan con la búsqueda')}}</span> "<span id="searchTerm"></span>".
-    <br>
-    <small class="text-muted">{{_('Intenta con otros términos o limpia la búsqueda para ver todos los roles.')}}</small>
+  <i class="fas fa-search"></i>
+  <span id="noResultsText">{{ _('No se encontraron roles que coincidan con la búsqueda') }}</span> "<span id="searchTerm"></span>".
+  <br>
+  <small class="text-muted">{{ _('Intenta con otros términos o limpia la búsqueda para ver todos los roles.') }}</small>
   </div>
   
   {% else %}
   <div class="alert alert-info mt-4">
     <i class="fas fa-info-circle"></i>
-    {{_('No hay roles registrados o no se pudieron cargar desde la API.')}}
+    {{ _('No hay roles registrados o no se pudieron cargar desde la API.') }}
   </div>
   {% endif %}
 </div>

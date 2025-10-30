@@ -44,7 +44,7 @@ def list_season():
         except ValueError as e:
             flash(str(e), 'error')
         except Exception as e:
-            flash(_('Error al crear la temporada: {}').format(str(e)), 'error')
+            flash(_('Error al crear la temporada: %(error)s') % {'error': str(e)}, 'error')
 
     season_list = season_service.get_all()
     return render_template('season/list.html', seasons=season_list, form=form, can_create=can_create)
@@ -83,7 +83,7 @@ def edit_season(id):
         except ValueError as e:
             flash(str(e), 'error')
         except Exception as e:
-            flash(_('Error al actualizar la temporada: {}').format(str(e)), 'error')
+            flash(_('Error al actualizar la temporada: %(error)s') % {'error': str(e)}, 'error')
 
     return render_template('season/edit.html', form=form, season=season)
 

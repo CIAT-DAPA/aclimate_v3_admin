@@ -39,7 +39,7 @@ class PhenologicalStageForm(FlaskForm):
     )
 
     duration_avg_day = IntegerField(
-        _l('Duración promedio en días de la fase)'),
+        _l('Duración promedio en días de la fase'),
         validators=[DataRequired(message=_l('Debe ingresar una duración promedio.'))]
     )
 

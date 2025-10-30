@@ -56,6 +56,8 @@ pipeline {
                             source /opt/anaconda3/etc/profile.d/conda.sh
                             conda activate /home/scalderon/.conda/envs/aclimate_v3_admin
                             chmod +x update_translations.sh
+                            # Este script SOLO compila .po -> .mo
+                            # NO modifica archivos .po (evita conflictos de merge)
                             ./update_translations.sh
                         """
                     } catch (Exception e) {
