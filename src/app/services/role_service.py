@@ -166,6 +166,40 @@ class RoleService:
         """
         return self.get_all(app_filter=app)
     
+    # ==================== COMPATIBILIDAD CON CÓDIGO ANTIGUO ====================
+    
+    def get_role_with_modules(self, name: str) -> Optional[Dict]:
+        """
+        Compatibilidad: obtener información del rol junto con módulos.
+        Nota: En la nueva arquitectura los permisos no se asignan al rol, sino
+        por usuario/país/módulo (tabla user_access). Por lo tanto, aquí
+        devolvemos el rol y una lista vacía de módulos para evitar rupturas.
+        """
+        role = self.get_by_name(name)
+        if not role:
+            return None
+        # Asegurar campos esperados por la vista
+        return {
+            'id': role.get('id'),
+            'name': role.get('name'),
+            'app': role.get('app'),
+            'display_name': role.get('display_name') or role.get('name'),
+            'description': None,  # La descripción se gestiona en Keycloak
+            'modules': [],        # Los módulos ya no se asignan a nivel de rol
+        }
+    
+    def update_local_modules(self, name: str, modules: List[str]) -> bool:
+        """
+        Compatibilidad: método no-op para "actualizar" módulos de un rol.
+        Mantiene compatibilidad con vistas antiguas; registra y devuelve True.
+        """
+        current_app.logger.info(
+            "update_local_modules() llamado para '%s' con módulos %s. "
+            "Este sistema ahora gestiona permisos por usuario (user_access).",
+            name, modules
+        )
+        return True
+    
     # ==================== MÉTODOS CON KEYCLOAK ====================
     
     def _get_current_user_token(self) -> Optional[str]:

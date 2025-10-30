@@ -42,7 +42,7 @@ def list_data_source():
         except ValueError as e:
             flash(str(e), 'danger')
         except Exception as e:
-            flash(_('Error al crear la fuente de datos: %(error)s', error=str(e)), 'danger')
+            flash(_('Error al crear la fuente de datos: %(error)s') % {'error': str(e)}, 'danger')
 
     data_source_list = data_source_service.get_all()
     return render_template('data_source/list.html', data_sources=data_source_list, form=form, can_create=can_create)
@@ -82,7 +82,7 @@ def edit_data_source(id):
         except ValueError as e:
             flash(str(e), 'danger')
         except Exception as e:
-            flash(_('Error al actualizar la fuente de datos: %(error)s', error=str(e)), 'danger')
+            flash(_('Error al actualizar la fuente de datos: %(error)s') % {'error': str(e)}, 'danger')
 
     return render_template('data_source/edit.html', form=form, data_source=data_source)
 

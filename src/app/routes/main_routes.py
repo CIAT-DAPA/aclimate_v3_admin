@@ -34,7 +34,7 @@ def login():
         
         if not oauth_service:
             logger.error("OAuth service not found in app extensions")
-            flash(_('Authentication service not available'), 'error')
+            flash(_('Servicio de autenticación no disponible'), 'error')
             return render_template('login.html', form=None)
         
         # Redirigir a Keycloak
@@ -45,7 +45,7 @@ def login():
         
     except Exception as e:
         logger.error(f"Error in login route: {e}")
-        flash(_('Error initiating authentication'), 'error')
+        flash(_('Error al iniciar autenticación'), 'error')
         return render_template('login.html', form=None)
 
 @bp.route('/auth/callback')
@@ -57,7 +57,7 @@ def auth_callback():
         
         if not oauth_service:
             logger.error("OAuth service not found in app extensions")
-            flash(_('Authentication service not available'), 'error')
+            flash(_('Servicio de autenticación no disponible'), 'error')
             return redirect(url_for('main.login'))
         
         # Intercambiar código por token
@@ -65,7 +65,7 @@ def auth_callback():
         
         if not token_data:
             logger.error("Failed to exchange code for token")
-            flash(_('Authentication failed'), 'error')
+            flash(_('Falló la autenticación'), 'error')
             return redirect(url_for('main.login'))
         
         # Obtener información del usuario
@@ -73,14 +73,14 @@ def auth_callback():
         
         if not user_info:
             logger.error("Failed to get user information")
-            flash(_('Failed to get user information'), 'error')
+            flash(_('No se pudo obtener información del usuario'), 'error')
             return redirect(url_for('main.login'))
         
         # Get Keycloak user ID
         keycloak_id = user_info.get('sub')
         if not keycloak_id:
             logger.error("No 'sub' (user ID) found in Keycloak user info")
-            flash(_('Invalid user information'), 'error')
+            flash(_('Información de usuario inválida'), 'error')
             return redirect(url_for('main.login'))
         
         # Autenticar usuario con información de Keycloak
@@ -90,16 +90,16 @@ def auth_callback():
         if user:
             login_user(user)
             logger.info(f"User {user.username} logged in successfully")
-            flash(_('Login successful!'), 'success')
+            flash(_('Inicio de sesión exitoso!'), 'success')
             return redirect(url_for('main.home'))
         else:
             logger.error("Failed to authenticate user")
-            flash(_('Authentication failed'), 'error')
+            flash(_('Falló la autenticación'), 'error')
             return redirect(url_for('main.login'))
             
     except Exception as e:
         logger.error(f"Auth callback error: {e}")
-        flash(_('Authentication error occurred'), 'error')
+        flash(_('Ocurrió un error de autenticación'), 'error')
         return redirect(url_for('main.login'))
 
 @bp.route('/logout')
@@ -126,12 +126,12 @@ def logout():
             )
             return redirect(keycloak_logout_url)
         else:
-            flash(_('Logged out successfully'), 'info')
+            flash(_('Cierre de sesión exitoso'), 'info')
             return redirect(url_for('main.index'))
             
     except Exception as e:
         logger.error(f"Logout error: {e}")
-        flash(_('Logout completed'), 'info')
+        flash(_('Cierre de sesión completado'), 'info')
         return redirect(url_for('main.index'))
 
 @bp.route('/home')
@@ -183,7 +183,7 @@ def refresh_roles():
         success = current_user.refresh_roles()
         
         if success:
-            flash(_('Roles refreshed successfully'), 'success')
+            flash(_('Roles actualizados exitosamente'), 'success')
             return jsonify({
                 'message': 'Roles refreshed successfully',
                 'roles': current_user.roles,
@@ -191,7 +191,7 @@ def refresh_roles():
                 'success': True
             })
         else:
-            flash(_('Failed to refresh roles'), 'error')
+            flash(_('No se pudieron actualizar los roles'), 'error')
             return jsonify({
                 'message': 'Failed to refresh roles',
                 'success': False
@@ -199,7 +199,7 @@ def refresh_roles():
             
     except Exception as e:
         logger.error(f"Error refreshing roles: {e}")
-        flash(_('Error refreshing roles'), 'error')
+        flash(_('Error al actualizar roles'), 'error')
         return jsonify({
             'error': str(e),
             'success': False

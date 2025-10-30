@@ -23,7 +23,7 @@ class IndicatorForm(FlaskForm):
     unit = StringField(
         _l('Unidad'),
         validators=[
-            DataRequired(message=_l('La unidad es obligatorio.')),
+            DataRequired(message=_l('La unidad es obligatoria.')),
             Length(max=25, message=_l('Máximo 25 caracteres.'))
         ]
     )

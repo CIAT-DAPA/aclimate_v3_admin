@@ -29,7 +29,10 @@
     </div>
 
     {{ form.submit(class="btn btn-primary") }}
-    <a href="{{ url_for('country.list_country') }}" class="btn btn-secondary">Cancelar</a>
+      <div class="d-flex justify-content-end">
+    <a href="{{ url_for('country.list_country') }}" class="btn btn-secondary">{{ _('Cancelar') }}</a>
+    <button type="submit" class="btn btn-primary ms-2">{{ _('Guardar') }}</button>
+  </div>
   </form>
 </div>
 {% endblock %}
