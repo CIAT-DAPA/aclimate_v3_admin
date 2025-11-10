@@ -6,11 +6,17 @@ import json
 from wtforms import ValidationError
 
 def validate_json(form, field):
-    if field.data:
+    if field.data and field.data.strip():
         try:
-            json.loads(field.data)
-        except Exception:
-            raise ValidationError(_l('Debe ser un JSON válido.'))
+            parsed = json.loads(field.data)
+            if not isinstance(parsed, dict):
+                raise ValidationError(_l('El JSON debe ser un objeto/diccionario (formato: {"clave": "valor"}).'))
+        except json.JSONDecodeError as e:
+            raise ValidationError(_l('Debe ser un JSON válido. Error: ') + str(e))
+        except ValidationError:
+            raise
+        except Exception as e:
+            raise ValidationError(_l('Error al validar el JSON: ') + str(e))
 
 class CountryIndicatorForm(FlaskForm):
     country_id = SelectField(

@@ -50,8 +50,8 @@
   </div>
 
   {% if country_indicators %}
-  <div id="countryIndicatorTableContainer">
-    {% if current_user.has_module_access('indicators', 'delete') %}
+  <div id="countryIndicatorTableContainer" class="table-responsive">
+    {% if current_user.has_module_access('configuration', 'delete') %}
     <form id="bulk-action-form" method="POST" action="{{ url_for('country_indicator.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
@@ -60,40 +60,40 @@
         </button>
       </div>
     {% endif %}
-      <table class="table table-hover align-middle">
+      <table class="table table-hover align-middle table-sm">
         <thead class="table-light">
           <tr>
-            {% if current_user.has_module_access('indicators', 'delete') %}
-            <th style="width: 5%"><input type="checkbox" id="select-all" /></th>
+            {% if current_user.has_module_access('configuration', 'delete') %}
+            <th style="width: 40px; min-width: 40px;"><input type="checkbox" id="select-all" /></th>
             {% endif %}
-            <th>{{ _('País') }}</th>
-            <th>{{ _('Indicador') }}</th>
-            <th>{{ _('Pronóstico espacial') }}</th>
-            <th>{{ _('Clima espacial') }}</th>
-            <th>{{ _('Pronóstico por ubicación') }}</th>
-            <th>{{ _('Clima por ubicación') }}</th>
-            <th>{{ _('Criterios') }}</th>
-            {% if current_user.has_module_access('indicators', 'update') or current_user.has_module_access('indicators', 'delete') %}
-            <th class="text-end">{{ _('Acciones') }}</th>
+            <th style="width: 10%; min-width: 100px;">{{ _('País') }}</th>
+            <th style="width: 18%; min-width: 150px;">{{ _('Indicador') }}</th>
+            <th style="width: 11%; min-width: 110px; text-align: center;">{{ _('Pronóstico espacial') }}</th>
+            <th style="width: 11%; min-width: 110px; text-align: center;">{{ _('Clima espacial') }}</th>
+            <th style="width: 12%; min-width: 120px; text-align: center;">{{ _('Pronóstico por ubicación') }}</th>
+            <th style="width: 12%; min-width: 120px; text-align: center;">{{ _('Clima por ubicación') }}</th>
+            <th style="width: 14%; min-width: 100px;">{{ _('Criterios') }}</th>
+            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
+            <th class="text-end" style="width: 12%; min-width: 100px;">{{ _('Acciones') }}</th>
             {% endif %}
           </tr>
         </thead>
         <tbody id="countryIndicatorTableBody">
           {% for ci in country_indicators %}
           <tr>
-            {% if current_user.has_module_access('indicators', 'delete') %}
+            {% if current_user.has_module_access('configuration', 'delete') %}
             <td><input type="checkbox" name="selected_ids" value="{{ ci.id }}" class="select-row" /></td>
             {% endif %}
             <td class="searchable country">{{ ci.country.name if ci.country else '' }}</td>
             <td class="searchable indicator">{{ ci.indicator.name if ci.indicator else '' }}</td>
-            <td class="searchable spatial_forecast">{{ _('Sí') if ci.spatial_forecast else _('No') }}</td>
-            <td class="searchable spatial_climate">{{ _('Sí') if ci.spatial_climate else _('No') }}</td>
-            <td class="searchable location_forecast">{{ _('Sí') if ci.location_forecast else _('No') }}</td>
-            <td class="searchable location_climate">{{ _('Sí') if ci.location_climate else _('No') }}</td>
+            <td class="searchable spatial_forecast text-center">{{ _('Sí') if ci.spatial_forecast else _('No') }}</td>
+            <td class="searchable spatial_climate text-center">{{ _('Sí') if ci.spatial_climate else _('No') }}</td>
+            <td class="searchable location_forecast text-center">{{ _('Sí') if ci.location_forecast else _('No') }}</td>
+            <td class="searchable location_climate text-center">{{ _('Sí') if ci.location_climate else _('No') }}</td>
             <td class="searchable criteria">{{ ci.criteria or '' }}</td>
-            {% if current_user.has_module_access('indicators', 'update') or current_user.has_module_access('indicators', 'delete') %}
+            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
             <td class="text-end">
-              {% if current_user.has_module_access('indicators', 'update') %}
+              {% if current_user.has_module_access('configuration', 'update') %}
               <a
                 href="{{ url_for('country_indicator.edit_country_indicator', id=ci.id) }}"
                 class="btn btn-warning btn-sm me-2"
@@ -102,7 +102,7 @@
                 <i class="fas fa-pen"></i>
               </a>
               {% endif %}
-              {% if current_user.has_module_access('indicators', 'delete') %}
+              {% if current_user.has_module_access('configuration', 'delete') %}
               <a
                 href="{{ url_for('country_indicator.delete_country_indicator', id=ci.id) }}"
                 class="btn btn-danger btn-sm"
@@ -117,7 +117,7 @@
           {% endfor %}
         </tbody>
       </table>
-    {% if current_user.has_module_access('indicators', 'delete') %}
+    {% if current_user.has_module_access('configuration', 'delete') %}
     </form>
     {% endif %}
   </div>
@@ -131,6 +131,38 @@
   </div>
   {% endif %}
 </div>
+
+  </div>
+</div>
+
+<!-- Estilos personalizados para la tabla -->
+<style>
+  #countryIndicatorTableContainer table th {
+    white-space: nowrap;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    padding: 0.75rem 0.5rem;
+  }
+  
+  #countryIndicatorTableContainer table td {
+    vertical-align: middle;
+    padding: 0.6rem 0.5rem;
+  }
+  
+  #countryIndicatorTableContainer .text-center {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+  
+  #countryIndicatorTableContainer .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  #countryIndicatorTableContainer table {
+    margin-bottom: 0;
+  }
+</style>
 
 <!-- Modal para agregar Relación País-Indicador -->
 <div

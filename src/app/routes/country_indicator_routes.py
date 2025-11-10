@@ -29,26 +29,38 @@ def list_country_indicator():
         if not can_create:
             flash(_('No tienes permiso para crear relaciones país-indicador.'), 'danger')
             return redirect(url_for('country_indicator.list_country_indicator'))
-            
+        
+        # Validar y convertir el campo criteria si existe
         criteria_data = None
-        if form.criteria.data:
+        if form.criteria.data and form.criteria.data.strip():
             try:
                 criteria_data = json.loads(form.criteria.data)
-            except Exception:
-                criteria_data = None  # O puedes manejar el error como prefieras
+                if not isinstance(criteria_data, dict):
+                    flash(_('El campo Criterios debe ser un objeto JSON válido (diccionario).'), 'danger')
+                    ci_list = country_indicator_service.get_all()
+                    return render_template('country_indicator/list.html', country_indicators=ci_list, form=form, can_create=can_create)
+            except json.JSONDecodeError as e:
+                flash(_('El campo Criterios contiene un JSON inválido. Por favor, verifica el formato.'), 'danger')
+                ci_list = country_indicator_service.get_all()
+                return render_template('country_indicator/list.html', country_indicators=ci_list, form=form, can_create=can_create)
 
-        new_ci = CountryIndicatorCreate(
-            country_id=int(form.country_id.data),
-            indicator_id=form.indicator_id.data,
-            spatial_forecast=form.spatial_forecast.data,
-            spatial_climate=form.spatial_climate.data,
-            location_forecast=form.location_forecast.data,
-            location_climate=form.location_climate.data,
-            criteria=criteria_data
-        )
-        country_indicator_service.create(new_ci)
-        flash(_('Relación país-indicador agregada correctamente.'), 'success')
-        return redirect(url_for('country_indicator.list_country_indicator'))
+        try:
+            new_ci = CountryIndicatorCreate(
+                country_id=int(form.country_id.data),
+                indicator_id=form.indicator_id.data,
+                spatial_forecast=form.spatial_forecast.data,
+                spatial_climate=form.spatial_climate.data,
+                location_forecast=form.location_forecast.data,
+                location_climate=form.location_climate.data,
+                criteria=criteria_data
+            )
+            country_indicator_service.create(new_ci)
+            flash(_('Relación país-indicador agregada correctamente.'), 'success')
+            return redirect(url_for('country_indicator.list_country_indicator'))
+        except Exception as e:
+            flash(_('Error al crear la relación: ') + str(e), 'danger')
+            ci_list = country_indicator_service.get_all()
+            return render_template('country_indicator/list.html', country_indicators=ci_list, form=form, can_create=can_create)
 
     ci_list = country_indicator_service.get_all()
     return render_template('country_indicator/list.html', country_indicators=ci_list, form=form, can_create=can_create)
@@ -73,18 +85,34 @@ def edit_country_indicator(id):
         form.indicator_id.data = ci.indicator_id
 
     if form.validate_on_submit():
-        update_data = CountryIndicatorUpdate(
-            country_id=int(form.country_id.data),
-            indicator_id=form.indicator_id.data,
-            spatial_forecast=form.spatial_forecast.data,
-            spatial_climate=form.spatial_climate.data,
-            location_forecast=form.location_forecast.data,
-            location_climate=form.location_climate.data,
-            criteria=form.criteria.data
-        )
-        country_indicator_service.update(id=id, obj_in=update_data)
-        flash(_('Relación país-indicador actualizada.'), 'success')
-        return redirect(url_for('country_indicator.list_country_indicator'))
+        # Validar y convertir el campo criteria si existe
+        criteria_data = None
+        if form.criteria.data and form.criteria.data.strip():
+            try:
+                criteria_data = json.loads(form.criteria.data)
+                if not isinstance(criteria_data, dict):
+                    flash(_('El campo Criterios debe ser un objeto JSON válido (diccionario).'), 'danger')
+                    return render_template('country_indicator/edit.html', form=form, country_indicator=ci)
+            except json.JSONDecodeError as e:
+                flash(_('El campo Criterios contiene un JSON inválido. Por favor, verifica el formato.'), 'danger')
+                return render_template('country_indicator/edit.html', form=form, country_indicator=ci)
+        
+        try:
+            update_data = CountryIndicatorUpdate(
+                country_id=int(form.country_id.data),
+                indicator_id=form.indicator_id.data,
+                spatial_forecast=form.spatial_forecast.data,
+                spatial_climate=form.spatial_climate.data,
+                location_forecast=form.location_forecast.data,
+                location_climate=form.location_climate.data,
+                criteria=criteria_data
+            )
+            country_indicator_service.update(id=id, obj_in=update_data)
+            flash(_('Relación país-indicador actualizada.'), 'success')
+            return redirect(url_for('country_indicator.list_country_indicator'))
+        except Exception as e:
+            flash(_('Error al actualizar: ') + str(e), 'danger')
+            return render_template('country_indicator/edit.html', form=form, country_indicator=ci)
 
     return render_template('country_indicator/edit.html', form=form, country_indicator=ci)
 

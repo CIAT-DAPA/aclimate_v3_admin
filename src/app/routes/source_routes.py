@@ -52,6 +52,7 @@ def edit_source(id):
 
     if request.method == 'GET':
         form.source_type.data = source.source_type
+        form.enable.data = source.enable
 
     if form.validate_on_submit():
         update_data = SourceUpdate(
