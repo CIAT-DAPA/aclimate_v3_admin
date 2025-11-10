@@ -41,7 +41,6 @@ echo ""
 # =============================================================================
 echo "🔍 Paso 3/7: Verificando archivos de traducción..."
 if [ -f "app/translations/es_CO/LC_MESSAGES/messages.po" ] && \
-   [ -f "app/translations/es_GT/LC_MESSAGES/messages.po" ] && \
    [ -f "app/translations/en_US/LC_MESSAGES/messages.po" ]; then
     echo "   ✅ Todos los archivos .po encontrados"
 else
@@ -77,17 +76,14 @@ echo ""
 # =============================================================================
 echo "🔍 Paso 7/7: Verificando archivos compilados..."
 if [ -f "app/translations/es_CO/LC_MESSAGES/messages.mo" ] && \
-   [ -f "app/translations/es_GT/LC_MESSAGES/messages.mo" ] && \
    [ -f "app/translations/en_US/LC_MESSAGES/messages.mo" ]; then
     echo "   ✅ Todos los archivos .mo existen"
     
     # Mostrar tamaños
     SIZE_CO=$(du -h app/translations/es_CO/LC_MESSAGES/messages.mo | cut -f1)
-    SIZE_GT=$(du -h app/translations/es_GT/LC_MESSAGES/messages.mo | cut -f1)
     SIZE_US=$(du -h app/translations/en_US/LC_MESSAGES/messages.mo | cut -f1)
     
     echo "   es_CO: $SIZE_CO"
-    echo "   es_GT: $SIZE_GT"
     echo "   en_US: $SIZE_US"
 else
     echo "   ⚠️  Advertencia: Algunos archivos .mo no se generaron"
