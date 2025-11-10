@@ -72,7 +72,6 @@ def edit_data_source(id):
                 name=form.name.data,
                 description=form.description.data,
                 type=form.type.data,
-                enable=form.enable.data,
                 content=form.content.data
             )
 
