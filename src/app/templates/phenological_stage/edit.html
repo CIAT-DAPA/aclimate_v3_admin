@@ -1,23 +1,25 @@
-{% extends 'base.html' %} {% block title %}Editar Fuente{% endblock %} {%
-block content %}
-<div class="container">
-  <nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item">
-        <a href="{{ url_for('source.list_source') }}">Fuentes</a>
-      </li>
-      <li class="breadcrumb-item active" aria-current="page">{{ source.name if source else '' }}</li>
-    </ol>
-  </nav>
+{% extends 'base.html' %}
+{% block title %}{{ _('Editar Etapa Fenológica') }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ _(\'Editar Etapa Fenológica\') }}</h2>
-    <a href="{{ url_for('source.list_source') }}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left"></i> Volver al listado
+    <h2>{{ _('Editar Etapa Fenológica') }}</h2>
+    <a href="{{ url_for('phenological_stage.list_phenological_stages') }}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> {{ _('Volver al listado') }}
     </a>
   </div>
 
   <form method="POST">
     {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.crop.label(class="form-label") }}
+      {{ form.crop(class="form-select") }}
+      {% for error in form.crop.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
 
     <div class="mb-3">
       {{ form.name.label(class="form-label") }}
@@ -28,9 +30,33 @@ block content %}
     </div>
 
     <div class="mb-3">
-      {{ form.source_type.label(class="form-label") }}
-      {{ form.source_type(class="form-select") }}
-      {% for error in form.source_type.errors %}
+      {{ form.short_name.label(class="form-label") }}
+      {{ form.short_name(class="form-control") }}
+      {% for error in form.short_name.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.description.label(class="form-label") }}
+      {{ form.description(class="form-control", rows="3") }}
+      {% for error in form.description.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.order_stage.label(class="form-label") }}
+      {{ form.order_stage(class="form-control", type="number") }}
+      {% for error in form.order_stage.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.duration_avg_day.label(class="form-label") }}
+      {{ form.duration_avg_day(class="form-control", type="number") }}
+      {% for error in form.duration_avg_day.errors %}
         <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
@@ -40,8 +66,9 @@ block content %}
       {{ form.enable.label(class="form-check-label") }}
     </div>
 
-    {{ form.submit(class="btn btn-success") }}
-    <a href="{{ url_for('source.list_source') }}" class="btn btn-outline-secondary">{{ _(\'Cancelar\') }}</a>
+    {{ form.submit(class="btn btn-primary") }}
+    <a href="{{ url_for('phenological_stage.list_phenological_stages') }}" class="btn btn-outline-secondary">{{ _('Cancelar') }}</a>
   </form>
 </div>
 {% endblock %}
+

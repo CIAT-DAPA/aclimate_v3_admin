@@ -13,13 +13,10 @@ class Config:
     # Configuración de internacionalización
     LANGUAGES = {
         'es_CO': {
-            'name': 'Español Colombia'
-        },
-        'es_GT':{
-            'name': 'Español Guatemala'
+            'name': 'Español'
         },
         'en_US': {
-            'name': 'English United States'
+            'name': 'English'
         }
     }
     

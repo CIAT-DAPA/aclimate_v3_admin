@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-30 11:03-0500\n"
+"POT-Creation-Date: 2025-11-10 14:48-0500\n"
 "PO-Revision-Date: 2025-08-05 10:12-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -131,11 +131,11 @@ msgstr "For Colombia: DANE Divipola Code for municipality"
 
 #: app/forms/adm2_form.py:25
 msgid "División Adm1 asociada"
-msgstr "Associated state"
+msgstr "Associated adm1"
 
 #: app/forms/adm2_form.py:27 app/forms/location_form.py:27
 msgid "Debe seleccionar una división de nivel 1."
-msgstr "You must select a state."
+msgstr "You must select a adm1."
 
 #: app/forms/adm2_form.py:31 app/forms/location_form.py:70
 msgid "¿Es visible?"
@@ -392,16 +392,16 @@ msgstr "Select a source ID."
 #: app/forms/location_form.py:25 app/templates/adm1/edit.html:7
 #: app/templates/adm2/list.html:227 app/templates/home.html:61
 msgid "Nivel administrativo 1"
-msgstr "State"
+msgstr "Administrative Level 1 (ADM1)"
 
 #: app/forms/location_form.py:32 app/templates/adm2/edit.html:7
 #: app/templates/home.html:84
 msgid "Nivel administrativo 2"
-msgstr "Administrative Level 2 (Counties)"
+msgstr "Administrative Level 2 (ADM2)"
 
 #: app/forms/location_form.py:34
 msgid "Debe seleccionar una división de nivel 2."
-msgstr "You must select a counties."
+msgstr "You must select an adm2."
 
 #: app/forms/location_form.py:39
 msgid "Nombre ubicación"
@@ -598,7 +598,7 @@ msgstr "Role name is required"
 msgid "Ej: Editor, Administrador, Visualizador"
 msgstr "E.g.: Editor, Administrator, Viewer"
 
-#: app/forms/role_form.py:30 app/templates/role/edit.html:74
+#: app/forms/role_form.py:30
 msgid "Módulos de Acceso"
 msgstr "Access Modules"
 
@@ -606,8 +606,7 @@ msgstr "Access Modules"
 msgid "Debe seleccionar al menos un módulo"
 msgstr "You must select at least one module"
 
-#: app/forms/role_form.py:38 app/templates/role/edit.html:138
-#: app/templates/setup/edit.html:101
+#: app/forms/role_form.py:38 app/templates/setup/edit.html:101
 msgid "Guardar Cambios"
 msgstr "Save Changes"
 
@@ -1239,11 +1238,11 @@ msgstr "Geographic"
 
 #: app/templates/base.html:165
 msgid "ADM 1"
-msgstr "States"
+msgstr "ADM 1"
 
 #: app/templates/base.html:171
 msgid "ADM 2"
-msgstr "Counties"
+msgstr "ADM 2"
 
 #: app/templates/base.html:174
 msgid "Ubicaciones"
@@ -1334,8 +1333,8 @@ msgstr "Configuration"
 
 #: app/templates/base.html:350 app/templates/source/list.html:2
 #: app/templates/source/list.html:6
-msgid "Fuentes"
-msgstr "Sources"
+msgid "Fuentes de locaciones"
+msgstr "Locations sources"
 
 #: app/templates/base.html:356
 msgid "Parámetros de clientes"
@@ -1454,7 +1453,7 @@ msgstr "Log in here"
 
 #: app/templates/adm1/edit.html:1
 msgid "Editar Adm1"
-msgstr "Edit state"
+msgstr "Edit Adm1"
 
 #: app/templates/adm1/edit.html:12 app/templates/location/edit.html:1
 #: app/templates/location/edit.html:12
@@ -1466,23 +1465,36 @@ msgid "Ej: 27 para Chocó"
 msgstr "E.g.: 27 for Chocó"
 
 #: app/templates/adm1/edit.html:47 app/templates/adm1/list.html:201
-#: app/templates/adm2/edit.html:58 app/templates/adm2/list.html:196
+#: app/templates/adm2/add.html:43 app/templates/adm2/edit.html:58
+#: app/templates/adm2/list.html:196 app/templates/climate_measure/add.html:54
+#: app/templates/climate_measure/edit.html:54
 #: app/templates/climate_measure/list.html:202
 #: app/templates/country/add.html:33 app/templates/country/edit.html:37
 #: app/templates/country/list.html:174
 #: app/templates/country_indicator/edit.html:58
-#: app/templates/country_indicator/list.html:198
-#: app/templates/crop/crop_list.html:159 app/templates/crop/list.html:174
-#: app/templates/cultivar/list.html:206 app/templates/data_source/list.html:210
-#: app/templates/indicator/list.html:223
+#: app/templates/country_indicator/list.html:198 app/templates/crop/add.html:38
+#: app/templates/crop/crop_list.html:159 app/templates/crop/edit.html:36
+#: app/templates/crop/list.html:174 app/templates/cultivar/edit.html:61
+#: app/templates/cultivar/list.html:206 app/templates/data_source/add.html:38
+#: app/templates/data_source/edit.html:64
+#: app/templates/data_source/list.html:210 app/templates/indicator/add.html:64
+#: app/templates/indicator/edit.html:77 app/templates/indicator/list.html:223
+#: app/templates/indicator_category/add.html:64
+#: app/templates/indicator_category/edit.html:38
 #: app/templates/indicator_category/list.html:184
 #: app/templates/location/edit.html:85 app/templates/location/list.html:244
+#: app/templates/phenological_stage/add.html:38
+#: app/templates/phenological_stage/edit.html:70
 #: app/templates/phenological_stage/list.html:227
+#: app/templates/phenological_stage_stress/edit.html:61
 #: app/templates/phenological_stage_stress/list.html:206
 #: app/templates/role/list.html:228 app/templates/role/list.html:270
-#: app/templates/season/list.html:224 app/templates/setup/edit.html:102
-#: app/templates/setup/list.html:223 app/templates/soil/list.html:203
-#: app/templates/source/list.html:189 app/templates/stress/list.html:204
+#: app/templates/season/edit.html:71 app/templates/season/list.html:224
+#: app/templates/setup/edit.html:102 app/templates/setup/list.html:223
+#: app/templates/soil/edit.html:57 app/templates/soil/list.html:203
+#: app/templates/source/add.html:38 app/templates/source/edit.html:44
+#: app/templates/source/list.html:189 app/templates/stress/add.html:38
+#: app/templates/stress/edit.html:61 app/templates/stress/list.html:204
 #: app/templates/user/list.html:373 app/templates/user/list.html:418
 #: app/templates/user/permissions.html:215
 msgid "Cancelar"
@@ -1490,11 +1502,11 @@ msgstr "Cancel"
 
 #: app/templates/adm1/list.html:1
 msgid "Divisiones Adm1"
-msgstr "States"
+msgstr "ADM1 Divisions"
 
 #: app/templates/adm1/list.html:5
 msgid "Divisiones administrativas - Nivel 1"
-msgstr "Administrative Divisions - Level 1 (States)"
+msgstr "Administrative Divisions - Level 1 (ADM1)"
 
 #: app/templates/adm1/list.html:12 app/templates/adm1/list.html:204
 #: app/templates/adm2/list.html:12 app/templates/adm2/list.html:198
@@ -1507,8 +1519,9 @@ msgstr "Administrative Divisions - Level 1 (States)"
 #: app/templates/crop/list.html:13 app/templates/crop/list.html:176
 #: app/templates/cultivar/list.html:13 app/templates/cultivar/list.html:208
 #: app/templates/data_source/list.html:13
-#: app/templates/data_source/list.html:212 app/templates/indicator/list.html:13
-#: app/templates/indicator/list.html:225
+#: app/templates/data_source/list.html:212 app/templates/indicator/add.html:65
+#: app/templates/indicator/list.html:13 app/templates/indicator/list.html:225
+#: app/templates/indicator_category/add.html:65
 #: app/templates/indicator_category/list.html:13
 #: app/templates/indicator_category/list.html:186
 #: app/templates/location/list.html:16 app/templates/location/list.html:247
@@ -1795,17 +1808,22 @@ msgstr "No administrative divisions registered."
 
 #: app/templates/adm1/list.html:163
 msgid "Agregar división Adm1"
-msgstr "Add State"
+msgstr "Add Adm1"
+
+#: app/templates/adm2/add.html:7
+msgid "Agregar división administrativa - Nivel 2"
+msgstr "Add Administrative Division - Level 2"
 
 #: app/templates/adm2/edit.html:1
 msgid "Editar Adm2"
-msgstr "Edit countie"
+msgstr "Edit Adm2"
 
 #: app/templates/adm2/edit.html:13
 msgid "Editar división administrativa - Nivel 2"
 msgstr "Edit Administrative Division - Level 2"
 
 #: app/templates/adm2/edit.html:15 app/templates/country_indicator/edit.html:9
+#: app/templates/phenological_stage/edit.html:9
 #: app/templates/setup/edit.html:19
 msgid "Volver al listado"
 msgstr "Back to list"
@@ -1816,19 +1834,27 @@ msgstr "E.g.: 27001 for Michigan"
 
 #: app/templates/adm2/list.html:1
 msgid "Divisiones Adm2"
-msgstr "Counties"
+msgstr "ADM2 Divisions"
 
 #: app/templates/adm2/list.html:5
 msgid "Divisiones administrativas - Nivel 2"
-msgstr "Administrative Divisions - Level 2 (Counties)"
+msgstr "Administrative Divisions - Level 2 (ADM2)"
 
 #: app/templates/adm2/list.html:72
 msgid "Adm1 asociado"
-msgstr "Associated state"
+msgstr "Associated Adm1"
 
 #: app/templates/adm2/list.html:154
 msgid "Agregar división Adm2"
-msgstr "Add counties"
+msgstr "Add Adm2"
+
+#: app/templates/climate_measure/add.html:7
+msgid "Agregar variable climática"
+msgstr "Edit climate measure"
+
+#: app/templates/climate_measure/edit.html:7
+msgid "Editar variable climática"
+msgstr "Edit climate measure"
 
 #: app/templates/climate_measure/list.html:2
 #: app/templates/climate_measure/list.html:6
@@ -1958,13 +1984,22 @@ msgstr "No country-indicator relationships registered."
 msgid "Agregar relación país-indicador"
 msgstr "Add country-indicator relationship"
 
+#: app/templates/crop/add.html:7 app/templates/crop/crop_list.html:135
+#: app/templates/crop/list.html:150
+msgid "Agregar cultivo"
+msgstr "Add crop"
+
 #: app/templates/crop/crop_list.html:117 app/templates/crop/list.html:131
 msgid "No hay cultivos registrados."
 msgstr "No crops registered."
 
-#: app/templates/crop/crop_list.html:135 app/templates/crop/list.html:150
-msgid "Agregar cultivo"
-msgstr "Add crop"
+#: app/templates/crop/edit.html:13
+msgid "Editar Cultivo"
+msgstr "Edit crop"
+
+#: app/templates/cultivar/edit.html:16
+msgid "Editar Cultivar"
+msgstr "Edit cultivar"
 
 #: app/templates/cultivar/list.html:74 app/templates/cultivar/list.html:253
 msgid "Secano"
@@ -1999,6 +2034,18 @@ msgstr "No crop"
 msgid "Sin orden"
 msgstr "No order"
 
+#: app/templates/data_source/add.html:7 app/templates/source/add.html:7
+msgid "Agregar Fuente"
+msgstr "Add source"
+
+#: app/templates/data_source/edit.html:13
+msgid "Editar Fuente de datos"
+msgstr "Edit data source"
+
+#: app/templates/data_source/edit.html:65
+msgid "Guardar cambios"
+msgstr "Save Changes"
+
 #: app/templates/data_source/list.html:2 app/templates/data_source/list.html:6
 msgid "Configuración de parámetros de clientes"
 msgstr "Client parameters configuration"
@@ -2011,13 +2058,19 @@ msgstr "No data sources registered."
 msgid "Agregar fuente"
 msgstr "Add source"
 
+#: app/templates/indicator/add.html:7 app/templates/indicator/list.html:168
+#: app/templates/indicator_category/add.html:7
+msgid "Agregar indicador"
+msgstr "Add indicator"
+
+#: app/templates/indicator/edit.html:14
+#: app/templates/indicator_category/edit.html:7
+msgid "Editar indicador"
+msgstr "Edit indicator"
+
 #: app/templates/indicator/list.html:150
 msgid "No hay indicadores registrados."
 msgstr "No indicators registered."
-
-#: app/templates/indicator/list.html:168
-msgid "Agregar indicador"
-msgstr "Add indicator"
 
 #: app/templates/indicator/list.html:255
 msgid "Sin tipo"
@@ -2090,11 +2143,11 @@ msgstr "External department code - E.g.: 27 for Michigan (optional)"
 
 #: app/templates/location/import.html:34
 msgid "Nombre de la división administrativa nivel 2 - Municipio (requerido)"
-msgstr "Administrative division level 2 name - Countie (required)"
+msgstr "Administrative division level 2 name - ADM2 (required)"
 
 #: app/templates/location/import.html:35
 msgid "Código externo del municipio - Ej: 27001 para Quibdó (opcional)"
-msgstr "External countie code - E.g.: 27001 for Michigan (optional)"
+msgstr "External adm2 code - E.g.: 27001 for Michigan (optional)"
 
 #: app/templates/location/import.html:36
 msgid "Nombre de la fuente de datos"
@@ -2166,11 +2219,11 @@ msgstr "Locations Created"
 
 #: app/templates/location/import.html:128
 msgid "Departamentos"
-msgstr "States"
+msgstr "Administration level 1"
 
 #: app/templates/location/import.html:135
 msgid "Municipios"
-msgstr "Counties"
+msgstr "Administration level 2"
 
 #: app/templates/location/import.html:142
 msgid "Fuentes Creadas"
@@ -2213,6 +2266,16 @@ msgstr "No locations registered."
 msgid "Agregar Locación"
 msgstr "Add Location"
 
+#: app/templates/phenological_stage/add.html:7
+#: app/templates/phenological_stage/list.html:166
+msgid "Agregar etapa fenológica"
+msgstr "Add phenological stage"
+
+#: app/templates/phenological_stage/edit.html:2
+#: app/templates/phenological_stage/edit.html:7
+msgid "Editar Etapa Fenológica"
+msgstr "Edit phenological stage"
+
 #: app/templates/phenological_stage/list.html:2
 #: app/templates/phenological_stage/list.html:6
 msgid "Etapas Fenológicas"
@@ -2226,10 +2289,6 @@ msgstr "Duration (days)"
 msgid "No hay etapas fenológicas registradas."
 msgstr "No phenological stages registered."
 
-#: app/templates/phenological_stage/list.html:166
-msgid "Agregar etapa fenológica"
-msgstr "Add phenological stage"
-
 #: app/templates/phenological_stage/list.html:268
 msgid "Duración"
 msgstr "Duration"
@@ -2237,6 +2296,10 @@ msgstr "Duration"
 #: app/templates/phenological_stage/list.html:270
 msgid "Sin duración"
 msgstr "No duration"
+
+#: app/templates/phenological_stage_stress/edit.html:16
+msgid "Editar Parámetro de Estrés"
+msgstr "Edit stress parameter"
 
 #: app/templates/phenological_stage_stress/list.html:2
 #: app/templates/phenological_stage_stress/list.html:6
@@ -2285,18 +2348,38 @@ msgid "Se gestiona desde Keycloak"
 msgstr "Managed from Keycloak"
 
 #: app/templates/role/edit.html:66
-msgid "Editar Módulos de Acceso"
-msgstr "Edit Access Modules"
+msgid "Permisos por Usuario"
+msgstr "Permissions by user"
 
-#: app/templates/role/edit.html:75
-msgid "Editable"
-msgstr "Editable"
+#: app/templates/role/edit.html:71
+msgid "Los permisos ya no se asignan al rol."
+msgstr "Permissions are no longer assigned to the role."
 
-#: app/templates/role/edit.html:131
-msgid "Selecciona los módulos a los que este rol tendrá acceso."
-msgstr "Select the modules this role will have access to."
+#: app/templates/role/edit.html:72
+msgid ""
+"Ahora los permisos se gestionan por usuario, país y módulo desde la vista"
+" de Gestión de Usuarios."
+msgstr ""
+"Permissions are now managed per user, country and module from the User "
+"Management view."
 
-#: app/templates/role/edit.html:149 app/templates/user/edit.html:216
+#: app/templates/role/edit.html:78
+msgid ""
+"Para asignar o modificar permisos, ve a Gestión de Usuarios y usa el "
+"botón \"Gestionar permisos\" del usuario correspondiente."
+msgstr ""
+"To assign or modify permissions, go to User Management and use the "
+"\"Manage permissions\" button for the corresponding user."
+
+#: app/templates/role/edit.html:82
+msgid "Ir a Gestión de Usuarios"
+msgstr "Go to User management"
+
+#: app/templates/role/edit.html:85
+msgid "Volver al Listado de Roles"
+msgstr "Back to Role List"
+
+#: app/templates/role/edit.html:97 app/templates/user/edit.html:216
 msgid "Volver al Listado"
 msgstr "Back to List"
 
@@ -2454,6 +2537,10 @@ msgstr "Some roles could not be deleted"
 msgid "Preparando..."
 msgstr "Preparing..."
 
+#: app/templates/season/edit.html:16
+msgid "Editar Temporada"
+msgstr "Edit season"
+
 #: app/templates/season/list.html:151
 msgid "No hay temporadas registradas."
 msgstr "No seasons registered."
@@ -2543,6 +2630,10 @@ msgstr "No soil"
 msgid "Sin temporada"
 msgstr "No season"
 
+#: app/templates/soil/edit.html:16
+msgid "Editar Suelo"
+msgstr "Edit Soil"
+
 #: app/templates/soil/list.html:144
 msgid "No hay suelos registrados."
 msgstr "No soils registered."
@@ -2551,13 +2642,21 @@ msgstr "No soils registered."
 msgid "Agregar suelo"
 msgstr "Add soil"
 
+#: app/templates/source/edit.html:13
+msgid "Editar Fuente de locaciones"
+msgstr "Edit Location source"
+
+#: app/templates/stress/add.html:7 app/templates/stress/list.html:163
+msgid "Agregar estrés"
+msgstr "Add stress"
+
+#: app/templates/stress/edit.html:14
+msgid "Editar Estrés"
+msgstr "Edit stress"
+
 #: app/templates/stress/list.html:145
 msgid "No hay estreses registrados."
 msgstr "No stresses registered."
-
-#: app/templates/stress/list.html:163
-msgid "Agregar estrés"
-msgstr "Add stress"
 
 #: app/templates/stress/list.html:235
 msgid "Sin nombre corto"
@@ -2823,9 +2922,7 @@ msgstr "Save Changes"
 #~ msgstr "Describe the responsibilities of this role..."
 
 #~ msgid "Módulo Geográfico - Gestión de países, adm1, adm2 y localizaciones"
-#~ msgstr ""
-#~ "Geographic Module - Management of "
-#~ "countries, states, counties and locations"
+#~ msgstr "Geographic Module - Management of countries, adm1, adm2 and locations"
 
 #~ msgid "Módulo Geográfico"
 #~ msgstr "Geographic Module"
@@ -2985,4 +3082,16 @@ msgstr "Save Changes"
 
 #~ msgid "Users"
 #~ msgstr "Users"
+
+#~ msgid "Editar Módulos de Acceso"
+#~ msgstr "Edit Access Modules"
+
+#~ msgid "Editable"
+#~ msgstr "Editable"
+
+#~ msgid "Selecciona los módulos a los que este rol tendrá acceso."
+#~ msgstr "Select the modules this role will have access to."
+
+#~ msgid "Fuentes"
+#~ msgstr "Sources"
 
