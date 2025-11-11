@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngIndicatorService, MngIndicatorCategoryService
 from aclimate_v3_orm.schemas import IndicatorCreate, IndicatorUpdate
-from aclimate_v3_orm.enums import IndicatorsType
+from aclimate_v3_orm.enums import IndicatorsType, Period
 from app.forms.indicator_form import IndicatorForm
 from app.decorators.permissions import require_module_access
 from app.config.permissions import Module
@@ -21,6 +21,8 @@ def list_indicator():
     form = IndicatorForm()
     # Llenar dinámicamente los tipos desde el Enum
     form.type.choices = [(cat.value, _(cat.value)) for cat in IndicatorsType]
+    # Llenar dinámicamente las temporalidades desde el Enum
+    form.temporality.choices = [(p.value, _(p.value)) for p in Period]
     # Llenar dinámicamente las categorías
     categories = category_service.get_all()
     form.indicator_category_id.choices = [(cat.id, cat.name) for cat in categories]
@@ -35,6 +37,7 @@ def list_indicator():
             short_name=form.short_name.data,
             unit=form.unit.data,
             type=form.type.data,
+            temporality=form.temporality.data,
             description=form.description.data,
             indicator_category_id=form.indicator_category_id.data,
             enable=True
@@ -58,6 +61,8 @@ def edit_indicator(id):
     form = IndicatorForm(obj=indicator)
     # Llenar dinámicamente los tipos desde el Enum
     form.type.choices = [(cat.value, _(cat.value)) for cat in IndicatorsType]
+    # Llenar dinámicamente las temporalidades desde el Enum
+    form.temporality.choices = [(p.value, _(p.value)) for p in Period]
     # Llenar dinámicamente las categorías
     categories = category_service.get_all()
     form.indicator_category_id.choices = [(cat.id, cat.name) for cat in categories]
@@ -71,6 +76,7 @@ def edit_indicator(id):
             name=form.name.data,
             short_name=form.short_name.data,
             type=form.type.data,
+            temporality=form.temporality.data,
             unit=form.unit.data,
             description=form.description.data,
             indicator_category_id=form.indicator_category_id.data,

@@ -73,6 +73,7 @@
             <th>{{ _('Nombre corto') }}</th>
             <th>{{ _('Unidad') }}</th>
             <th>{{ _('Tipo') }}</th>
+            <th>{{ _('Temporalidad') }}</th>
             <th>{{ _('Categoría') }}</th>
             <th>{{ _('Descripción') }}</th>
             <th>{{ _('Estado') }}</th>
@@ -94,6 +95,7 @@
             <td class="searchable">{{ indicator.short_name }}</td>
             <td>{{ indicator.unit or ''}}</td>
             <td class="searchable">{{ indicator.type if indicator.type else '' }}</td>
+            <td class="searchable">{{ indicator.temporality if indicator.temporality else '' }}</td>
             <td class="searchable">
               {{ indicator.category.name if indicator.category else '' }}
             </td>
@@ -200,6 +202,13 @@
           {{ form.type.label(class="form-label") }}
           {{ form.type(class="form-select") }}
           {% for error in form.type.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.temporality.label(class="form-label") }}
+          {{ form.temporality(class="form-select") }}
+          {% for error in form.temporality.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
