@@ -34,6 +34,12 @@ class IndicatorForm(FlaskForm):
         validators=[DataRequired(message=_l('Debe seleccionar un tipo.'))]
     )
 
+    temporality = SelectField(
+        _l('Temporalidad'),
+        choices=[],  # Llena dinámicamente en la vista
+        validators=[DataRequired(message=_l('Debe seleccionar una temporalidad.'))]
+    )
+
     indicator_category_id = SelectField(
         _l('Categoría'),
         choices=[],  # Llena dinámicamente en la vista con [(valor, etiqueta), ...]

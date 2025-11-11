@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-11-10 16:14-0500\n"
+"POT-Creation-Date: 2025-11-11 17:13-0500\n"
 "PO-Revision-Date: 2025-08-05 10:12-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -104,7 +104,7 @@ msgstr "You must select a country."
 #: app/forms/adm1_form.py:31 app/forms/adm2_form.py:32
 #: app/forms/climate_measure_form.py:37 app/forms/country_form.py:24
 #: app/forms/crop_form.py:15 app/forms/cultivar_form.py:38
-#: app/forms/indicator_category_form.py:20 app/forms/indicator_form.py:49
+#: app/forms/indicator_category_form.py:20 app/forms/indicator_form.py:55
 #: app/forms/phenological_stage_form.py:46
 #: app/forms/phenological_stage_stress_form.py:35 app/forms/season_form.py:45
 #: app/forms/setup_form.py:45 app/forms/soil_form.py:37
@@ -116,7 +116,7 @@ msgstr "Is enabled?"
 #: app/forms/climate_measure_form.py:39 app/forms/country_form.py:26
 #: app/forms/country_indicator_form.py:45 app/forms/crop_form.py:17
 #: app/forms/cultivar_form.py:40 app/forms/data_source_form.py:67
-#: app/forms/indicator_category_form.py:22 app/forms/indicator_form.py:51
+#: app/forms/indicator_category_form.py:22 app/forms/indicator_form.py:57
 #: app/forms/location_form.py:73 app/forms/phenological_stage_form.py:48
 #: app/forms/phenological_stage_stress_form.py:37 app/forms/season_form.py:47
 #: app/forms/setup_form.py:47 app/forms/soil_form.py:39
@@ -180,10 +180,10 @@ msgid "Máximo 50 caracteres."
 msgstr "Maximum 50 characters."
 
 #: app/forms/climate_measure_form.py:33 app/forms/data_source_form.py:31
-#: app/forms/indicator_category_form.py:16 app/forms/indicator_form.py:45
+#: app/forms/indicator_category_form.py:16 app/forms/indicator_form.py:51
 #: app/forms/phenological_stage_form.py:32 app/forms/stress_form.py:30
 #: app/templates/climate_measure/list.html:75
-#: app/templates/indicator/list.html:77
+#: app/templates/indicator/list.html:78
 #: app/templates/indicator_category/list.html:73
 #: app/templates/role/edit.html:51 app/templates/stress/list.html:75
 msgid "Descripción"
@@ -372,7 +372,7 @@ msgid "Máximo 25 caracteres."
 msgstr "Maximum 25 characters."
 
 #: app/forms/indicator_form.py:32 app/templates/indicator/list.html:75
-#: app/templates/indicator/list.html:252
+#: app/templates/indicator/list.html:261
 msgid "Tipo"
 msgstr "Type"
 
@@ -380,13 +380,21 @@ msgstr "Type"
 msgid "Debe seleccionar un tipo."
 msgstr "You must select a type."
 
-#: app/forms/indicator_form.py:38 app/forms/stress_form.py:24
-#: app/templates/indicator/list.html:76 app/templates/stress/list.html:74
+#: app/forms/indicator_form.py:38 app/templates/indicator/list.html:76
+msgid "Temporalidad"
+msgstr "Temporality"
+
+#: app/forms/indicator_form.py:40
+msgid "Debe seleccionar una temporalidad."
+msgstr "You must select a temporality."
+
+#: app/forms/indicator_form.py:44 app/forms/stress_form.py:24
+#: app/templates/indicator/list.html:77 app/templates/stress/list.html:74
 #: app/templates/stress/list.html:239
 msgid "Categoría"
 msgstr "Category"
 
-#: app/forms/indicator_form.py:41 app/forms/stress_form.py:26
+#: app/forms/indicator_form.py:47 app/forms/stress_form.py:26
 msgid "Debe seleccionar una categoría."
 msgstr "You must select a category."
 
@@ -807,7 +815,7 @@ msgstr "Administrative division added successfully."
 #: app/routes/data_source_routes.py:106
 #: app/routes/indicators_category_routes.py:43
 #: app/routes/indicators_category_routes.py:75
-#: app/routes/indicators_routes.py:55 app/routes/indicators_routes.py:101
+#: app/routes/indicators_routes.py:58 app/routes/indicators_routes.py:107
 #: app/routes/phenological_stage_routes.py:51
 #: app/routes/phenological_stage_routes.py:93
 #: app/routes/phenological_stage_stress_routes.py:46
@@ -828,7 +836,7 @@ msgstr "Administrative division updated."
 #: app/routes/crop_routes.py:64 app/routes/cultivar_routes.py:83
 #: app/routes/data_source_routes.py:94
 #: app/routes/indicators_category_routes.py:64
-#: app/routes/indicators_routes.py:90
+#: app/routes/indicators_routes.py:96
 #: app/routes/phenological_stage_routes.py:82
 #: app/routes/phenological_stage_stress_routes.py:76
 #: app/routes/season_routes.py:95 app/routes/setup_routes.py:101
@@ -1035,23 +1043,23 @@ msgstr "Category disabled."
 msgid "Categoría reactivada."
 msgstr "Category reactivated."
 
-#: app/routes/indicators_routes.py:30
+#: app/routes/indicators_routes.py:32
 msgid "No tienes permiso para crear indicadores."
 msgstr "You don't have permission to create indicators."
 
-#: app/routes/indicators_routes.py:43
+#: app/routes/indicators_routes.py:46
 msgid "Indicador agregado correctamente."
 msgstr "Indicator added successfully."
 
-#: app/routes/indicators_routes.py:80
+#: app/routes/indicators_routes.py:86
 msgid "Indicador actualizado."
 msgstr "Indicator updated."
 
-#: app/routes/indicators_routes.py:92
+#: app/routes/indicators_routes.py:98
 msgid "Indicador deshabilitado."
 msgstr "Indicator disabled."
 
-#: app/routes/indicators_routes.py:105
+#: app/routes/indicators_routes.py:111
 msgid "Indicador reactivado."
 msgstr "Indicator reactivated."
 
@@ -1507,7 +1515,7 @@ msgstr "E.g.: 27 for Chocó"
 #: app/templates/cultivar/list.html:206 app/templates/data_source/add.html:38
 #: app/templates/data_source/edit.html:64
 #: app/templates/data_source/list.html:210 app/templates/indicator/add.html:64
-#: app/templates/indicator/edit.html:77 app/templates/indicator/list.html:223
+#: app/templates/indicator/edit.html:85 app/templates/indicator/list.html:232
 #: app/templates/indicator_category/add.html:64
 #: app/templates/indicator_category/edit.html:38
 #: app/templates/indicator_category/list.html:184
@@ -1549,7 +1557,7 @@ msgstr "Administrative Divisions - Level 1 (ADM1)"
 #: app/templates/cultivar/list.html:13 app/templates/cultivar/list.html:208
 #: app/templates/data_source/list.html:13
 #: app/templates/data_source/list.html:212 app/templates/indicator/add.html:65
-#: app/templates/indicator/list.html:13 app/templates/indicator/list.html:225
+#: app/templates/indicator/list.html:13 app/templates/indicator/list.html:234
 #: app/templates/indicator_category/add.html:65
 #: app/templates/indicator_category/list.html:13
 #: app/templates/indicator_category/list.html:186
@@ -1698,8 +1706,8 @@ msgstr "Recover selected"
 #: app/templates/crop/list.html:71 app/templates/crop/list.html:203
 #: app/templates/cultivar/list.html:75 app/templates/cultivar/list.html:259
 #: app/templates/data_source/list.html:76
-#: app/templates/data_source/list.html:263 app/templates/indicator/list.html:78
-#: app/templates/indicator/list.html:260
+#: app/templates/data_source/list.html:263 app/templates/indicator/list.html:79
+#: app/templates/indicator/list.html:269
 #: app/templates/indicator_category/list.html:74
 #: app/templates/indicator_category/list.html:213
 #: app/templates/location/list.html:80 app/templates/location/list.html:366
@@ -1721,7 +1729,7 @@ msgstr "Status"
 #: app/templates/country_indicator/list.html:77
 #: app/templates/crop/crop_list.html:68 app/templates/crop/list.html:73
 #: app/templates/cultivar/list.html:77 app/templates/data_source/list.html:78
-#: app/templates/indicator/list.html:80
+#: app/templates/indicator/list.html:81
 #: app/templates/indicator_category/list.html:76
 #: app/templates/location/list.html:81
 #: app/templates/phenological_stage/list.html:79
@@ -1742,7 +1750,7 @@ msgstr "No ID"
 #: app/templates/country/list.html:218 app/templates/crop/crop_list.html:192
 #: app/templates/crop/list.html:207 app/templates/cultivar/list.html:97
 #: app/templates/cultivar/list.html:263 app/templates/data_source/list.html:267
-#: app/templates/indicator/list.html:264 app/templates/location/list.html:97
+#: app/templates/indicator/list.html:273 app/templates/location/list.html:97
 #: app/templates/location/list.html:370
 #: app/templates/phenological_stage/list.html:100
 #: app/templates/phenological_stage/list.html:278
@@ -1760,7 +1768,7 @@ msgstr "Enabled"
 #: app/templates/country/list.html:219 app/templates/crop/crop_list.html:193
 #: app/templates/crop/list.html:208 app/templates/cultivar/list.html:97
 #: app/templates/cultivar/list.html:264 app/templates/data_source/list.html:268
-#: app/templates/indicator/list.html:265 app/templates/location/list.html:97
+#: app/templates/indicator/list.html:274 app/templates/location/list.html:97
 #: app/templates/location/list.html:371
 #: app/templates/phenological_stage/list.html:100
 #: app/templates/phenological_stage/list.html:279
@@ -1813,7 +1821,7 @@ msgstr "Recover"
 #: app/templates/country_indicator/list.html:126
 #: app/templates/crop/crop_list.html:113 app/templates/crop/list.html:127
 #: app/templates/cultivar/list.html:139 app/templates/data_source/list.html:136
-#: app/templates/indicator/list.html:146
+#: app/templates/indicator/list.html:148
 #: app/templates/indicator_category/list.html:135
 #: app/templates/location/list.html:138
 #: app/templates/phenological_stage/list.html:144
@@ -1917,7 +1925,7 @@ msgstr "Disabled"
 #: app/templates/climate_measure/list.html:139
 #: app/templates/country_indicator/list.html:126
 #: app/templates/crop/crop_list.html:113 app/templates/crop/list.html:127
-#: app/templates/indicator/list.html:146
+#: app/templates/indicator/list.html:148
 #: app/templates/indicator_category/list.html:135
 #: app/templates/phenological_stage/list.html:144
 #: app/templates/phenological_stage_stress/list.html:141
@@ -2087,7 +2095,7 @@ msgstr "No data sources registered."
 msgid "Agregar fuente"
 msgstr "Add source"
 
-#: app/templates/indicator/add.html:7 app/templates/indicator/list.html:168
+#: app/templates/indicator/add.html:7 app/templates/indicator/list.html:170
 #: app/templates/indicator_category/add.html:7
 msgid "Agregar indicador"
 msgstr "Add indicator"
@@ -2097,11 +2105,11 @@ msgstr "Add indicator"
 msgid "Editar indicador"
 msgstr "Edit indicator"
 
-#: app/templates/indicator/list.html:150
+#: app/templates/indicator/list.html:152
 msgid "No hay indicadores registrados."
 msgstr "No indicators registered."
 
-#: app/templates/indicator/list.html:255
+#: app/templates/indicator/list.html:264
 msgid "Sin tipo"
 msgstr "No type"
 
@@ -3123,4 +3131,23 @@ msgstr "Save Changes"
 
 #~ msgid "Fuentes"
 #~ msgstr "Sources"
+
+# Valores del enum Period (Temporalidad)
+#~ msgid "daily"
+#~ msgstr "Daily"
+
+#~ msgid "monthly"
+#~ msgstr "Monthly"
+
+#~ msgid "annual"
+#~ msgstr "Annual"
+
+#~ msgid "seasonal"
+#~ msgstr "Seasonal"
+
+#~ msgid "decadal"
+#~ msgstr "Decadal"
+
+#~ msgid "other"
+#~ msgstr "Other"
 
