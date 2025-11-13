@@ -18,9 +18,10 @@ def load_user(user_id):
 
 @bp.route('/')
 def index():
+    """Página principal - muestra landing page pública o redirige a home si está autenticado"""
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-    return redirect(url_for('main.login'))
+    return render_template('landing.html')
 
 @bp.route('/login')
 def login():
