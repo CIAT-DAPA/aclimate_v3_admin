@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired, Length, NumberRange
 class LocationForm(FlaskForm):
     country = SelectField(
         _l('País'),
+        coerce=int,
         validators=[
             DataRequired(message=_l('Debe seleccionar un país.'))
         ],

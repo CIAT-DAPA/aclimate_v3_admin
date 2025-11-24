@@ -93,21 +93,46 @@ def edit_location(id):
 
     form = LocationForm(obj=loc)
     form.country.choices = [(0, '---------')] + [(a.id, a.name) for a in country_service.get_all()]
-    # Solo la opción vacía para selects dependientes
-    form.admin_1_id.choices = [(0, '---------')]
-    form.admin_2_id.choices = [(0, '---------')]
     form.source_id.choices = [(0, '---------')] + [(s.id, s.name) for s in source_service.get_all()]
     
+    # Obtener el ADM2 actual de la locación
+    adm2 = adm2_service.get_by_id(loc.admin_2_id)
+    if adm2:
+        # Obtener el ADM1 desde ADM2
+        adm1 = adm1_service.get_by_id(adm2.admin_1_id)
+        if adm1:
+            # Obtener el país desde ADM1
+            country_id = adm1.country_id
+            
+            # Poblar choices de ADM1 basado en el país
+            form.admin_1_id.choices = [(0, '---------')] + [(a.id, a.name) for a in adm1_service.get_by_country_id(country_id)]
+            
+            # Poblar choices de ADM2 basado en ADM1
+            form.admin_2_id.choices = [(0, '---------')] + [(a.id, a.name) for a in adm2_service.get_by_admin1_id(adm2.admin_1_id)]
+            
+            # Pre-cargar los valores en GET
+            if request.method == 'GET':
+                form.country.data = country_id
+                form.admin_1_id.data = adm2.admin_1_id
+                form.admin_2_id.data = loc.admin_2_id
+                form.source_id.data = loc.source_id
+                form.ubi.data = loc.name
+                form.latitude.data = loc.latitude
+                form.longitude.data = loc.longitude
+                form.altitude.data = loc.altitude
+
+        else:
+            form.admin_1_id.choices = [(0, '---------')]
+            form.admin_2_id.choices = [(0, '---------')]
+    else:
+        form.admin_1_id.choices = [(0, '---------')]
+        form.admin_2_id.choices = [(0, '---------')]
+    
     # Si es POST, se poblan los choices según lo enviado (para que WTForms valide correctamente)
-    if form.country.data:
+    if request.method == 'POST' and form.country.data:
         form.admin_1_id.choices = [(0, '---------')] + [(a.id, a.name) for a in adm1_service.get_by_country_id(form.country.data)]
-    if form.admin_1_id.data:
+    if request.method == 'POST' and form.admin_1_id.data:
         form.admin_2_id.choices = [(0, '---------')] + [(a.id, a.name) for a in adm2_service.get_by_admin1_id(form.admin_1_id.data)]
-
-
-    if request.method == 'GET':
-        form.country.data = loc.country
-        form.ubi.data = loc.name
 
     if form.validate_on_submit():
         update_data = LocationUpdate(
