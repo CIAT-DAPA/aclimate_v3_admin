@@ -345,6 +345,12 @@
           <nav class="nav flex-column">
             <a
               class="nav-link d-flex align-items-center text-dark"
+              href="{{ url_for('app.list_app') }}"
+            >
+              <span>{{ _('Aplicaciones') }}</span>
+            </a>
+            <a
+              class="nav-link d-flex align-items-center text-dark"
               href="{{ url_for('source.list_source') }}"
             >
               <span>{{ _('Fuentes de locaciones') }}</span>
