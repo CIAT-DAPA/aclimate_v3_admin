@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Aplicaciones') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Aplicaciones') }}</h2>
+    {% if can_create %}
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addAppModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="appSearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="appFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="appFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="appSearchResults" class="text-muted small"></span>
+  </div>
+
+  <!-- Contenedor para mensajes -->
+  <div id="noAppResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if apps %}
+  <div id="appTableContainer" class="table-responsive">
+    {% if current_user.has_module_access('configuration', 'delete') %}
+    <form id="bulk-action-form" method="POST" action="{{ url_for('app.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Deshabilitar seleccionados') }}
+        </button>
+        <button type="button" class="btn btn-success btn-sm" disabled id="bulk-recover">
+          <i class="fas fa-undo"></i> {{ _('Recuperar seleccionados') }}
+        </button>
+      </div>
+    {% endif %}
+      <table class="table table-hover align-middle table-sm">
+        <thead class="table-light">
+          <tr>
+            {% if current_user.has_module_access('configuration', 'delete') %}
+            <th style="width: 40px; min-width: 40px;"><input type="checkbox" id="select-all" /></th>
+            {% endif %}
+            <th style="width: 30%; min-width: 150px;">{{ _('Nombre') }}</th>
+            <th style="width: 30%; min-width: 150px;">{{ _('ID externo del país') }}</th>
+            <th style="width: 20%; min-width: 100px;">{{ _('Estado') }}</th>
+            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
+            <th class="text-end" style="width: 20%; min-width: 100px;">{{ _('Acciones') }}</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody id="appTableBody">
+          {% for app in apps %}
+          <tr data-status="{% if app.enable %}active{% else %}inactive{% endif %}">
+            {% if current_user.has_module_access('configuration', 'delete') %}
+            <td><input type="checkbox" name="selected_ids" value="{{ app.id }}" class="select-row" /></td>
+            {% endif %}
+            <td class="searchable name">{{ app.name }}</td>
+            <td class="searchable country_ext_id">{{ app.country_ext_id }}</td>
+            <td class="searchable status">
+              {% if app.enable %}
+                {{ _('Habilitado') }}
+              {% else %}
+                {{ _('Deshabilitado') }}
+              {% endif %}
+            </td>
+            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
+            <td class="text-end">
+              {% if current_user.has_module_access('configuration', 'update') %}
+              <a
+                href="{{ url_for('app.edit_app', id=app.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="{{ _('Editar') }}"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% endif %}
+              {% if current_user.has_module_access('configuration', 'delete') %}
+              {% if app.enable %}
+              <a
+                href="{{ url_for('app.delete_app', id=app.id) }}"
+                class="btn btn-danger btn-sm"
+                title="{{ _('Deshabilitar') }}"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% else %}
+              <a
+                href="{{ url_for('app.reset_app', id=app.id) }}"
+                class="btn btn-success btn-sm"
+                title="{{ _('Recuperar') }}"
+              >
+                <i class="fas fa-undo"></i>
+              </a>
+              {% endif %}
+              {% endif %}
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% if current_user.has_module_access('configuration', 'delete') %}
+    </form>
+    {% endif %}
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="appResultsCount"></span> {{ _('resultados') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay aplicaciones registradas.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal para agregar Aplicación -->
+<div
+  class="modal fade"
+  id="addAppModal"
+  tabindex="-1"
+  aria-labelledby="addAppLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addAppLabel">
+          {{ _('Agregar aplicación') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Cerrar') }}"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control") }}
+          {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.country_ext_id.label(class="form-label") }}
+          {{ form.country_ext_id(class="form-control") }}
+          {% for error in form.country_ext_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Estilos personalizados para la tabla -->
+<style>
+  #appTableContainer table th {
+    white-space: nowrap;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    padding: 0.75rem 0.5rem;
+  }
+  
+  #appTableContainer table td {
+    vertical-align: middle;
+    padding: 0.6rem 0.5rem;
+  }
+  
+  #appTableContainer .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  #appTableContainer table {
+    margin-bottom: 0;
+  }
+</style>
+
+<!-- Script para búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración para búsqueda en aplicaciones
+    initTableSearch({
+      searchInputId: 'appSearchInput',
+      filtersButtonId: 'appFiltersButton',
+      tableContainerId: 'appTableContainer',
+      noResultsId: 'noAppResults',
+      resultsCountId: 'appResultsCount',
+      tableBodyId: 'appTableBody',
+      searchColumns: [
+        { selector: '.searchable' }
+      ],
+      filterConfigs: [
+        {
+          name: 'status',
+          label: '{{ _("Estado") }}',
+          getValue: row => row.dataset.status,
+          getDisplayValue: row => {
+            return row.dataset.status === 'active' 
+              ? '{{ _("Habilitado") }}' 
+              : '{{ _("Deshabilitado") }}';
+          }
+        }
+      ]
+    });
+    // Configuración para acciones masivas
+    setupBulkActions({
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      recoverBtnId: 'bulk-recover',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+{% endblock %}
