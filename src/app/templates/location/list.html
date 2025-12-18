@@ -67,6 +67,7 @@
         </button>
         {% endif %}
       </div>
+      <div class="table-responsive">
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
@@ -74,6 +75,8 @@
               <input type="checkbox" id="select-all" />
             </th>
             <th>{{ _('Locación') }}</th>
+            <th>{{ _('ID Externo') }}</th>
+            <th>{{ _('Fuente') }}</th>
             <th>{{ _('División administrativa 1') }}</th>
             <th>{{ _('División administrativa 2') }}</th>
             <th>{{ _('País') }}</th>
@@ -86,20 +89,24 @@
           <tr data-country="{{ loc.admin_2.admin_1.country.name }}"
             data-admin1="{{ loc.admin_2.admin_1.name }}"
             data-admin2="{{ loc.admin_2.name }}"
+            data-source="{{ loc.source.name if loc.source else '-' }}"
             data-status="{% if loc.enable %}active{% else %}inactive{% endif %}">
             <td>
               <input type="checkbox" name="selected_ids" value="{{ loc.id }}" class="select-row" />
             </td>
             <td class="searchable">{{ loc.name }}</td>
+            <td class="searchable">{{ loc.ext_id }}</td>
+            <td class="searchable">{{ loc.source.name if loc.source else '-' }}</td>
             <td class="searchable">{{ loc.admin_2.admin_1.name }}</td>
             <td class="searchable">{{ loc.admin_2.name }}</td>
             <td class="searchable">{{ loc.admin_2.admin_1.country.name }}</td>
             <td>{{ _('Habilitado') if loc.enable else _('Deshabilitado') }}</td>
-            <td class="text-end">
+            <td class="text-end text-nowrap" style="min-width: 120px;">
+              <div class="d-inline-flex gap-2">
               {% if current_user.has_module_access('geographic', 'update') %}
               <a
                 href="{{ url_for('location.edit_location', id=loc.id) }}"
-                class="btn btn-warning btn-sm me-2"
+                class="btn btn-warning btn-sm"
                 title="{{ _('Editar') }}"
               >
                 <i class="fas fa-pen"></i>
@@ -126,11 +133,13 @@
                 </a>
                 {% endif %}
               {% endif %}
+              </div>
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+      </div>
     </form>
   </div>
   <!-- Mensaje de contador de resultados -->
@@ -209,17 +218,33 @@
             <div class="text-danger">{{ error }}</div>
             {% endfor %}
           </div>
-          <div class="col-3">
+          <div class="col-6">
+            {{ form.ext_id.label(class="form-label") }}
+            {{ form.ext_id(class="form-control", id="ext_id") }}
+            {% for error in form.ext_id.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-4">
             {{ form.latitude.label(class="form-label") }}
             {{ form.latitude(class="form-control", id="latitude", type="number", step="any") }}
             {% for error in form.latitude.errors %}
             <div class="text-danger">{{ error }}</div>
             {% endfor %}
           </div>
-          <div class="col-3">
+          <div class="col-4">
             {{ form.longitude.label(class="form-label") }}
             {{ form.longitude(class="form-control", id="longitude", type="number", step="any") }}
             {% for error in form.longitude.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-4">
+            {{ form.altitude.label(class="form-label") }}
+            {{ form.altitude(class="form-control", id="altitude") }}
+            {% for error in form.altitude.errors %}
             <div class="text-danger">{{ error }}</div>
             {% endfor %}
           </div>
@@ -228,15 +253,6 @@
         <div class="mb-3">
           <label class="form-label">{{ _('Ubicación en el mapa') }}</label>
           <div id="map" style="height: 300px; width: 100%; border: 1px solid #ccc;"></div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-6">
-            {{ form.altitude.label(class="form-label") }}
-            {{ form.altitude(class="form-control", id="altitude") }}
-            {% for error in form.altitude.errors %}
-            <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-          </div>
         </div>
       </div>
       <div class="modal-footer d-flex justify-content-between">
@@ -348,6 +364,12 @@ document.addEventListener('DOMContentLoaded', function() {
           label: '{{ _("País") }}',
           getValue: row => row.dataset.country,
           getDisplayValue: row => row.dataset.country
+        },
+        {
+          name: 'source',
+          label: '{{ _("Fuente") }}',
+          getValue: row => row.dataset.source,
+          getDisplayValue: row => row.dataset.source
         },
         {
           name: 'admin1',
