@@ -45,7 +45,7 @@ def list_location():
             admin_2_id=form.admin_2_id.data,
             source_id=form.source_id.data,
             name=form.ubi.data,
-            ext_id=form.ubi.data,
+            ext_id=form.ext_id.data,
             latitude=form.latitude.data,
             longitude=form.longitude.data,
             altitude=form.altitude.data,
@@ -117,6 +117,7 @@ def edit_location(id):
                 form.admin_2_id.data = loc.admin_2_id
                 form.source_id.data = loc.source_id
                 form.ubi.data = loc.name
+                form.ext_id.data = loc.ext_id
                 form.latitude.data = loc.latitude
                 form.longitude.data = loc.longitude
                 form.altitude.data = loc.altitude
@@ -139,7 +140,7 @@ def edit_location(id):
             admin_2_id=form.admin_2_id.data,
             source_id=form.source_id.data,
             name=form.ubi.data,
-            ext_id=form.ubi.data,
+            ext_id=form.ext_id.data,
             latitude=form.latitude.data,
             longitude=form.longitude.data,
             altitude=form.altitude.data,

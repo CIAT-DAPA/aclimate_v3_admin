@@ -44,6 +44,14 @@ class LocationForm(FlaskForm):
         ]
     )
 
+    ext_id = StringField(
+        _l('ID Externo'),
+        validators=[
+            DataRequired(message=_l('El ID externo es obligatorio.')),
+            Length(max=255, message=_l('Máximo 255 caracteres.'))
+        ]
+    )
+
     latitude = StringField(
         _l('Latitud'),
         validators=[

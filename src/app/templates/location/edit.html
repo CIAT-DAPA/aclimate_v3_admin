@@ -52,21 +52,30 @@
             <div class="text-danger">{{ error }}</div>
             {% endfor %}
           </div>
-          <div class="col-2">
+          <div class="col-6">
+            {{ form.ext_id.label(class="form-label") }}
+            {{ form.ext_id(class="form-control", id="ext_id") }}
+            {% for error in form.ext_id.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+    </div>
+    <div class="row mb-3">
+          <div class="col-4">
             {{ form.latitude.label(class="form-label") }}
             {{ form.latitude(class="form-control", id="latitude", type="number", step="any") }}
             {% for error in form.latitude.errors %}
             <div class="text-danger">{{ error }}</div>
             {% endfor %}
           </div>
-          <div class="col-2">
+          <div class="col-4">
             {{ form.longitude.label(class="form-label") }}
             {{ form.longitude(class="form-control", id="longitude", type="number", step="any") }}
             {% for error in form.longitude.errors %}
             <div class="text-danger">{{ error }}</div>
             {% endfor %}
           </div>
-          <div class="col-2">
+          <div class="col-4">
             {{ form.altitude.label(class="form-label") }}
             {{ form.altitude(class="form-control", id="altitude") }}
             {% for error in form.altitude.errors %}
