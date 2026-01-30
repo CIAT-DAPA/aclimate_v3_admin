@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Editar Característica de Indicador') }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ _('Editar característica de indicador') }}</h2>
+    <a href="{{ url_for('indicator_features.list_indicator_features') }}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> {{ _('Volver al listado') }}
+    </a>
+  </div>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.country_indicator_id.label(class="form-label") }}
+      {{ form.country_indicator_id(class="form-select", disabled=true) }}
+      <small class="form-text text-muted">{{ _('La relación país-indicador no se puede cambiar después de la creación.') }}</small>
+      {% for error in form.country_indicator_id.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.title.label(class="form-label") }}
+      {{ form.title(class="form-control") }}
+      {% for error in form.title.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.description.label(class="form-label") }}
+      {{ form.description(class="form-control", rows="4") }}
+      {% for error in form.description.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.type.label(class="form-label") }}
+      {{ form.type(class="form-select") }}
+      {% for error in form.type.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    {{ form.submit(class="btn btn-success") }}
+    <a href="{{ url_for('indicator_features.list_indicator_features') }}" class="btn btn-outline-secondary">{{ _('Cancelar') }}</a>
+  </form>
+</div>
+{% endblock %}
