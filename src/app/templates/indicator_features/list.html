@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Características de Indicadores') }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4" style="margin-bottom: 100px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ _('Características de Indicadores') }}</h2>
+    {% if can_create %}
+    <button
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addIndicatorFeatureModal"
+    >
+      <i class="fas fa-plus"></i> {{ _('Agregar') }}
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <input
+      type="text"
+      class="form-control me-2"
+      id="indicatorFeatureSearchInput"
+      placeholder="{{ _('Buscar...') }}"
+      style="max-width: 300px"
+    />
+    <div class="dropdown">
+      <button 
+        class="btn btn-outline-secondary dropdown-toggle" 
+        type="button" 
+        id="indicatorFeatureFiltersButton" 
+        data-bs-toggle="dropdown" 
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+        data-filter-text="{{ _('Filtros') }}"
+        data-clear-text="{{ _('Limpiar filtros') }}"
+      >
+        <i class="fas fa-filter"></i> {{ _('Filtros') }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="indicatorFeatureFiltersButton" style="min-width: 250px;">
+        <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
+      </ul>
+    </div>
+    <span id="indicatorFeatureSearchResults" class="text-muted small"></span>
+  </div>
+
+  <!-- Contenedor para mensajes -->
+  <div id="noIndicatorFeatureResults" class="alert alert-info mt-4" style="display: none;">
+    {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
+  </div>
+
+  {% if indicator_features %}
+  <div id="indicatorFeatureTableContainer" class="table-responsive">
+    {% if current_user.has_module_access('configuration', 'delete') %}
+    <form id="bulk-action-form" method="POST" action="{{ url_for('indicator_features.bulk_action') }}">
+      <div class="mb-2">
+        <input type="hidden" name="action" id="bulk-action-hidden" value="" />
+        <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
+          <i class="fas fa-trash"></i> {{ _('Eliminar seleccionadas') }}
+        </button>
+      </div>
+    {% endif %}
+      <table class="table table-hover align-middle table-sm">
+        <thead class="table-light">
+          <tr>
+            {% if current_user.has_module_access('configuration', 'delete') %}
+            <th style="width: 40px; min-width: 40px;"><input type="checkbox" id="select-all" /></th>
+            {% endif %}
+            <th style="width: 25%; min-width: 200px;">{{ _('País - Indicador') }}</th>
+            <th style="width: 20%; min-width: 150px;">{{ _('Título') }}</th>
+            <th style="width: 35%; min-width: 200px;">{{ _('Descripción') }}</th>
+            <th style="width: 10%; min-width: 120px;">{{ _('Tipo') }}</th>
+            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
+            <th class="text-end" style="width: 10%; min-width: 100px;">{{ _('Acciones') }}</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody id="indicatorFeatureTableBody">
+          {% for feature in indicator_features %}
+          <tr>
+            {% if current_user.has_module_access('configuration', 'delete') %}
+            <td><input type="checkbox" name="selected_ids" value="{{ feature.id }}" class="select-row" /></td>
+            {% endif %}
+            <td class="searchable country-indicator">
+              {{ feature.country_indicator.country.name if feature.country_indicator and feature.country_indicator.country else '' }} - 
+              {{ feature.country_indicator.indicator.name if feature.country_indicator and feature.country_indicator.indicator else '' }}
+            </td>
+            <td class="searchable title">{{ feature.title }}</td>
+            <td class="searchable description">{{ feature.description or '' }}</td>
+            <td class="searchable type">{{ _(feature.type.capitalize()) if feature.type else '' }}</td>
+            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
+            <td class="text-end">
+              {% if current_user.has_module_access('configuration', 'update') %}
+              <a
+                href="{{ url_for('indicator_features.edit_indicator_features', id=feature.id) }}"
+                class="btn btn-warning btn-sm me-2"
+                title="{{ _('Editar') }}"
+              >
+                <i class="fas fa-pen"></i>
+              </a>
+              {% endif %}
+              {% if current_user.has_module_access('configuration', 'delete') %}
+              <a
+                href="{{ url_for('indicator_features.delete_indicator_features', id=feature.id) }}"
+                class="btn btn-danger btn-sm"
+                title="{{ _('Eliminar') }}"
+              >
+                <i class="fas fa-trash"></i>
+              </a>
+              {% endif %}
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% if current_user.has_module_access('configuration', 'delete') %}
+    </form>
+    {% endif %}
+  </div>
+  <!-- Mensaje de contador de resultados -->
+  <div class="mt-2 text-muted small">
+    {{ _('Mostrando') }} <span id="indicatorFeatureResultsCount"></span> {{ _('resultados') }}
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">
+    {{ _('No hay características de indicadores registradas.') }}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Estilos personalizados para la tabla -->
+<style>
+  #indicatorFeatureTableContainer table th {
+    white-space: nowrap;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    padding: 0.75rem 0.5rem;
+  }
+  
+  #indicatorFeatureTableContainer table td {
+    vertical-align: middle;
+    padding: 0.6rem 0.5rem;
+  }
+  
+  #indicatorFeatureTableContainer .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  #indicatorFeatureTableContainer table {
+    margin-bottom: 0;
+  }
+</style>
+
+<!-- Modal para agregar Característica de Indicador -->
+<div
+  class="modal fade"
+  id="addIndicatorFeatureModal"
+  tabindex="-1"
+  aria-labelledby="addIndicatorFeatureLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {{ form.hidden_tag() }}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addIndicatorFeatureLabel">
+          {{ _('Agregar característica de indicador') }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Cerrar') }}"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          {{ form.country_indicator_id.label(class="form-label") }}
+          {{ form.country_indicator_id(class="form-select") }}
+          {% for error in form.country_indicator_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.title.label(class="form-label") }}
+          {{ form.title(class="form-control") }}
+          {% for error in form.title.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-control", rows="3") }}
+          {% for error in form.description.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.type.label(class="form-label") }}
+          {{ form.type(class="form-select") }}
+          {% for error in form.type.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ _('Cancelar') }}
+        </button>
+        <button type="submit" class="btn btn-primary">{{ _('Agregar') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Script para búsqueda y acciones masivas -->
+<script type="module">
+  import { initTableSearch } from "{{ url_for('static', filename='js/utils/tableSearch.js') }}";
+  import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración para búsqueda y filtros en características de indicadores
+    initTableSearch({
+      searchInputId: 'indicatorFeatureSearchInput',
+      filtersButtonId: 'indicatorFeatureFiltersButton',
+      tableContainerId: 'indicatorFeatureTableContainer',
+      noResultsId: 'noIndicatorFeatureResults',
+      resultsCountId: 'indicatorFeatureResultsCount',
+      tableBodyId: 'indicatorFeatureTableBody',
+      searchColumns: [
+        { selector: '.searchable' }
+      ],
+      filterConfigs: [
+        {
+          name: 'country_indicator',
+          label: '{{ _("País - Indicador") }}',
+          getValue: row => row.querySelector('.country-indicator')?.textContent.trim(),
+          getDisplayValue: row => row.querySelector('.country-indicator')?.textContent.trim() || ''
+        },
+        {
+          name: 'type',
+          label: '{{ _("Tipo") }}',
+          getValue: row => row.querySelector('.type')?.textContent.trim(),
+          getDisplayValue: row => row.querySelector('.type')?.textContent.trim() || ''
+        }
+      ]
+    });
+    // Configuración para acciones masivas
+    setupBulkActions({
+      selectAllId: 'select-all',
+      rowCheckboxClass: 'select-row',
+      disableBtnId: 'bulk-disable',
+      formId: 'bulk-action-form',
+      actionInputId: 'bulk-action-hidden'
+    });
+  });
+</script>
+{% endblock %}
