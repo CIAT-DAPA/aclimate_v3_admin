@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-11-24 10:35-0500\n"
+"POT-Creation-Date: 2026-02-03 09:26-0500\n"
 "PO-Revision-Date: 2025-08-05 10:12-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -65,15 +65,16 @@ msgstr "Name is required."
 #: app/forms/adm2_form.py:11 app/forms/adm2_form.py:19 app/forms/app_form.py:11
 #: app/forms/country_form.py:11 app/forms/crop_form.py:11
 #: app/forms/cultivar_form.py:25 app/forms/data_source_form.py:26
-#: app/forms/location_form.py:42 app/forms/phenological_stage_form.py:19
-#: app/forms/soil_form.py:25 app/forms/source_form.py:11
-#: app/forms/stress_form.py:11 app/forms/user_form.py:26
-#: app/forms/user_form.py:117
+#: app/forms/location_form.py:43 app/forms/location_form.py:51
+#: app/forms/phenological_stage_form.py:19 app/forms/soil_form.py:25
+#: app/forms/source_form.py:11 app/forms/stress_form.py:11
+#: app/forms/user_form.py:26 app/forms/user_form.py:117
 msgid "Máximo 255 caracteres."
 msgstr "Maximum 255 characters."
 
 #: app/forms/adm1_form.py:16 app/forms/adm2_form.py:16
-#: app/templates/adm1/list.html:77 app/templates/adm2/list.html:71
+#: app/forms/location_form.py:48 app/templates/adm1/list.html:77
+#: app/templates/adm2/list.html:71 app/templates/location/list.html:78
 msgid "ID Externo"
 msgstr "External ID"
 
@@ -91,13 +92,13 @@ msgstr "For Colombia: DANE Divipola Code for department"
 #: app/templates/cultivar/list.html:71 app/templates/cultivar/list.html:235
 #: app/templates/data_source/list.html:75
 #: app/templates/data_source/list.html:251 app/templates/home.html:39
-#: app/templates/location/list.html:79 app/templates/location/list.html:348
+#: app/templates/location/list.html:82 app/templates/location/list.html:364
 #: app/templates/soil/list.html:73 app/templates/soil/list.html:232
 msgid "País"
 msgstr "Country"
 
 #: app/forms/adm1_form.py:27 app/forms/cultivar_form.py:10
-#: app/forms/data_source_form.py:18 app/forms/location_form.py:10
+#: app/forms/data_source_form.py:18 app/forms/location_form.py:11
 #: app/forms/soil_form.py:10
 msgid "Debe seleccionar un país."
 msgstr "You must select a country."
@@ -117,8 +118,9 @@ msgstr "Is enabled?"
 #: app/forms/climate_measure_form.py:39 app/forms/country_form.py:26
 #: app/forms/country_indicator_form.py:45 app/forms/crop_form.py:17
 #: app/forms/cultivar_form.py:40 app/forms/data_source_form.py:67
-#: app/forms/indicator_category_form.py:22 app/forms/indicator_form.py:57
-#: app/forms/location_form.py:73 app/forms/phenological_stage_form.py:48
+#: app/forms/indicator_category_form.py:22
+#: app/forms/indicator_features_form.py:34 app/forms/indicator_form.py:57
+#: app/forms/location_form.py:82 app/forms/phenological_stage_form.py:48
 #: app/forms/phenological_stage_stress_form.py:37 app/forms/season_form.py:47
 #: app/forms/setup_form.py:47 app/forms/soil_form.py:39
 #: app/forms/source_form.py:24 app/forms/stress_form.py:36
@@ -134,11 +136,11 @@ msgstr "For Colombia: DANE Divipola Code for municipality"
 msgid "División Adm1 asociada"
 msgstr "Associated adm1"
 
-#: app/forms/adm2_form.py:27 app/forms/location_form.py:27
+#: app/forms/adm2_form.py:27 app/forms/location_form.py:28
 msgid "Debe seleccionar una división de nivel 1."
 msgstr "You must select a adm1."
 
-#: app/forms/adm2_form.py:31 app/forms/location_form.py:70
+#: app/forms/adm2_form.py:31 app/forms/location_form.py:79
 msgid "¿Es visible?"
 msgstr "Is visible?"
 
@@ -190,11 +192,13 @@ msgid "La unidad es obligatoria."
 msgstr "Unit is required."
 
 #: app/forms/climate_measure_form.py:33 app/forms/data_source_form.py:31
-#: app/forms/indicator_category_form.py:16 app/forms/indicator_form.py:51
+#: app/forms/indicator_category_form.py:16
+#: app/forms/indicator_features_form.py:24 app/forms/indicator_form.py:51
 #: app/forms/phenological_stage_form.py:32 app/forms/stress_form.py:30
 #: app/templates/climate_measure/list.html:75
 #: app/templates/indicator/list.html:78
 #: app/templates/indicator_category/list.html:73
+#: app/templates/indicator_features/list.html:71
 #: app/templates/role/edit.html:51 app/templates/stress/list.html:75
 msgid "Descripción"
 msgstr "Description"
@@ -377,14 +381,41 @@ msgstr "Custom"
 msgid "Contenido en formato JSON"
 msgstr "Content in JSON format"
 
+#: app/forms/indicator_features_form.py:9
+msgid "Relación País-Indicador"
+msgstr "Country-Indicator Relationships"
+
+#: app/forms/indicator_features_form.py:12
+msgid "La relación país-indicador es obligatoria."
+msgstr "Country-indicator relationship is mandatory."
+
+#: app/forms/indicator_features_form.py:16
+#: app/templates/indicator_features/list.html:70
+msgid "Título"
+msgstr "Title"
+
+#: app/forms/indicator_features_form.py:18
+msgid "El título es obligatorio."
+msgstr "Title is required."
+
+#: app/forms/indicator_features_form.py:19
+msgid "El título no puede exceder 150 caracteres."
+msgstr ""
+
+#: app/forms/indicator_features_form.py:29 app/forms/indicator_form.py:32
+#: app/templates/indicator/list.html:75 app/templates/indicator/list.html:261
+#: app/templates/indicator_features/list.html:72
+#: app/templates/indicator_features/list.html:244
+msgid "Tipo"
+msgstr "Type"
+
+#: app/forms/indicator_features_form.py:31
+msgid "El tipo es obligatorio."
+msgstr "Type is required."
+
 #: app/forms/indicator_form.py:27
 msgid "Máximo 25 caracteres."
 msgstr "Maximum 25 characters."
-
-#: app/forms/indicator_form.py:32 app/templates/indicator/list.html:75
-#: app/templates/indicator/list.html:261
-msgid "Tipo"
-msgstr "Type"
 
 #: app/forms/indicator_form.py:34
 msgid "Debe seleccionar un tipo."
@@ -408,58 +439,62 @@ msgstr "Category"
 msgid "Debe seleccionar una categoría."
 msgstr "You must select a category."
 
-#: app/forms/location_form.py:16
+#: app/forms/location_form.py:17
 msgid "Id del origen"
 msgstr "Source ID"
 
-#: app/forms/location_form.py:18
+#: app/forms/location_form.py:19
 msgid "Seleccione un id origen."
 msgstr "Select a source ID."
 
-#: app/forms/location_form.py:25 app/templates/adm1/edit.html:7
+#: app/forms/location_form.py:26 app/templates/adm1/edit.html:7
 #: app/templates/adm2/list.html:227 app/templates/home.html:61
 msgid "Nivel administrativo 1"
 msgstr "Administrative Level 1 (ADM1)"
 
-#: app/forms/location_form.py:32 app/templates/adm2/edit.html:7
+#: app/forms/location_form.py:33 app/templates/adm2/edit.html:7
 #: app/templates/home.html:84
 msgid "Nivel administrativo 2"
 msgstr "Administrative Level 2 (ADM2)"
 
-#: app/forms/location_form.py:34
+#: app/forms/location_form.py:35
 msgid "Debe seleccionar una división de nivel 2."
 msgstr "You must select an adm2."
 
-#: app/forms/location_form.py:39
+#: app/forms/location_form.py:40
 msgid "Nombre ubicación"
 msgstr "Location name"
 
-#: app/forms/location_form.py:41
+#: app/forms/location_form.py:42
 msgid "El nombre de la ubicación es obligatorio."
 msgstr "Location name is required."
 
-#: app/forms/location_form.py:47
+#: app/forms/location_form.py:50
+msgid "El ID externo es obligatorio."
+msgstr "External ID is required."
+
+#: app/forms/location_form.py:56
 msgid "Latitud"
 msgstr "Latitude"
 
-#: app/forms/location_form.py:49
+#: app/forms/location_form.py:58
 msgid "La latitud es obligatoria."
 msgstr "Latitude is required."
 
-#: app/forms/location_form.py:50 app/forms/location_form.py:58
-#: app/forms/location_form.py:65
+#: app/forms/location_form.py:59 app/forms/location_form.py:67
+#: app/forms/location_form.py:74
 msgid "Máximo 20 caracteres."
 msgstr "Maximum 20 characters."
 
-#: app/forms/location_form.py:55
+#: app/forms/location_form.py:64
 msgid "Longitud"
 msgstr "Longitude"
 
-#: app/forms/location_form.py:57
+#: app/forms/location_form.py:66
 msgid "La longitud es obligatoria."
 msgstr "Longitude is required."
 
-#: app/forms/location_form.py:63
+#: app/forms/location_form.py:72
 msgid "Altitud"
 msgstr "Altitude"
 
@@ -824,6 +859,7 @@ msgstr "Administrative division added successfully."
 #: app/routes/crop_routes.py:75 app/routes/cultivar_routes.py:52
 #: app/routes/cultivar_routes.py:94 app/routes/data_source_routes.py:57
 #: app/routes/data_source_routes.py:106
+#: app/routes/indicator_features_routes.py:97
 #: app/routes/indicators_category_routes.py:43
 #: app/routes/indicators_category_routes.py:75
 #: app/routes/indicators_routes.py:58 app/routes/indicators_routes.py:107
@@ -889,6 +925,7 @@ msgid "Aplicación actualizada."
 msgstr "Application updated."
 
 #: app/routes/app_routes.py:68 app/routes/country_indicator_routes.py:114
+#: app/routes/indicator_features_routes.py:128
 msgid "Error al actualizar: "
 msgstr "Error updating: "
 
@@ -965,6 +1002,7 @@ msgid "Relación país-indicador actualizada."
 msgstr "Country-indicator relationship updated."
 
 #: app/routes/country_indicator_routes.py:124
+#: app/routes/indicator_features_routes.py:138
 msgid "No se pudo eliminar."
 msgstr "Could not disable."
 
@@ -1073,6 +1111,30 @@ msgstr "Source disabled."
 #: app/routes/data_source_routes.py:110 app/routes/source_routes.py:92
 msgid "Fuente reactivada."
 msgstr "Source reactivated."
+
+#: app/routes/indicator_features_routes.py:32
+msgid "No tienes permiso para crear características de indicadores."
+msgstr "You don't have permission to create indicator feature."
+
+#: app/routes/indicator_features_routes.py:43
+msgid "Característica de indicador agregada correctamente."
+msgstr "Indicator feature added successfully."
+
+#: app/routes/indicator_features_routes.py:46
+msgid "Error al crear la característica: "
+msgstr "Error creating the feature: "
+
+#: app/routes/indicator_features_routes.py:125
+msgid "Característica de indicador actualizada."
+msgstr "Indicator feature removed updated."
+
+#: app/routes/indicator_features_routes.py:140
+msgid "Característica de indicador eliminada."
+msgstr "Indicator feature removed."
+
+#: app/routes/indicator_features_routes.py:151
+msgid "No se seleccionaron características."
+msgstr "No features were selected."
 
 #: app/routes/indicators_category_routes.py:22
 msgid "No tienes permiso para crear categorías."
@@ -1439,12 +1501,17 @@ msgstr "Client parameters "
 msgid "Indicadores por país"
 msgstr "Indicators by country"
 
+#: app/templates/base.html:374
+msgid "Características de indicadores"
+msgstr "Indicator Features"
+
 #: app/templates/adm1/list.html:169 app/templates/app/list.html:165
-#: app/templates/base.html:419 app/templates/climate_measure/list.html:167
+#: app/templates/base.html:425 app/templates/climate_measure/list.html:167
 #: app/templates/country_indicator/list.html:186
 #: app/templates/cultivar/list.html:167
 #: app/templates/indicator_category/list.html:163
-#: app/templates/location/list.html:167
+#: app/templates/indicator_features/list.html:175
+#: app/templates/location/list.html:176
 #: app/templates/phenological_stage/list.html:172
 #: app/templates/phenological_stage_stress/list.html:169
 #: app/templates/season/list.html:175 app/templates/setup/list.html:173
@@ -1672,7 +1739,9 @@ msgstr "E.g.: 27 for Chocó"
 #: app/templates/indicator_category/add.html:64
 #: app/templates/indicator_category/edit.html:38
 #: app/templates/indicator_category/list.html:184
-#: app/templates/location/edit.html:85 app/templates/location/list.html:244
+#: app/templates/indicator_features/edit.html:50
+#: app/templates/indicator_features/list.html:210
+#: app/templates/location/edit.html:94 app/templates/location/list.html:260
 #: app/templates/phenological_stage/add.html:38
 #: app/templates/phenological_stage/edit.html:70
 #: app/templates/phenological_stage/list.html:227
@@ -1715,7 +1784,9 @@ msgstr "Administrative Divisions - Level 1 (ADM1)"
 #: app/templates/indicator_category/add.html:65
 #: app/templates/indicator_category/list.html:13
 #: app/templates/indicator_category/list.html:186
-#: app/templates/location/list.html:16 app/templates/location/list.html:247
+#: app/templates/indicator_features/list.html:13
+#: app/templates/indicator_features/list.html:212
+#: app/templates/location/list.html:16 app/templates/location/list.html:263
 #: app/templates/phenological_stage/list.html:13
 #: app/templates/phenological_stage/list.html:229
 #: app/templates/phenological_stage_stress/list.html:13
@@ -1737,6 +1808,7 @@ msgstr "Add"
 #: app/templates/cultivar/list.html:24 app/templates/data_source/list.html:24
 #: app/templates/indicator/list.html:24
 #: app/templates/indicator_category/list.html:24
+#: app/templates/indicator_features/list.html:24
 #: app/templates/location/list.html:28
 #: app/templates/phenological_stage/list.html:24
 #: app/templates/phenological_stage_stress/list.html:24
@@ -1762,6 +1834,8 @@ msgstr "Search"
 #: app/templates/indicator/list.html:38
 #: app/templates/indicator_category/list.html:35
 #: app/templates/indicator_category/list.html:38
+#: app/templates/indicator_features/list.html:35
+#: app/templates/indicator_features/list.html:38
 #: app/templates/location/list.html:39 app/templates/location/list.html:42
 #: app/templates/phenological_stage/list.html:35
 #: app/templates/phenological_stage/list.html:38
@@ -1784,6 +1858,7 @@ msgstr "Filters"
 #: app/templates/cultivar/list.html:36 app/templates/data_source/list.html:36
 #: app/templates/indicator/list.html:36
 #: app/templates/indicator_category/list.html:36
+#: app/templates/indicator_features/list.html:36
 #: app/templates/location/list.html:40
 #: app/templates/phenological_stage/list.html:36
 #: app/templates/phenological_stage_stress/list.html:36
@@ -1801,6 +1876,7 @@ msgstr "Clear filters"
 #: app/templates/cultivar/list.html:41 app/templates/data_source/list.html:41
 #: app/templates/indicator/list.html:41
 #: app/templates/indicator_category/list.html:41
+#: app/templates/indicator_features/list.html:41
 #: app/templates/location/list.html:45
 #: app/templates/phenological_stage/list.html:41
 #: app/templates/phenological_stage_stress/list.html:41
@@ -1819,6 +1895,7 @@ msgstr "Loading filters..."
 #: app/templates/cultivar/list.html:49 app/templates/data_source/list.html:50
 #: app/templates/indicator/list.html:49
 #: app/templates/indicator_category/list.html:49
+#: app/templates/indicator_features/list.html:49
 #: app/templates/location/list.html:53
 #: app/templates/phenological_stage/list.html:49
 #: app/templates/phenological_stage_stress/list.html:49
@@ -1866,7 +1943,7 @@ msgstr "Recover selected"
 #: app/templates/indicator/list.html:269
 #: app/templates/indicator_category/list.html:74
 #: app/templates/indicator_category/list.html:213
-#: app/templates/location/list.html:80 app/templates/location/list.html:366
+#: app/templates/location/list.html:83 app/templates/location/list.html:388
 #: app/templates/phenological_stage/list.html:77
 #: app/templates/phenological_stage/list.html:274
 #: app/templates/phenological_stage_stress/list.html:76
@@ -1887,7 +1964,8 @@ msgstr "Status"
 #: app/templates/cultivar/list.html:77 app/templates/data_source/list.html:78
 #: app/templates/indicator/list.html:81
 #: app/templates/indicator_category/list.html:76
-#: app/templates/location/list.html:81
+#: app/templates/indicator_features/list.html:74
+#: app/templates/location/list.html:84
 #: app/templates/phenological_stage/list.html:79
 #: app/templates/phenological_stage_stress/list.html:78
 #: app/templates/role/list.html:71 app/templates/season/list.html:80
@@ -1907,8 +1985,8 @@ msgstr "No ID"
 #: app/templates/country/list.html:218 app/templates/crop/crop_list.html:192
 #: app/templates/crop/list.html:207 app/templates/cultivar/list.html:97
 #: app/templates/cultivar/list.html:263 app/templates/data_source/list.html:267
-#: app/templates/indicator/list.html:273 app/templates/location/list.html:97
-#: app/templates/location/list.html:370
+#: app/templates/indicator/list.html:273 app/templates/location/list.html:103
+#: app/templates/location/list.html:392
 #: app/templates/phenological_stage/list.html:100
 #: app/templates/phenological_stage/list.html:278
 #: app/templates/phenological_stage_stress/list.html:97
@@ -1926,8 +2004,8 @@ msgstr "Enabled"
 #: app/templates/country/list.html:219 app/templates/crop/crop_list.html:193
 #: app/templates/crop/list.html:208 app/templates/cultivar/list.html:97
 #: app/templates/cultivar/list.html:264 app/templates/data_source/list.html:268
-#: app/templates/indicator/list.html:274 app/templates/location/list.html:97
-#: app/templates/location/list.html:371
+#: app/templates/indicator/list.html:274 app/templates/location/list.html:103
+#: app/templates/location/list.html:393
 #: app/templates/phenological_stage/list.html:100
 #: app/templates/phenological_stage/list.html:279
 #: app/templates/phenological_stage_stress/list.html:97
@@ -1944,7 +2022,8 @@ msgstr "Disabled"
 #: app/templates/country_indicator/list.html:100
 #: app/templates/cultivar/list.html:105
 #: app/templates/indicator_category/list.html:99
-#: app/templates/location/list.html:103
+#: app/templates/indicator_features/list.html:97
+#: app/templates/location/list.html:110
 #: app/templates/phenological_stage/list.html:108
 #: app/templates/phenological_stage_stress/list.html:105
 #: app/templates/season/list.html:113 app/templates/setup/list.html:109
@@ -1956,7 +2035,7 @@ msgstr "Edit"
 #: app/templates/climate_measure/list.html:113
 #: app/templates/cultivar/list.html:115
 #: app/templates/indicator_category/list.html:109
-#: app/templates/location/list.html:113
+#: app/templates/location/list.html:120
 #: app/templates/phenological_stage/list.html:118
 #: app/templates/phenological_stage_stress/list.html:115
 #: app/templates/season/list.html:123 app/templates/setup/list.html:119
@@ -1968,7 +2047,7 @@ msgstr "Disable"
 #: app/templates/climate_measure/list.html:121
 #: app/templates/cultivar/list.html:123
 #: app/templates/indicator_category/list.html:117
-#: app/templates/location/list.html:123
+#: app/templates/location/list.html:130
 #: app/templates/phenological_stage/list.html:126
 #: app/templates/phenological_stage_stress/list.html:123
 #: app/templates/season/list.html:131 app/templates/setup/list.html:127
@@ -1984,7 +2063,8 @@ msgstr "Recover"
 #: app/templates/cultivar/list.html:139 app/templates/data_source/list.html:136
 #: app/templates/indicator/list.html:148
 #: app/templates/indicator_category/list.html:135
-#: app/templates/location/list.html:138
+#: app/templates/indicator_features/list.html:123
+#: app/templates/location/list.html:147
 #: app/templates/phenological_stage/list.html:144
 #: app/templates/phenological_stage_stress/list.html:141
 #: app/templates/role/list.html:521 app/templates/season/list.html:147
@@ -1996,7 +2076,7 @@ msgstr "Showing"
 
 #: app/templates/adm1/list.html:140 app/templates/adm2/list.html:131
 #: app/templates/country/list.html:124 app/templates/data_source/list.html:136
-#: app/templates/location/list.html:138 app/templates/source/list.html:139
+#: app/templates/location/list.html:147 app/templates/source/list.html:139
 msgid "resultado (s)"
 msgstr "result(s)"
 
@@ -2022,6 +2102,7 @@ msgstr "Edit Administrative Division - Level 2"
 
 #: app/templates/adm2/edit.html:15 app/templates/app/edit.html:16
 #: app/templates/country_indicator/edit.html:9
+#: app/templates/indicator_features/edit.html:9
 #: app/templates/phenological_stage/edit.html:9
 #: app/templates/setup/edit.html:19
 msgid "Volver al listado"
@@ -2056,6 +2137,7 @@ msgstr "Edit Application"
 #: app/templates/crop/crop_list.html:113 app/templates/crop/list.html:127
 #: app/templates/indicator/list.html:148
 #: app/templates/indicator_category/list.html:135
+#: app/templates/indicator_features/list.html:123
 #: app/templates/phenological_stage/list.html:144
 #: app/templates/phenological_stage_stress/list.html:141
 #: app/templates/setup/list.html:145 app/templates/stress/list.html:141
@@ -2157,6 +2239,7 @@ msgid "Relaciones País-Indicador"
 msgstr "Country-Indicator Relationships"
 
 #: app/templates/country_indicator/list.html:59
+#: app/templates/indicator_features/list.html:59
 msgid "Eliminar seleccionadas"
 msgstr "Delete selected"
 
@@ -2183,6 +2266,7 @@ msgid "No"
 msgstr "No"
 
 #: app/templates/country_indicator/list.html:109
+#: app/templates/indicator_features/list.html:106
 #: app/templates/setup/edit.html:76 app/templates/user/permissions.html:132
 msgid "Eliminar"
 msgstr "Delete"
@@ -2300,7 +2384,37 @@ msgstr "No categories registered."
 msgid "Agregar categoría de indicador"
 msgstr "Add indicator category"
 
-#: app/templates/location/edit.html:79 app/templates/location/list.html:229
+#: app/templates/indicator_features/edit.html:2
+msgid "Editar Característica de Indicador"
+msgstr "Edit indicator feature"
+
+#: app/templates/indicator_features/edit.html:7
+msgid "Editar característica de indicador"
+msgstr "Edit indicator feature"
+
+#: app/templates/indicator_features/edit.html:19
+msgid "La relación país-indicador no se puede cambiar después de la creación."
+msgstr "The country-indicator relationship cannot be changed after creation."
+
+#: app/templates/indicator_features/list.html:2
+#: app/templates/indicator_features/list.html:6
+msgid "Características de Indicadores"
+msgstr "Indicator Features"
+
+#: app/templates/indicator_features/list.html:69
+#: app/templates/indicator_features/list.html:238
+msgid "País - Indicador"
+msgstr "Country - Indicators"
+
+#: app/templates/indicator_features/list.html:127
+msgid "No hay características de indicadores registradas."
+msgstr "No indicators feature registered."
+
+#: app/templates/indicator_features/list.html:169
+msgid "Agregar característica de indicador"
+msgstr "Add indicator feature"
+
+#: app/templates/location/edit.html:88 app/templates/location/list.html:254
 msgid "Ubicación en el mapa"
 msgstr "Map location"
 
@@ -2457,23 +2571,27 @@ msgstr "... and %(count)s more error(s)"
 msgid "Importar CSV"
 msgstr "Import CSV"
 
-#: app/templates/location/list.html:76
+#: app/templates/location/list.html:77
 msgid "Locación"
 msgstr "Location"
 
-#: app/templates/location/list.html:77 app/templates/location/list.html:354
+#: app/templates/location/list.html:79 app/templates/location/list.html:370
+msgid "Fuente"
+msgstr "Source"
+
+#: app/templates/location/list.html:80 app/templates/location/list.html:376
 msgid "División administrativa 1"
 msgstr "Administrative division 1"
 
-#: app/templates/location/list.html:78 app/templates/location/list.html:360
+#: app/templates/location/list.html:81 app/templates/location/list.html:382
 msgid "División administrativa 2"
 msgstr "Administrative division 2"
 
-#: app/templates/location/list.html:142
+#: app/templates/location/list.html:151
 msgid "No hay locaciones registradas."
 msgstr "No locations registered."
 
-#: app/templates/location/list.html:161
+#: app/templates/location/list.html:170
 msgid "Agregar Locación"
 msgstr "Add Location"
 
