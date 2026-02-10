@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-03 09:26-0500\n"
+"POT-Creation-Date: 2026-02-10 14:39-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es_CO\n"
@@ -65,7 +65,7 @@ msgstr "El nombre es obligatorio."
 #: app/forms/adm2_form.py:11 app/forms/adm2_form.py:19 app/forms/app_form.py:11
 #: app/forms/country_form.py:11 app/forms/crop_form.py:11
 #: app/forms/cultivar_form.py:25 app/forms/data_source_form.py:26
-#: app/forms/location_form.py:43 app/forms/location_form.py:51
+#: app/forms/location_form.py:43 app/forms/location_form.py:59
 #: app/forms/phenological_stage_form.py:19 app/forms/soil_form.py:25
 #: app/forms/source_form.py:11 app/forms/stress_form.py:11
 #: app/forms/user_form.py:26 app/forms/user_form.py:117
@@ -73,7 +73,7 @@ msgid "Máximo 255 caracteres."
 msgstr "Máximo 255 caracteres."
 
 #: app/forms/adm1_form.py:16 app/forms/adm2_form.py:16
-#: app/forms/location_form.py:48 app/templates/adm1/list.html:77
+#: app/forms/location_form.py:56 app/templates/adm1/list.html:77
 #: app/templates/adm2/list.html:71 app/templates/location/list.html:78
 msgid "ID Externo"
 msgstr "ID Externo"
@@ -92,7 +92,7 @@ msgstr "Para Colombia: Código Divipola DANE del departamento"
 #: app/templates/cultivar/list.html:71 app/templates/cultivar/list.html:235
 #: app/templates/data_source/list.html:75
 #: app/templates/data_source/list.html:251 app/templates/home.html:39
-#: app/templates/location/list.html:82 app/templates/location/list.html:364
+#: app/templates/location/list.html:82 app/templates/location/list.html:373
 #: app/templates/soil/list.html:73 app/templates/soil/list.html:232
 msgid "País"
 msgstr "País"
@@ -120,7 +120,7 @@ msgstr "¿Está habilitado?"
 #: app/forms/cultivar_form.py:40 app/forms/data_source_form.py:67
 #: app/forms/indicator_category_form.py:22
 #: app/forms/indicator_features_form.py:34 app/forms/indicator_form.py:57
-#: app/forms/location_form.py:82 app/forms/phenological_stage_form.py:48
+#: app/forms/location_form.py:90 app/forms/phenological_stage_form.py:48
 #: app/forms/phenological_stage_stress_form.py:37 app/forms/season_form.py:47
 #: app/forms/setup_form.py:47 app/forms/soil_form.py:39
 #: app/forms/source_form.py:24 app/forms/stress_form.py:36
@@ -140,7 +140,7 @@ msgstr "División Adm1 asociada"
 msgid "Debe seleccionar una división de nivel 1."
 msgstr "Debe seleccionar una división de nivel 1."
 
-#: app/forms/adm2_form.py:31 app/forms/location_form.py:79
+#: app/forms/adm2_form.py:31 app/forms/location_form.py:87
 msgid "¿Es visible?"
 msgstr "¿Es visible?"
 
@@ -469,32 +469,44 @@ msgstr "Nombre ubicación"
 msgid "El nombre de la ubicación es obligatorio."
 msgstr "El nombre de la ubicación es obligatorio."
 
+#: app/forms/location_form.py:48
+msgid "Nombre máquina"
+msgstr "Nombre máquina"
+
 #: app/forms/location_form.py:50
+msgid "El nombre máquina es obligatorio."
+msgstr "El nombre máquina es obligatorio."
+
+#: app/forms/location_form.py:51
+msgid "Máximo 120 caracteres."
+msgstr "Máximo 120 caracteres."
+
+#: app/forms/location_form.py:58
 msgid "El ID externo es obligatorio."
 msgstr "El ID externo es obligatorio."
 
-#: app/forms/location_form.py:56
+#: app/forms/location_form.py:64
 msgid "Latitud"
 msgstr "Latitud"
 
-#: app/forms/location_form.py:58
+#: app/forms/location_form.py:66
 msgid "La latitud es obligatoria."
 msgstr "La latitud es obligatoria."
 
-#: app/forms/location_form.py:59 app/forms/location_form.py:67
-#: app/forms/location_form.py:74
+#: app/forms/location_form.py:67 app/forms/location_form.py:75
+#: app/forms/location_form.py:82
 msgid "Máximo 20 caracteres."
 msgstr "Máximo 20 caracteres."
 
-#: app/forms/location_form.py:64
+#: app/forms/location_form.py:72
 msgid "Longitud"
 msgstr "Longitud"
 
-#: app/forms/location_form.py:66
+#: app/forms/location_form.py:74
 msgid "La longitud es obligatoria."
 msgstr "La longitud es obligatoria."
 
-#: app/forms/location_form.py:72
+#: app/forms/location_form.py:80
 msgid "Altitud"
 msgstr "Altitud"
 
@@ -1744,7 +1756,7 @@ msgstr "Ej: 27 para Chocó"
 #: app/templates/indicator_category/list.html:184
 #: app/templates/indicator_features/edit.html:50
 #: app/templates/indicator_features/list.html:210
-#: app/templates/location/edit.html:94 app/templates/location/list.html:260
+#: app/templates/location/edit.html:103 app/templates/location/list.html:269
 #: app/templates/phenological_stage/add.html:38
 #: app/templates/phenological_stage/edit.html:70
 #: app/templates/phenological_stage/list.html:227
@@ -1789,7 +1801,7 @@ msgstr "Divisiones administrativas - Nivel 1"
 #: app/templates/indicator_category/list.html:186
 #: app/templates/indicator_features/list.html:13
 #: app/templates/indicator_features/list.html:212
-#: app/templates/location/list.html:16 app/templates/location/list.html:263
+#: app/templates/location/list.html:16 app/templates/location/list.html:272
 #: app/templates/phenological_stage/list.html:13
 #: app/templates/phenological_stage/list.html:229
 #: app/templates/phenological_stage_stress/list.html:13
@@ -1946,7 +1958,7 @@ msgstr "Recuperar seleccionados"
 #: app/templates/indicator/list.html:269
 #: app/templates/indicator_category/list.html:74
 #: app/templates/indicator_category/list.html:213
-#: app/templates/location/list.html:83 app/templates/location/list.html:388
+#: app/templates/location/list.html:83 app/templates/location/list.html:397
 #: app/templates/phenological_stage/list.html:77
 #: app/templates/phenological_stage/list.html:274
 #: app/templates/phenological_stage_stress/list.html:76
@@ -1989,7 +2001,7 @@ msgstr "Sin ID"
 #: app/templates/crop/list.html:207 app/templates/cultivar/list.html:97
 #: app/templates/cultivar/list.html:263 app/templates/data_source/list.html:267
 #: app/templates/indicator/list.html:273 app/templates/location/list.html:103
-#: app/templates/location/list.html:392
+#: app/templates/location/list.html:401
 #: app/templates/phenological_stage/list.html:100
 #: app/templates/phenological_stage/list.html:278
 #: app/templates/phenological_stage_stress/list.html:97
@@ -2008,7 +2020,7 @@ msgstr "Habilitado"
 #: app/templates/crop/list.html:208 app/templates/cultivar/list.html:97
 #: app/templates/cultivar/list.html:264 app/templates/data_source/list.html:268
 #: app/templates/indicator/list.html:274 app/templates/location/list.html:103
-#: app/templates/location/list.html:393
+#: app/templates/location/list.html:402
 #: app/templates/phenological_stage/list.html:100
 #: app/templates/phenological_stage/list.html:279
 #: app/templates/phenological_stage_stress/list.html:97
@@ -2417,7 +2429,7 @@ msgstr "No hay características de indicadores registradas."
 msgid "Agregar característica de indicador"
 msgstr "Agregar característica de indicador"
 
-#: app/templates/location/edit.html:88 app/templates/location/list.html:254
+#: app/templates/location/edit.html:97 app/templates/location/list.html:263
 msgid "Ubicación en el mapa"
 msgstr "Ubicación en el mapa"
 
@@ -2578,15 +2590,15 @@ msgstr "Importar CSV"
 msgid "Locación"
 msgstr "Locación"
 
-#: app/templates/location/list.html:79 app/templates/location/list.html:370
+#: app/templates/location/list.html:79 app/templates/location/list.html:379
 msgid "Fuente"
 msgstr "Fuente"
 
-#: app/templates/location/list.html:80 app/templates/location/list.html:376
+#: app/templates/location/list.html:80 app/templates/location/list.html:385
 msgid "División administrativa 1"
 msgstr "División administrativa 1"
 
-#: app/templates/location/list.html:81 app/templates/location/list.html:382
+#: app/templates/location/list.html:81 app/templates/location/list.html:391
 msgid "División administrativa 2"
 msgstr "División administrativa 2"
 
