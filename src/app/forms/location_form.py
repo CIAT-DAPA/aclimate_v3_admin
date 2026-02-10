@@ -44,6 +44,14 @@ class LocationForm(FlaskForm):
         ]
     )
 
+    machine_name = StringField(
+        _l('Nombre máquina'),
+        validators=[
+            DataRequired(message=_l('El nombre máquina es obligatorio.')),
+            Length(max=120, message=_l('Máximo 120 caracteres.'))
+        ]
+    )
+
     ext_id = StringField(
         _l('ID Externo'),
         validators=[

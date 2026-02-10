@@ -53,6 +53,15 @@
             {% endfor %}
           </div>
           <div class="col-6">
+            {{ form.machine_name.label(class="form-label") }}
+            {{ form.machine_name(class="form-control", id="machine_name") }}
+            {% for error in form.machine_name.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+    </div>
+    <div class="row mb-3">
+          <div class="col-6">
             {{ form.ext_id.label(class="form-label") }}
             {{ form.ext_id(class="form-control", id="ext_id") }}
             {% for error in form.ext_id.errors %}
