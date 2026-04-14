@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-10 14:39-0500\n"
+"POT-Creation-Date: 2026-04-14 10:26-0500\n"
 "PO-Revision-Date: 2025-08-05 10:12-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -528,13 +528,13 @@ msgstr "Only CSV files are allowed."
 
 #: app/forms/location_import_form.py:21
 msgid ""
-"Formato: ext_id, name, latitude, longitude, altitude, admin_level_1, "
-"ext_id_level_1, admin_level_2, ext_id_level_2, source_name, "
-"type_of_source"
+"Formato: ext_id, name, machine_name, latitude, longitude, altitude, "
+"admin_level_1, ext_id_level_1, admin_level_2, ext_id_level_2, "
+"source_name, type_of_source"
 msgstr ""
-"Format: ext_id, name, latitude, longitude, altitude, admin_level_1, "
-"ext_id_level_1, admin_level_2, ext_id_level_2, source_name, "
-"type_of_source"
+"Format: ext_id, name, machine_name, latitude, longitude, altitude, "
+"admin_level_1, ext_id_level_1, admin_level_2, ext_id_level_2, "
+"source_name, type_of_source"
 
 #: app/forms/location_import_form.py:24 app/templates/location/import.html:2
 msgid "Importar Locaciones"
@@ -2459,38 +2459,42 @@ msgid "Nombre de la locación (requerido)"
 msgstr "Location name (required)"
 
 #: app/templates/location/import.html:29
+msgid "Nombre máquina de la locación (requerido)"
+msgstr "Location machine name (required)"
+
+#: app/templates/location/import.html:30
 msgid "Latitud en grados decimales (requerido)"
 msgstr "Latitude in decimal degrees (required)"
 
-#: app/templates/location/import.html:30
+#: app/templates/location/import.html:31
 msgid "Longitud en grados decimales (requerido)"
 msgstr "Longitude in decimal degrees (required)"
 
-#: app/templates/location/import.html:31
+#: app/templates/location/import.html:32
 msgid "Altitud en metros (requerido)"
 msgstr "Altitude in meters (required)"
 
-#: app/templates/location/import.html:32
+#: app/templates/location/import.html:33
 msgid "Nombre de la división administrativa nivel 1 - Departamento (requerido)"
 msgstr "Administrative division level 1 name - States (required)"
 
-#: app/templates/location/import.html:33
+#: app/templates/location/import.html:34
 msgid "Código externo del departamento - Ej: 27 para Chocó (opcional)"
 msgstr "External department code - E.g.: 27 for Michigan (optional)"
 
-#: app/templates/location/import.html:34
+#: app/templates/location/import.html:35
 msgid "Nombre de la división administrativa nivel 2 - Municipio (requerido)"
 msgstr "Administrative division level 2 name - ADM2 (required)"
 
-#: app/templates/location/import.html:35
+#: app/templates/location/import.html:36
 msgid "Código externo del municipio - Ej: 27001 para Quibdó (opcional)"
 msgstr "External adm2 code - E.g.: 27001 for Michigan (optional)"
 
-#: app/templates/location/import.html:36
+#: app/templates/location/import.html:37
 msgid "Nombre de la fuente de datos"
 msgstr "Data source name"
 
-#: app/templates/location/import.html:37
+#: app/templates/location/import.html:38
 msgid ""
 "Tipo de fuente: MA (Manual), AU (Automática), SP (Espacial), PL "
 "(Pluviómetro), TP (Termopluviómetro) (requerido)"
@@ -2498,11 +2502,11 @@ msgstr ""
 "Source type: MA (Manual), AU (Automatic), SP (Spatial), PL (Pluviometer),"
 " TP (Thermopluviometer) (required)"
 
-#: app/templates/location/import.html:42
+#: app/templates/location/import.html:43
 msgid "Nota importante:"
 msgstr "Important note:"
 
-#: app/templates/location/import.html:44
+#: app/templates/location/import.html:45
 msgid ""
 "Si una división administrativa (ADM1 o ADM2) no existe, se creará "
 "automáticamente."
@@ -2510,7 +2514,7 @@ msgstr ""
 "If an administrative division (ADM1 or ADM2) does not exist, it will be "
 "created automatically."
 
-#: app/templates/location/import.html:45
+#: app/templates/location/import.html:46
 msgid ""
 "Si una fuente de datos no existe, se creará automáticamente (solo si el "
 "tipo es válido)."
@@ -2518,7 +2522,7 @@ msgstr ""
 "If a data source does not exist, it will be created automatically (only "
 "if the type is valid)."
 
-#: app/templates/location/import.html:46
+#: app/templates/location/import.html:47
 msgid ""
 "El sistema buscará primero por código externo (ext_id), y si no lo "
 "encuentra, por nombre."
@@ -2526,11 +2530,11 @@ msgstr ""
 "The system will search first by external code (ext_id), and if not found,"
 " by name."
 
-#: app/templates/location/import.html:47
+#: app/templates/location/import.html:48
 msgid "Las locaciones con ext_id duplicado serán omitidas."
 msgstr "Locations with duplicate ext_id will be skipped."
 
-#: app/templates/location/import.html:48
+#: app/templates/location/import.html:49
 msgid ""
 "Si el type_of_source <strong>NO</strong> es válido, la fila completa será"
 " rechazada"
@@ -2538,43 +2542,43 @@ msgstr ""
 "If the type_of_source is <strong>NOT</strong> valid, the entire row will "
 "be rejected"
 
-#: app/templates/location/import.html:52
+#: app/templates/location/import.html:53
 msgid "Ejemplo de formato CSV:"
 msgstr "CSV format example:"
 
-#: app/templates/location/import.html:62
+#: app/templates/location/import.html:63
 msgid "Cargar Archivo CSV"
 msgstr "Upload CSV File"
 
-#: app/templates/location/import.html:113
+#: app/templates/location/import.html:114
 msgid "Resultados de la Importación"
 msgstr "Import Results"
 
-#: app/templates/location/import.html:121
+#: app/templates/location/import.html:122
 msgid "Locaciones Creadas"
 msgstr "Locations Created"
 
-#: app/templates/location/import.html:128
+#: app/templates/location/import.html:129
 msgid "Departamentos"
 msgstr "Administration level 1"
 
-#: app/templates/location/import.html:135
+#: app/templates/location/import.html:136
 msgid "Municipios"
 msgstr "Administration level 2"
 
-#: app/templates/location/import.html:142
+#: app/templates/location/import.html:143
 msgid "Fuentes Creadas"
 msgstr "Sources created."
 
-#: app/templates/location/import.html:149
+#: app/templates/location/import.html:150
 msgid "Locaciones Omitidas"
 msgstr "Locations Skipped"
 
-#: app/templates/location/import.html:157
+#: app/templates/location/import.html:158
 msgid "Errores Encontrados"
 msgstr "Errors Found"
 
-#: app/templates/location/import.html:165
+#: app/templates/location/import.html:166
 #, python-format
 msgid "... y %(count)s error(es) más"
 msgstr "... and %(count)s more error(s)"
