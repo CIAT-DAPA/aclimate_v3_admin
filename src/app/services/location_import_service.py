@@ -69,7 +69,7 @@ class LocationImportService:
                 try:
                     # Validar campos requeridos
                     required_fields = [
-                        'ext_id', 'name', 'latitude', 'longitude', 'altitude',
+                        'ext_id', 'name', 'machine_name', 'latitude', 'longitude', 'altitude',
                         'admin_level_1', 'admin_level_2', 'source_name'
                     ]
                     
@@ -155,6 +155,7 @@ class LocationImportService:
                         admin_2_id=adm2_id,
                         source_id=source_id,
                         name=row['name'].strip(),
+                        machine_name=row['machine_name'].strip(),
                         ext_id=row['ext_id'].strip(),
                         latitude=float(row['latitude'].strip().replace(',', '.')),
                         longitude=float(row['longitude'].strip().replace(',', '.')),
