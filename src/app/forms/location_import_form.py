@@ -18,7 +18,7 @@ class LocationImportForm(FlaskForm):
             FileRequired(message=_l('Debe seleccionar un archivo.')),
             FileAllowed(['csv'], message=_l('Solo se permiten archivos CSV.'))
         ],
-        description=_l('Formato: ext_id, name, latitude, longitude, altitude, admin_level_1, ext_id_level_1, admin_level_2, ext_id_level_2, source_name, type_of_source')
+        description=_l('Formato: ext_id, name, machine_name, latitude, longitude, altitude, admin_level_1, ext_id_level_1, admin_level_2, ext_id_level_2, source_name, type_of_source')
     )
     
     submit = SubmitField(_l('Importar Locaciones'))

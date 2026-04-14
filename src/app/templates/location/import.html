@@ -26,6 +26,7 @@
                     <ul>
                         <li><strong>ext_id</strong>: {{ _('Código externo de la locación (único, requerido)') }}</li>
                         <li><strong>name</strong>: {{ _('Nombre de la locación (requerido)') }}</li>
+                        <li><strong>machine_name</strong>: {{ _('Nombre máquina de la locación (requerido)') }}</li>
                         <li><strong>latitude</strong>: {{ _('Latitud en grados decimales (requerido)') }}</li>
                         <li><strong>longitude</strong>: {{ _('Longitud en grados decimales (requerido)') }}</li>
                         <li><strong>altitude</strong>: {{ _('Altitud en metros (requerido)') }}</li>
@@ -50,9 +51,9 @@
                     </div>
 
                     <h6 class="mt-3">{{ _('Ejemplo de formato CSV:') }}</h6>
-                    <pre class="bg-light p-3 rounded"><code>ext_id,name,latitude,longitude,altitude,admin_level_1,ext_id_level_1,admin_level_2,ext_id_level_2,source_name,type_of_source
-27001001,Estación Quibdó,5.6919,-76.6583,43,Chocó,27,Quibdó,27001,IDEAM,AU
-27001002,Estación Tutunendo,5.7633,-76.5317,80,Chocó,27,Quibdó,27001,IDEAM,AU</code></pre>
+                    <pre class="bg-light p-3 rounded"><code>ext_id,name,machine_name,latitude,longitude,altitude,admin_level_1,ext_id_level_1,admin_level_2,ext_id_level_2,source_name,type_of_source
+27001001,Estación Quibdó,quibdo_station,5.6919,-76.6583,43,Chocó,27,Quibdó,27001,IDEAM,AU
+27001002,Estación Tutunendo,tutunendo_station,5.7633,-76.5317,80,Chocó,27,Quibdó,27001,IDEAM,AU</code></pre>
                 </div>
             </div>
 
