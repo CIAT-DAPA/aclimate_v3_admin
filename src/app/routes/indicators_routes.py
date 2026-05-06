@@ -67,9 +67,12 @@ def edit_indicator(id):
     categories = category_service.get_all()
     form.indicator_category_id.choices = [(cat.id, cat.name) for cat in categories]
 
-    # Preseleccionar la categoría actual
-    if request.method == 'GET' and indicator.indicator_category_id:
-        form.indicator_category_id.data = indicator.indicator_category_id
+    # Preseleccionar los valores actuales cuando es GET
+    if request.method == 'GET':
+        form.type.data = indicator.type.value if hasattr(indicator.type, 'value') else indicator.type
+        form.temporality.data = indicator.temporality.value if hasattr(indicator.temporality, 'value') else indicator.temporality
+        if indicator.indicator_category_id:
+            form.indicator_category_id.data = indicator.indicator_category_id
 
     if form.validate_on_submit():
         update_data = IndicatorUpdate(

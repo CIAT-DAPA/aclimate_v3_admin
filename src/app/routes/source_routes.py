@@ -10,6 +10,13 @@ from app.config.permissions import Module
 
 bp = Blueprint('source', __name__)
 source_service = MngSourceService()
+SOURCE_TYPE_CHOICES = [
+    (SourceType.MANUAL.value, _("Manual")),
+    (SourceType.AUTOMATIC.value, _("Automático")),
+    (SourceType.SPATIAL.value, _("Espacial")),
+    (SourceType.PLUVIOMETER.value, _("Pluviómetro")),
+    (SourceType.THERMOPLUVIOMETER.value, _("Termopluviómetro")),
+]
 
 @bp.route('/source', methods=['GET', 'POST'])
 @login_required
@@ -18,7 +25,7 @@ def list_source():
     can_create = current_user.has_module_access(Module.CONFIGURATION.value, 'create')
     
     form = SourceForm()
-    form.source_type.choices = [(SourceType.MANUAL.value, "Manual"), (SourceType.AUTOMATIC.value, "Automático"), (SourceType.SPATIAL.value, "Espacial"), (SourceType.PLUVIOMETER.value, "Pluviómetro"), (SourceType.THERMOPLUVIOMETER.value, "Termopluviómetro")]
+    form.source_type.choices = SOURCE_TYPE_CHOICES
 
     if form.validate_on_submit():
         if not can_create:
@@ -48,7 +55,7 @@ def edit_source(id):
         return redirect(url_for('source.list_source'))
 
     form = SourceForm(obj=source)
-    form.source_type.choices = [(SourceType.MANUAL.value, "Manual"), (SourceType.AUTOMATIC.value, "Automático")]
+    form.source_type.choices = SOURCE_TYPE_CHOICES
 
     if request.method == 'GET':
         form.source_type.data = source.source_type

@@ -25,6 +25,30 @@ class LocationImportService:
         self.adm2_service = MngAdmin2Service()
         self.source_service = MngSourceService()
         self.country_service = MngCountryService()
+
+    def _normalize_key(self, key: str) -> str:
+        if key is None:
+            return ''
+        return self._clean_text(key).lower().replace(' ', '_')
+
+    def _clean_text(self, value) -> str:
+        if value is None:
+            return ''
+        return str(value).replace('\u00a0', ' ').strip()
+
+    def _get_row_value(self, row: Dict, *keys: str) -> str:
+        for key in keys:
+            normalized_key = self._normalize_key(key)
+            if normalized_key in row:
+                return self._clean_text(row.get(normalized_key, ''))
+        return ''
+
+    def _parse_float(self, row: Dict, *keys: str) -> float:
+        raw_value = self._get_row_value(row, *keys)
+        if not raw_value:
+            raise ValueError(f"Campo {keys[0]} vacío")
+        cleaned = raw_value.replace(' ', '').replace(',', '.')
+        return float(cleaned)
     
     def import_from_csv(self, file_content: bytes, country_id: int) -> Dict:
         """
@@ -67,39 +91,69 @@ class LocationImportService:
             for row in csv_reader:
                 row_number += 1
                 try:
+                    normalized_row = {
+                        self._normalize_key(k): v for k, v in row.items()
+                    }
+
                     # Validar campos requeridos
                     required_fields = [
-                        'ext_id', 'name', 'machine_name', 'latitude', 'longitude', 'altitude',
-                        'admin_level_1', 'admin_level_2', 'source_name'
+                        ('ext_id', ['ext_id']),
+                        ('name', ['name']),
+                        ('machine_name', ['machine_name']),
+                        ('latitude', ['latitude']),
+                        ('longitude', ['longitude']),
+                        ('altitude', ['altitude']),
+                        ('admin_level_1', ['admin_level_1', 'admin1', 'adm1']),
+                        ('admin_level_2', ['admin_level_2', 'admin2', 'adm2']),
+                        ('source_name', ['source_name'])
                     ]
                     
-                    missing_fields = [field for field in required_fields if not row.get(field, '').strip()]
+                    missing_fields = [
+                        field for field, keys in required_fields
+                        if not self._get_row_value(normalized_row, *keys)
+                    ]
                     if missing_fields:
                         stats['errors'].append(f"Fila {row_number}: Campos faltantes: {', '.join(missing_fields)}")
                         stats['locations_skipped'] += 1
                         continue
+
+                    ext_id = self._get_row_value(normalized_row, 'ext_id')
+                    name = self._get_row_value(normalized_row, 'name')
+                    machine_name = self._get_row_value(normalized_row, 'machine_name')
                     
                     # Verificar si la locación ya existe
                     existing_locations = self.location_service.get_by_ext_id(
-                        ext_id=row['ext_id'].strip(),
+                        ext_id=ext_id,
                         enabled=True
                     )
                     
                     if not existing_locations:
                         # Buscar deshabilitadas
                         existing_locations = self.location_service.get_by_ext_id(
-                            ext_id=row['ext_id'].strip(),
+                            ext_id=ext_id,
                             enabled=False
                         )
                     
                     if existing_locations and len(existing_locations) > 0:
-                        current_app.logger.info(f"Locación {row['name']} ya existe (ext_id: {row['ext_id']})")
+                        stats['errors'].append(
+                            f"Fila {row_number}: Locación ya existe (ext_id: {ext_id})"
+                        )
+                        current_app.logger.info(f"Locación {name} ya existe (ext_id: {ext_id})")
                         stats['locations_skipped'] += 1
                         continue
                     
                     # Procesar/crear ADM1
-                    adm1_name = row['admin_level_1'].strip()
-                    adm1_ext_id = row.get('ext_id_level_1', '').strip()
+                    adm1_name = self._get_row_value(
+                        normalized_row,
+                        'admin_level_1',
+                        'admin1',
+                        'adm1'
+                    )
+                    adm1_ext_id = self._get_row_value(
+                        normalized_row,
+                        'ext_id_level_1',
+                        'ext_id_admin_level_1'
+                    )
                     adm1_id = self._get_or_create_adm1(
                         name=adm1_name,
                         ext_id=adm1_ext_id,
@@ -114,8 +168,17 @@ class LocationImportService:
                         continue
                     
                     # Procesar/crear ADM2
-                    adm2_name = row['admin_level_2'].strip()
-                    adm2_ext_id = row.get('ext_id_level_2', '').strip()
+                    adm2_name = self._get_row_value(
+                        normalized_row,
+                        'admin_level_2',
+                        'admin2',
+                        'adm2'
+                    )
+                    adm2_ext_id = self._get_row_value(
+                        normalized_row,
+                        'ext_id_level_2',
+                        'ext_id_admin_level_2'
+                    )
                     adm2_id = self._get_or_create_adm2(
                         name=adm2_name,
                         ext_id=adm2_ext_id,
@@ -130,8 +193,12 @@ class LocationImportService:
                         continue
                     
                     # Obtener o crear source
-                    source_name = row['source_name'].strip()
-                    source_type = row.get('type_of_source', '').strip()
+                    source_name = self._get_row_value(normalized_row, 'source_name')
+                    source_type = self._get_row_value(
+                        normalized_row,
+                        'type_of_source',
+                        'source_type'
+                    )
                     source_id, error = self._get_or_create_source(
                         name=source_name,
                         source_type=source_type,
@@ -154,19 +221,19 @@ class LocationImportService:
                     location_data = LocationCreate(
                         admin_2_id=adm2_id,
                         source_id=source_id,
-                        name=row['name'].strip(),
-                        machine_name=row['machine_name'].strip(),
-                        ext_id=row['ext_id'].strip(),
-                        latitude=float(row['latitude'].strip().replace(',', '.')),
-                        longitude=float(row['longitude'].strip().replace(',', '.')),
-                        altitude=float(row['altitude'].strip().replace(',', '.')),
+                        name=name,
+                        machine_name=machine_name,
+                        ext_id=ext_id,
+                        latitude=self._parse_float(normalized_row, 'latitude'),
+                        longitude=self._parse_float(normalized_row, 'longitude'),
+                        altitude=self._parse_float(normalized_row, 'altitude'),
                         enable=True,
                         visible=True
                     )
                     
                     self.location_service.create(location_data)
                     stats['locations_created'] += 1
-                    current_app.logger.info(f"Locación creada: {row['name']}")
+                    current_app.logger.info(f"Locación creada: {name}")
                     
                 except ValueError as e:
                     stats['errors'].append(f"Fila {row_number}: Error de formato - {str(e)}")
