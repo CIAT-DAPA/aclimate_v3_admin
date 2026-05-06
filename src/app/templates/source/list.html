@@ -51,6 +51,13 @@
   </div>
 
   {% if sources %}
+  {% set source_type_labels = {
+    'MA': _('Manual'),
+    'AU': _('Automático'),
+    'SP': _('Espacial'),
+    'PL': _('Pluviómetro'),
+    'TP': _('Termopluviómetro')
+  } %}
   <div id="sourceTableContainer">
     {% if current_user.has_module_access('configuration', 'delete') %}
     <form id="bulk-action-form" method="POST" action="{{ url_for('source.bulk_action') }}">
@@ -80,19 +87,13 @@
         </thead>
         <tbody id="sourceTableBody">
           {% for source in sources %}
-          <tr data-type="{% if source.source_type == 'AU' %}Automático{% else %}Manual{% endif %}"
+            <tr data-type="{{ source_type_labels.get(source.source_type, source.source_type) }}"
               data-status="{% if source.enable %}active{% else %}inactive{% endif %}">
             {% if current_user.has_module_access('configuration', 'delete') %}
             <td><input type="checkbox" name="selected_ids" value="{{ source.id }}" class="select-row" /></td>
             {% endif %}
             <td class="searchable">{{ source.name }}</td>
-            <td class="searchable">
-              {% if source.source_type == 'AU' %}
-                Automático
-              {% else %}
-                Manual
-              {% endif %}
-            </td>
+            <td class="searchable">{{ source_type_labels.get(source.source_type, source.source_type) }}</td>
             <td>{{ 'Habilitado' if source.enable else 'Deshabilitado' }}</td>
             {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
             <td class="text-end">
