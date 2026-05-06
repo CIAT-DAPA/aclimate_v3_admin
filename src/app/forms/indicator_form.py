@@ -31,12 +31,14 @@ class IndicatorForm(FlaskForm):
     type = SelectField(
         _l('Tipo'),
         choices=[],  # Llena dinámicamente en la vista con [(valor, etiqueta), ...]
+        coerce=str,
         validators=[DataRequired(message=_l('Debe seleccionar un tipo.'))]
     )
 
     temporality = SelectField(
         _l('Temporalidad'),
         choices=[],  # Llena dinámicamente en la vista
+        coerce=str,
         validators=[DataRequired(message=_l('Debe seleccionar una temporalidad.'))]
     )
 
