@@ -13,7 +13,9 @@ export function initTableSearch(config) {
         resultsCountId,
         tableBodyId,
         searchColumns,
-        filterConfigs
+        filterConfigs,
+        rowCheckboxSelector = '.select-row',
+        clearSelectionOnHide = true
     } = config;
 
     // Elementos DOM
@@ -115,11 +117,17 @@ export function initTableSearch(config) {
             visibleCount++;
         } else {
             row.style.display = 'none';
+            const rowCheckbox = row.querySelector(rowCheckboxSelector);
+            if (clearSelectionOnHide && rowCheckbox && rowCheckbox.checked) {
+                rowCheckbox.checked = false;
+            }
         }
     });
 
     // Actualizar UI de resultados
     updateResultsUI(searchTerm, visibleCount);
+
+    document.dispatchEvent(new CustomEvent('bulk-selection-refresh'));
 }
 
     /**

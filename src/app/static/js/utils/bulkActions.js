@@ -36,10 +36,28 @@ export function setupBulkActions(config = {}) {
     return;
   }
 
-  // Actualizar estado de los botones
-  function updateBulkButtons() {
-    const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-    
+  function getVisibleCheckboxes() {
+    return Array.from(checkboxes).filter(cb => {
+      const row = cb.closest('tr');
+      if (!row) {
+        return false;
+      }
+      return getComputedStyle(row).display !== 'none';
+    });
+  }
+
+  // Actualizar estado de los botones y seleccionar todo
+  function updateSelectionState() {
+    const visibleCheckboxes = getVisibleCheckboxes();
+    const anyChecked = visibleCheckboxes.some(cb => cb.checked);
+    const allChecked = visibleCheckboxes.length > 0 && visibleCheckboxes.every(cb => cb.checked);
+
+    if (selectAll) {
+      selectAll.checked = allChecked;
+      selectAll.indeterminate = anyChecked && !allChecked;
+      selectAll.disabled = visibleCheckboxes.length === 0;
+    }
+
     // Usamos clases para manejar visibilidad
     if (anyChecked) {
       bulkDisable.classList.add(visibleClass);
@@ -48,31 +66,31 @@ export function setupBulkActions(config = {}) {
       bulkDisable.classList.remove(visibleClass);
       bulkRecover.classList.remove(visibleClass);
     }
-    
+
     bulkDisable.disabled = !anyChecked;
     bulkRecover.disabled = !anyChecked;
   }
 
   // Inicializar
-  updateBulkButtons();
+  updateSelectionState();
 
   // Evento para seleccionar/deseleccionar todos
   if (selectAll) {
     selectAll.addEventListener('change', () => {
-      checkboxes.forEach(cb => cb.checked = selectAll.checked);
-      updateBulkButtons();
+      getVisibleCheckboxes().forEach(cb => cb.checked = selectAll.checked);
+      updateSelectionState();
     });
   }
 
   // Eventos para checkboxes individuales
   checkboxes.forEach(cb => {
     cb.addEventListener('change', () => {
-      // Actualizar estado de "seleccionar todos"
-      if (selectAll) {
-        selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
-      }
-      updateBulkButtons();
+      updateSelectionState();
     });
+  });
+
+  document.addEventListener('bulk-selection-refresh', () => {
+    updateSelectionState();
   });
 
   // Deshabilitar botones al enviar
