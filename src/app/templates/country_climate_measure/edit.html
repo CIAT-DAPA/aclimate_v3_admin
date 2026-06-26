@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Editar Relación País-Indicador') }}{% endblock %}
+{% block title %}{{ _('Editar Relación País-Variable Climática') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ _('Editar relación país-indicador') }}</h2>
-    <a href="{{ url_for('country_indicator.list_country_indicator') }}" class="btn btn-secondary">
+    <h2>{{ _('Editar relación país-variable climática') }}</h2>
+    <a href="{{ url_for('country_climate_measure.list_country_climate_measure') }}" class="btn btn-secondary">
       <i class="fas fa-arrow-left"></i> {{ _('Volver al listado') }}
     </a>
   </div>
@@ -22,9 +22,9 @@
     </div>
 
     <div class="mb-3">
-      {{ form.indicator_id.label(class="form-label") }}
-      {{ form.indicator_id(class="form-select") }}
-      {% for error in form.indicator_id.errors %}
+      {{ form.measure_id.label(class="form-label") }}
+      {{ form.measure_id(class="form-select") }}
+      {% for error in form.measure_id.errors %}
         <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
@@ -44,14 +44,6 @@
     <div class="form-check mb-2">
       {{ form.location_climate(class="form-check-input") }}
       {{ form.location_climate.label(class="form-check-label") }}
-    </div>
-
-    <div class="mb-3">
-      {{ form.criteria.label(class="form-label") }}
-      {{ form.criteria(class="form-control") }}
-      {% for error in form.criteria.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
     </div>
 
     <div class="mb-3">
@@ -79,7 +71,7 @@
     </div>
 
     {{ form.submit(class="btn btn-success") }}
-    <a href="{{ url_for('country_indicator.list_country_indicator') }}" class="btn btn-outline-secondary">{{ _('Cancelar') }}</a>
+    <a href="{{ url_for('country_climate_measure.list_country_climate_measure') }}" class="btn btn-outline-secondary">{{ _('Cancelar') }}</a>
   </form>
 </div>
 {% endblock %}

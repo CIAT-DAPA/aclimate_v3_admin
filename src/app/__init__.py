@@ -136,6 +136,7 @@ def create_app():
     from app.routes.cultivar_routes import bp as cultivar_bp
     from app.routes.season_routes import bp as season_bp
     from app.routes.country_indicator_routes import bp as country_indicator_bp
+    from app.routes.country_climate_measure_routes import bp as country_climate_measure_bp
     from app.routes.app_routes import bp as app_bp
     from app.routes.indicator_features_routes import bp as indicator_features_bp
     
@@ -161,6 +162,7 @@ def create_app():
     app.register_blueprint(cultivar_bp)
     app.register_blueprint(season_bp)
     app.register_blueprint(country_indicator_bp)
+    app.register_blueprint(country_climate_measure_bp)
     app.register_blueprint(app_bp)
     app.register_blueprint(indicator_features_bp)
 
