@@ -52,7 +52,10 @@ def list_country_indicator():
                 spatial_climate=form.spatial_climate.data,
                 location_forecast=form.location_forecast.data,
                 location_climate=form.location_climate.data,
-                criteria=criteria_data
+                criteria=criteria_data,
+                description=form.description.data or None,
+                store=form.store.data or None,
+                workspace=form.workspace.data or None
             )
             country_indicator_service.create(new_ci)
             flash(_('Relación país-indicador agregada correctamente.'), 'success')
@@ -105,7 +108,10 @@ def edit_country_indicator(id):
                 spatial_climate=form.spatial_climate.data,
                 location_forecast=form.location_forecast.data,
                 location_climate=form.location_climate.data,
-                criteria=criteria_data
+                criteria=criteria_data,
+                description=form.description.data or None,
+                store=form.store.data or None,
+                workspace=form.workspace.data or None
             )
             country_indicator_service.update(id=id, obj_in=update_data)
             flash(_('Relación país-indicador actualizada.'), 'success')

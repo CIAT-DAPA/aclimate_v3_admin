@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Relaciones País-Indicador') }}{% endblock %}
+{% block title %}{{ _('Relaciones País-Variable Climática') }}{% endblock %}
 {% block content %}
 <div class="container-fluid mt-4" style="margin-bottom: 100px">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ _('Relaciones País-Indicador') }}</h2>
+    <h2>{{ _('Relaciones País-Variable Climática') }}</h2>
     {% if can_create %}
     <button
       class="btn btn-primary"
       data-bs-toggle="modal"
-      data-bs-target="#addCountryIndicatorModal"
+      data-bs-target="#addCountryClimateMeasureModal"
     >
       <i class="fas fa-plus"></i> {{ _('Agregar') }}
     </button>
@@ -20,7 +20,7 @@
     <input
       type="text"
       class="form-control me-2"
-      id="countryIndicatorSearchInput"
+      id="countryClimateMeasureSearchInput"
       placeholder="{{ _('Buscar...') }}"
       style="max-width: 300px"
     />
@@ -28,7 +28,7 @@
       <button 
         class="btn btn-outline-secondary dropdown-toggle" 
         type="button" 
-        id="countryIndicatorFiltersButton" 
+        id="countryClimateMeasureFiltersButton" 
         data-bs-toggle="dropdown" 
         data-bs-auto-close="outside"
         aria-expanded="false"
@@ -37,22 +37,22 @@
       >
         <i class="fas fa-filter"></i> {{ _('Filtros') }}
       </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="countryIndicatorFiltersButton" style="min-width: 250px;">
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="countryClimateMeasureFiltersButton" style="min-width: 250px;">
         <li><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> {{ _('Cargando filtros...') }}</div></li>
       </ul>
     </div>
-    <span id="countryIndicatorSearchResults" class="text-muted small"></span>
+    <span id="countryClimateMeasureSearchResults" class="text-muted small"></span>
   </div>
 
   <!-- Contenedor para mensajes -->
-  <div id="noCountryIndicatorResults" class="alert alert-info mt-4" style="display: none;">
+  <div id="noCountryClimateMeasureResults" class="alert alert-info mt-4" style="display: none;">
     {{ _('No se encontraron resultados para') }} "<span class="search-term"></span>"
   </div>
 
-  {% if country_indicators %}
-  <div id="countryIndicatorTableContainer" class="table-responsive">
+  {% if country_climate_measures %}
+  <div id="countryClimateMeasureTableContainer" class="table-responsive">
     {% if current_user.has_module_access('configuration', 'delete') %}
-    <form id="bulk-action-form" method="POST" action="{{ url_for('country_indicator.bulk_action') }}">
+    <form id="bulk-action-form" method="POST" action="{{ url_for('country_climate_measure.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
         <button type="button" class="btn btn-danger btn-sm" disabled id="bulk-disable">
@@ -67,12 +67,11 @@
             <th style="width: 40px; min-width: 40px;"><input type="checkbox" id="select-all" /></th>
             {% endif %}
             <th style="width: 10%; min-width: 100px;">{{ _('País') }}</th>
-            <th style="width: 18%; min-width: 150px;">{{ _('Indicador') }}</th>
+            <th style="width: 18%; min-width: 150px;">{{ _('Variable climática') }}</th>
             <th style="width: 11%; min-width: 110px; text-align: center;">{{ _('Pronóstico espacial') }}</th>
             <th style="width: 11%; min-width: 110px; text-align: center;">{{ _('Clima espacial') }}</th>
             <th style="width: 12%; min-width: 120px; text-align: center;">{{ _('Pronóstico por ubicación') }}</th>
             <th style="width: 12%; min-width: 120px; text-align: center;">{{ _('Clima por ubicación') }}</th>
-            <th style="width: 14%; min-width: 100px;">{{ _('Criterios') }}</th>
             <th style="width: 14%; min-width: 100px;">{{ _('Descripción') }}</th>
             <th style="width: 8%; min-width: 80px;">{{ _('Store') }}</th>
             <th style="width: 8%; min-width: 80px;">{{ _('Workspace') }}</th>
@@ -81,27 +80,26 @@
             {% endif %}
           </tr>
         </thead>
-        <tbody id="countryIndicatorTableBody">
-          {% for ci in country_indicators %}
+        <tbody id="countryClimateMeasureTableBody">
+          {% for cm in country_climate_measures %}
           <tr>
             {% if current_user.has_module_access('configuration', 'delete') %}
-            <td><input type="checkbox" name="selected_ids" value="{{ ci.id }}" class="select-row" /></td>
+            <td><input type="checkbox" name="selected_ids" value="{{ cm.id }}" class="select-row" /></td>
             {% endif %}
-            <td class="searchable country">{{ ci.country.name if ci.country else '' }}</td>
-            <td class="searchable indicator">{{ ci.indicator.name if ci.indicator else '' }}</td>
-            <td class="searchable spatial_forecast text-center">{{ _('Sí') if ci.spatial_forecast else _('No') }}</td>
-            <td class="searchable spatial_climate text-center">{{ _('Sí') if ci.spatial_climate else _('No') }}</td>
-            <td class="searchable location_forecast text-center">{{ _('Sí') if ci.location_forecast else _('No') }}</td>
-            <td class="searchable location_climate text-center">{{ _('Sí') if ci.location_climate else _('No') }}</td>
-            <td class="searchable criteria">{{ ci.criteria or '' }}</td>
-            <td class="searchable description">{{ ci.description or '' }}</td>
-            <td class="searchable store">{{ ci.store or '' }}</td>
-            <td class="searchable workspace">{{ ci.workspace or '' }}</td>
+            <td class="searchable country">{{ cm.country.name if cm.country else '' }}</td>
+            <td class="searchable measure">{{ cm.measure.name if cm.measure else '' }}</td>
+            <td class="searchable spatial_forecast text-center">{{ _('Sí') if cm.spatial_forecast else _('No') }}</td>
+            <td class="searchable spatial_climate text-center">{{ _('Sí') if cm.spatial_climate else _('No') }}</td>
+            <td class="searchable location_forecast text-center">{{ _('Sí') if cm.location_forecast else _('No') }}</td>
+            <td class="searchable location_climate text-center">{{ _('Sí') if cm.location_climate else _('No') }}</td>
+            <td class="searchable description">{{ cm.description or '' }}</td>
+            <td class="searchable store">{{ cm.store or '' }}</td>
+            <td class="searchable workspace">{{ cm.workspace or '' }}</td>
             {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
             <td class="text-end">
               {% if current_user.has_module_access('configuration', 'update') %}
               <a
-                href="{{ url_for('country_indicator.edit_country_indicator', id=ci.id) }}"
+                href="{{ url_for('country_climate_measure.edit_country_climate_measure', id=cm.id) }}"
                 class="btn btn-warning btn-sm me-2"
                 title="{{ _('Editar') }}"
               >
@@ -110,7 +108,7 @@
               {% endif %}
               {% if current_user.has_module_access('configuration', 'delete') %}
               <a
-                href="{{ url_for('country_indicator.delete_country_indicator', id=ci.id) }}"
+                href="{{ url_for('country_climate_measure.delete_country_climate_measure', id=cm.id) }}"
                 class="btn btn-danger btn-sm"
                 title="{{ _('Eliminar') }}"
               >
@@ -129,11 +127,11 @@
   </div>
   <!-- Mensaje de contador de resultados -->
   <div class="mt-2 text-muted small">
-    {{ _('Mostrando') }} <span id="countryIndicatorResultsCount"></span> {{ _('resultados') }}
+    {{ _('Mostrando') }} <span id="countryClimateMeasureResultsCount"></span> {{ _('resultados') }}
   </div>
   {% else %}
   <div class="alert alert-info mt-4">
-    {{ _('No hay relaciones país-indicador registradas.') }}
+    {{ _('No hay relaciones país-variable climática registradas.') }}
   </div>
   {% endif %}
 </div>
@@ -143,47 +141,47 @@
 
 <!-- Estilos personalizados para la tabla -->
 <style>
-  #countryIndicatorTableContainer table th {
+  #countryClimateMeasureTableContainer table th {
     white-space: nowrap;
     vertical-align: middle;
     font-size: 0.9rem;
     padding: 0.75rem 0.5rem;
   }
   
-  #countryIndicatorTableContainer table td {
+  #countryClimateMeasureTableContainer table td {
     vertical-align: middle;
     padding: 0.6rem 0.5rem;
   }
   
-  #countryIndicatorTableContainer .text-center {
+  #countryClimateMeasureTableContainer .text-center {
     padding-left: 0.25rem;
     padding-right: 0.25rem;
   }
   
-  #countryIndicatorTableContainer .btn-sm {
+  #countryClimateMeasureTableContainer .btn-sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
   }
   
-  #countryIndicatorTableContainer table {
+  #countryClimateMeasureTableContainer table {
     margin-bottom: 0;
   }
 </style>
 
-<!-- Modal para agregar Relación País-Indicador -->
+<!-- Modal para agregar Relación País-Variable Climática -->
 <div
   class="modal fade"
-  id="addCountryIndicatorModal"
+  id="addCountryClimateMeasureModal"
   tabindex="-1"
-  aria-labelledby="addCountryIndicatorLabel"
+  aria-labelledby="addCountryClimateMeasureLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <form method="POST" class="modal-content">
       {{ form.hidden_tag() }}
       <div class="modal-header">
-        <h5 class="modal-title" id="addCountryIndicatorLabel">
-          {{ _('Agregar relación país-indicador') }}
+        <h5 class="modal-title" id="addCountryClimateMeasureLabel">
+          {{ _('Agregar relación país-variable climática') }}
         </h5>
         <button
           type="button"
@@ -201,9 +199,9 @@
           {% endfor %}
         </div>
         <div class="mb-3">
-          {{ form.indicator_id.label(class="form-label") }}
-          {{ form.indicator_id(class="form-select") }}
-          {% for error in form.indicator_id.errors %}
+          {{ form.measure_id.label(class="form-label") }}
+          {{ form.measure_id(class="form-select") }}
+          {% for error in form.measure_id.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
@@ -222,13 +220,6 @@
         <div class="form-check mb-2">
           {{ form.location_climate(class="form-check-input") }}
           {{ form.location_climate.label(class="form-check-label") }}
-        </div>
-        <div class="mb-3">
-          {{ form.criteria.label(class="form-label") }}
-          {{ form.criteria(class="form-control") }}
-          {% for error in form.criteria.errors %}
-          <div class="text-danger">{{ error }}</div>
-          {% endfor %}
         </div>
         <div class="mb-3">
           {{ form.description.label(class="form-label") }}
@@ -268,14 +259,14 @@
   import { setupBulkActions } from "{{ url_for('static', filename='js/utils/bulkActions.js') }}";
 
   document.addEventListener('DOMContentLoaded', function() {
-    // Configuración para búsqueda y filtros en relaciones país-indicador
+    // Configuración para búsqueda y filtros en relaciones país-variable climática
     initTableSearch({
-      searchInputId: 'countryIndicatorSearchInput',
-      filtersButtonId: 'countryIndicatorFiltersButton',
-      tableContainerId: 'countryIndicatorTableContainer',
-      noResultsId: 'noCountryIndicatorResults',
-      resultsCountId: 'countryIndicatorResultsCount',
-      tableBodyId: 'countryIndicatorTableBody',
+      searchInputId: 'countryClimateMeasureSearchInput',
+      filtersButtonId: 'countryClimateMeasureFiltersButton',
+      tableContainerId: 'countryClimateMeasureTableContainer',
+      noResultsId: 'noCountryClimateMeasureResults',
+      resultsCountId: 'countryClimateMeasureResultsCount',
+      tableBodyId: 'countryClimateMeasureTableBody',
       searchColumns: [
         { selector: '.searchable' }
       ],
@@ -287,10 +278,10 @@
           getDisplayValue: row => row.querySelector('.country')?.textContent.trim() || ''
         },
         {
-          name: 'indicator',
-          label: '{{ _("Indicador") }}',
-          getValue: row => row.querySelector('.indicator')?.textContent.trim(),
-          getDisplayValue: row => row.querySelector('.indicator')?.textContent.trim() || ''
+          name: 'measure',
+          label: '{{ _("Variable climática") }}',
+          getValue: row => row.querySelector('.measure')?.textContent.trim(),
+          getDisplayValue: row => row.querySelector('.measure')?.textContent.trim() || ''
         },
         {
           name: 'spatial_forecast',
@@ -316,12 +307,6 @@
           getValue: row => row.querySelector('.location_climate')?.textContent.trim(),
           getDisplayValue: row => row.querySelector('.location_climate')?.textContent.trim() || ''
         },
-        // {
-        //   name: 'criteria',
-        //   label: '{{ _("Criterios") }}',
-        //   getValue: row => row.querySelector('.criteria')?.textContent.trim(),
-        //   getDisplayValue: row => row.querySelector('.criteria')?.textContent.trim() || ''
-        // }
       ]
     });
     // Configuración para acciones masivas
@@ -335,5 +320,3 @@
   });
 </script>
 {% endblock %}
-
-
