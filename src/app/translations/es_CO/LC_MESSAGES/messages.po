@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-01 15:03-0500\n"
+"POT-Creation-Date: 2026-07-01 16:36-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es_CO\n"
@@ -273,7 +273,7 @@ msgstr "Store"
 #: app/templates/country_climate_measure/list.html:77
 #: app/templates/country_indicator/list.html:78
 msgid "Workspace"
-msgstr ""
+msgstr "Workspace"
 
 #: app/forms/country_form.py:8
 msgid "Nombre del país"
@@ -298,7 +298,7 @@ msgstr "Debe contener solo letras mayúsculas."
 #: app/forms/country_indicator_form.py:13
 #, python-brace-format
 msgid "El JSON debe ser un objeto/diccionario (formato: {\"clave\": \"valor\"})."
-msgstr ""
+msgstr "El JSON debe ser un objeto/diccionario (formato: {\"clave\": \"valor\"})."
 
 #: app/forms/country_indicator_form.py:15
 msgid "Debe ser un JSON válido. Error: "
@@ -444,7 +444,7 @@ msgstr "El título es obligatorio."
 
 #: app/forms/indicator_features_form.py:19
 msgid "El título no puede exceder 150 caracteres."
-msgstr ""
+msgstr "El título no puede exceder 150 caracteres."
 
 #: app/forms/indicator_features_form.py:29 app/forms/indicator_form.py:32
 #: app/templates/indicator/list.html:75 app/templates/indicator/list.html:261
@@ -1073,6 +1073,8 @@ msgid ""
 "El campo Criterios contiene un JSON inválido. Por favor, verifica el "
 "formato."
 msgstr ""
+"El campo Criterios contiene un JSON inválido. Por favor, verifica el "
+"formato."
 
 #: app/routes/country_indicator_routes.py:61
 msgid "Relación país-indicador agregada correctamente."
@@ -1601,8 +1603,12 @@ msgstr "Fuentes de locaciones"
 msgid "Parámetros de clientes"
 msgstr "Parámetros de clientes"
 
+#: app/templates/base.html:380
+msgid "Medidas climáticas por país"
+msgstr "Climate measures by country"
+
 #: app/templates/adm1/list.html:169 app/templates/app/list.html:165
-#: app/templates/base.html:426 app/templates/climate_measure/list.html:167
+#: app/templates/base.html:432 app/templates/climate_measure/list.html:167
 #: app/templates/country_climate_measure/list.html:190
 #: app/templates/country_indicator/list.html:197
 #: app/templates/cultivar/list.html:167

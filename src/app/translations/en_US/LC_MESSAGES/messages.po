@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-01 15:03-0500\n"
+"POT-Creation-Date: 2026-07-01 16:36-0500\n"
 "PO-Revision-Date: 2025-08-05 10:12-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -1601,8 +1601,12 @@ msgstr "Locations sources"
 msgid "Parámetros de clientes"
 msgstr "Client parameters "
 
+#: app/templates/base.html:380
+msgid "Medidas climáticas por país"
+msgstr "Medidas climáticas por paí"
+
 #: app/templates/adm1/list.html:169 app/templates/app/list.html:165
-#: app/templates/base.html:426 app/templates/climate_measure/list.html:167
+#: app/templates/base.html:432 app/templates/climate_measure/list.html:167
 #: app/templates/country_climate_measure/list.html:190
 #: app/templates/country_indicator/list.html:197
 #: app/templates/cultivar/list.html:167
