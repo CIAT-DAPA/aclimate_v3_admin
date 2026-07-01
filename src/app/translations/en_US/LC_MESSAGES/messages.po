@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-06 15:52-0500\n"
+"POT-Creation-Date: 2026-06-26 11:55-0500\n"
 "PO-Revision-Date: 2025-08-05 10:12-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -82,13 +82,15 @@ msgstr "External ID"
 msgid "Para Colombia: Código Divipola DANE del departamento"
 msgstr "For Colombia: DANE Divipola Code for department"
 
-#: app/forms/adm1_form.py:25 app/forms/country_indicator_form.py:23
-#: app/forms/cultivar_form.py:8 app/forms/data_source_form.py:16
-#: app/forms/location_form.py:8 app/forms/location_import_form.py:9
-#: app/forms/soil_form.py:8 app/templates/adm1/list.html:78
-#: app/templates/adm1/list.html:235
+#: app/forms/adm1_form.py:25 app/forms/country_climate_measure_form.py:9
+#: app/forms/country_indicator_form.py:23 app/forms/cultivar_form.py:8
+#: app/forms/data_source_form.py:16 app/forms/location_form.py:8
+#: app/forms/location_import_form.py:9 app/forms/soil_form.py:8
+#: app/templates/adm1/list.html:78 app/templates/adm1/list.html:235
+#: app/templates/country_climate_measure/list.html:69
+#: app/templates/country_climate_measure/list.html:276
 #: app/templates/country_indicator/list.html:69
-#: app/templates/country_indicator/list.html:258
+#: app/templates/country_indicator/list.html:285
 #: app/templates/cultivar/list.html:71 app/templates/cultivar/list.html:235
 #: app/templates/data_source/list.html:75
 #: app/templates/data_source/list.html:251 app/templates/home.html:39
@@ -115,8 +117,9 @@ msgid "¿Está habilitado?"
 msgstr "Is enabled?"
 
 #: app/forms/adm1_form.py:33 app/forms/adm2_form.py:34 app/forms/app_form.py:25
-#: app/forms/climate_measure_form.py:39 app/forms/country_form.py:26
-#: app/forms/country_indicator_form.py:45 app/forms/crop_form.py:17
+#: app/forms/climate_measure_form.py:39
+#: app/forms/country_climate_measure_form.py:41 app/forms/country_form.py:26
+#: app/forms/country_indicator_form.py:60 app/forms/crop_form.py:17
 #: app/forms/cultivar_form.py:40 app/forms/data_source_form.py:67
 #: app/forms/indicator_category_form.py:22
 #: app/forms/indicator_features_form.py:34 app/forms/indicator_form.py:59
@@ -191,17 +194,86 @@ msgstr "Unit"
 msgid "La unidad es obligatoria."
 msgstr "Unit is required."
 
-#: app/forms/climate_measure_form.py:33 app/forms/data_source_form.py:31
+#: app/forms/climate_measure_form.py:33
+#: app/forms/country_climate_measure_form.py:27
+#: app/forms/country_indicator_form.py:46 app/forms/data_source_form.py:31
 #: app/forms/indicator_category_form.py:16
 #: app/forms/indicator_features_form.py:24 app/forms/indicator_form.py:53
 #: app/forms/phenological_stage_form.py:32 app/forms/stress_form.py:30
 #: app/templates/climate_measure/list.html:75
+#: app/templates/country_climate_measure/list.html:75
+#: app/templates/country_indicator/list.html:76
 #: app/templates/indicator/list.html:78
 #: app/templates/indicator_category/list.html:73
 #: app/templates/indicator_features/list.html:71
 #: app/templates/role/edit.html:51 app/templates/stress/list.html:75
 msgid "Descripción"
 msgstr "Description"
+
+#: app/forms/country_climate_measure_form.py:11
+#: app/forms/country_indicator_form.py:25
+msgid "El país es obligatorio."
+msgstr "Country is required."
+
+#: app/forms/country_climate_measure_form.py:15
+#: app/templates/country_climate_measure/list.html:70
+#: app/templates/country_climate_measure/list.html:282
+msgid "Variable climática"
+msgstr "Climate variable"
+
+#: app/forms/country_climate_measure_form.py:18
+msgid "La variable climática es obligatoria."
+msgstr "Climate variable is required."
+
+#: app/forms/country_climate_measure_form.py:21
+#: app/forms/country_indicator_form.py:35
+#: app/templates/country_climate_measure/list.html:71
+#: app/templates/country_climate_measure/list.html:288
+#: app/templates/country_indicator/list.html:71
+#: app/templates/country_indicator/list.html:297
+msgid "Pronóstico espacial"
+msgstr "Spatial Forecast"
+
+#: app/forms/country_climate_measure_form.py:22
+#: app/forms/country_indicator_form.py:36
+#: app/templates/country_climate_measure/list.html:72
+#: app/templates/country_climate_measure/list.html:294
+#: app/templates/country_indicator/list.html:72
+#: app/templates/country_indicator/list.html:303
+msgid "Clima espacial"
+msgstr "Spatial Climate"
+
+#: app/forms/country_climate_measure_form.py:23
+#: app/forms/country_indicator_form.py:37
+#: app/templates/country_climate_measure/list.html:73
+#: app/templates/country_climate_measure/list.html:300
+#: app/templates/country_indicator/list.html:73
+#: app/templates/country_indicator/list.html:309
+msgid "Pronóstico por ubicación"
+msgstr "Forecast by location"
+
+#: app/forms/country_climate_measure_form.py:24
+#: app/forms/country_indicator_form.py:38
+#: app/templates/country_climate_measure/list.html:74
+#: app/templates/country_climate_measure/list.html:306
+#: app/templates/country_indicator/list.html:74
+#: app/templates/country_indicator/list.html:315
+msgid "Clima por ubicación"
+msgstr "Climate by location"
+
+#: app/forms/country_climate_measure_form.py:32
+#: app/forms/country_indicator_form.py:51
+#: app/templates/country_climate_measure/list.html:76
+#: app/templates/country_indicator/list.html:77
+msgid "Store"
+msgstr "Store"
+
+#: app/forms/country_climate_measure_form.py:37
+#: app/forms/country_indicator_form.py:56
+#: app/templates/country_climate_measure/list.html:77
+#: app/templates/country_indicator/list.html:78
+msgid "Workspace"
+msgstr ""
 
 #: app/forms/country_form.py:8
 msgid "Nombre del país"
@@ -236,43 +308,15 @@ msgstr "Must be valid JSON. Error: "
 msgid "Error al validar el JSON: "
 msgstr "Error validating JSON: "
 
-#: app/forms/country_indicator_form.py:25
-msgid "El país es obligatorio."
-msgstr "Country is required."
-
 #: app/forms/country_indicator_form.py:29
 #: app/templates/country_indicator/list.html:70
-#: app/templates/country_indicator/list.html:264
+#: app/templates/country_indicator/list.html:291
 msgid "Indicador"
 msgstr "Indicators"
 
 #: app/forms/country_indicator_form.py:32
 msgid "El indicador es obligatorio."
 msgstr "Indicator is required."
-
-#: app/forms/country_indicator_form.py:35
-#: app/templates/country_indicator/list.html:71
-#: app/templates/country_indicator/list.html:270
-msgid "Pronóstico espacial"
-msgstr "Spatial Forecast"
-
-#: app/forms/country_indicator_form.py:36
-#: app/templates/country_indicator/list.html:72
-#: app/templates/country_indicator/list.html:276
-msgid "Clima espacial"
-msgstr "Spatial Climate"
-
-#: app/forms/country_indicator_form.py:37
-#: app/templates/country_indicator/list.html:73
-#: app/templates/country_indicator/list.html:282
-msgid "Pronóstico por ubicación"
-msgstr "Forecast by location"
-
-#: app/forms/country_indicator_form.py:38
-#: app/templates/country_indicator/list.html:74
-#: app/templates/country_indicator/list.html:288
-msgid "Clima por ubicación"
-msgstr "Climate by location"
 
 #: app/forms/country_indicator_form.py:41
 msgid "Criterios (JSON)"
@@ -866,8 +910,9 @@ msgstr "Administrative division added successfully."
 #: app/routes/app_routes.py:47 app/routes/app_routes.py:92
 #: app/routes/climate_measure_routes.py:45
 #: app/routes/climate_measure_routes.py:81
-#: app/routes/country_indicator_routes.py:74
-#: app/routes/country_indicator_routes.py:135 app/routes/crop_routes.py:43
+#: app/routes/country_climate_measure_routes.py:63
+#: app/routes/country_indicator_routes.py:77
+#: app/routes/country_indicator_routes.py:141 app/routes/crop_routes.py:43
 #: app/routes/crop_routes.py:75 app/routes/cultivar_routes.py:52
 #: app/routes/cultivar_routes.py:94 app/routes/data_source_routes.py:57
 #: app/routes/data_source_routes.py:106
@@ -936,7 +981,8 @@ msgstr "Error creating the application: "
 msgid "Aplicación actualizada."
 msgstr "Application updated."
 
-#: app/routes/app_routes.py:68 app/routes/country_indicator_routes.py:114
+#: app/routes/app_routes.py:68 app/routes/country_climate_measure_routes.py:93
+#: app/routes/country_indicator_routes.py:120
 #: app/routes/indicator_features_routes.py:128
 msgid "Error al actualizar: "
 msgstr "Error updating: "
@@ -985,44 +1031,62 @@ msgstr "Climate variable disabled."
 msgid "Variable climática reactivada."
 msgstr "Climate variable reactivated."
 
+#: app/routes/country_climate_measure_routes.py:30
+msgid "No tienes permiso para crear relaciones país-variable climática."
+msgstr "You don't have permission to create country-climate measure relationships."
+
+#: app/routes/country_climate_measure_routes.py:46
+msgid "Relación país-variable climática agregada correctamente."
+msgstr "Country-climate measure relationship successfully added."
+
+#: app/routes/country_climate_measure_routes.py:49
+#: app/routes/country_indicator_routes.py:64
+msgid "Error al crear la relación: "
+msgstr "Error creating the relationship: "
+
+#: app/routes/country_climate_measure_routes.py:90
+msgid "Relación país-variable climática actualizada."
+msgstr "Country-climate measure relationship updated."
+
+#: app/routes/country_climate_measure_routes.py:104
+#: app/routes/country_indicator_routes.py:130
+#: app/routes/indicator_features_routes.py:138
+msgid "No se pudo eliminar."
+msgstr "Could not disable."
+
+#: app/routes/country_climate_measure_routes.py:106
+msgid "Relación país-variable climática eliminada."
+msgstr "Country-climate measure relationship deleted."
+
 #: app/routes/country_indicator_routes.py:30
 msgid "No tienes permiso para crear relaciones país-indicador."
 msgstr "You don't have permission to create country-indicator relationships."
 
 #: app/routes/country_indicator_routes.py:39
-#: app/routes/country_indicator_routes.py:94
+#: app/routes/country_indicator_routes.py:97
 msgid "El campo Criterios debe ser un objeto JSON válido (diccionario)."
 msgstr "The Criteria field must be a valid JSON object (dictionary)."
 
 #: app/routes/country_indicator_routes.py:43
-#: app/routes/country_indicator_routes.py:97
+#: app/routes/country_indicator_routes.py:100
 msgid ""
 "El campo Criterios contiene un JSON inválido. Por favor, verifica el "
 "formato."
 msgstr "The Criteria field contains invalid JSON. Please verify the format."
 
-#: app/routes/country_indicator_routes.py:58
+#: app/routes/country_indicator_routes.py:61
 msgid "Relación país-indicador agregada correctamente."
 msgstr "Country-indicator relationship added successfully."
 
-#: app/routes/country_indicator_routes.py:61
-msgid "Error al crear la relación: "
-msgstr "Error creating the relationship: "
-
-#: app/routes/country_indicator_routes.py:111
+#: app/routes/country_indicator_routes.py:117
 msgid "Relación país-indicador actualizada."
 msgstr "Country-indicator relationship updated."
 
-#: app/routes/country_indicator_routes.py:124
-#: app/routes/indicator_features_routes.py:138
-msgid "No se pudo eliminar."
-msgstr "Could not disable."
-
-#: app/routes/country_indicator_routes.py:126
+#: app/routes/country_indicator_routes.py:132
 msgid "Relación país-indicador eliminada."
 msgstr "Country-indicator relationship deleted."
 
-#: app/routes/country_indicator_routes.py:139
+#: app/routes/country_indicator_routes.py:145
 msgid "Relación país-indicador reactivada."
 msgstr "Country-indicator relationship reactivated."
 
@@ -1534,12 +1598,17 @@ msgid "Indicadores por país"
 msgstr "Indicators by country"
 
 #: app/templates/base.html:374
+msgid "Medidas climáticas por país"
+msgstr "Climate measures by country"
+
+#: app/templates/base.html:380
 msgid "Características de indicadores"
 msgstr "Indicator Features"
 
 #: app/templates/adm1/list.html:169 app/templates/app/list.html:165
-#: app/templates/base.html:425 app/templates/climate_measure/list.html:167
-#: app/templates/country_indicator/list.html:186
+#: app/templates/base.html:431 app/templates/climate_measure/list.html:167
+#: app/templates/country_climate_measure/list.html:190
+#: app/templates/country_indicator/list.html:192
 #: app/templates/cultivar/list.html:167
 #: app/templates/indicator_category/list.html:163
 #: app/templates/indicator_features/list.html:175
@@ -1760,8 +1829,10 @@ msgstr "E.g.: 27 for Chocó"
 #: app/templates/climate_measure/list.html:202
 #: app/templates/country/add.html:33 app/templates/country/edit.html:37
 #: app/templates/country/list.html:174
-#: app/templates/country_indicator/edit.html:58
-#: app/templates/country_indicator/list.html:230 app/templates/crop/add.html:38
+#: app/templates/country_climate_measure/edit.html:74
+#: app/templates/country_climate_measure/list.html:248
+#: app/templates/country_indicator/edit.html:82
+#: app/templates/country_indicator/list.html:257 app/templates/crop/add.html:38
 #: app/templates/crop/crop_list.html:159 app/templates/crop/edit.html:36
 #: app/templates/crop/list.html:174 app/templates/cultivar/edit.html:61
 #: app/templates/cultivar/list.html:206 app/templates/data_source/add.html:38
@@ -1805,8 +1876,10 @@ msgstr "Administrative Divisions - Level 1 (ADM1)"
 #: app/templates/climate_measure/list.html:13
 #: app/templates/climate_measure/list.html:204
 #: app/templates/country/list.html:13 app/templates/country/list.html:177
+#: app/templates/country_climate_measure/list.html:13
+#: app/templates/country_climate_measure/list.html:250
 #: app/templates/country_indicator/list.html:13
-#: app/templates/country_indicator/list.html:232
+#: app/templates/country_indicator/list.html:259
 #: app/templates/crop/crop_list.html:12 app/templates/crop/crop_list.html:161
 #: app/templates/crop/list.html:13 app/templates/crop/list.html:176
 #: app/templates/cultivar/list.html:13 app/templates/cultivar/list.html:208
@@ -1835,6 +1908,7 @@ msgstr "Add"
 #: app/templates/adm1/list.html:23 app/templates/adm2/list.html:23
 #: app/templates/app/list.html:24 app/templates/climate_measure/list.html:24
 #: app/templates/country/list.html:24
+#: app/templates/country_climate_measure/list.html:24
 #: app/templates/country_indicator/list.html:24
 #: app/templates/crop/crop_list.html:22 app/templates/crop/list.html:24
 #: app/templates/cultivar/list.html:24 app/templates/data_source/list.html:24
@@ -1856,6 +1930,8 @@ msgstr "Search"
 #: app/templates/climate_measure/list.html:35
 #: app/templates/climate_measure/list.html:38
 #: app/templates/country/list.html:35 app/templates/country/list.html:38
+#: app/templates/country_climate_measure/list.html:35
+#: app/templates/country_climate_measure/list.html:38
 #: app/templates/country_indicator/list.html:35
 #: app/templates/country_indicator/list.html:38
 #: app/templates/crop/crop_list.html:33 app/templates/crop/crop_list.html:36
@@ -1885,6 +1961,7 @@ msgstr "Filters"
 #: app/templates/adm1/list.html:35 app/templates/adm2/list.html:35
 #: app/templates/app/list.html:36 app/templates/climate_measure/list.html:36
 #: app/templates/country/list.html:36
+#: app/templates/country_climate_measure/list.html:36
 #: app/templates/country_indicator/list.html:36
 #: app/templates/crop/crop_list.html:34 app/templates/crop/list.html:36
 #: app/templates/cultivar/list.html:36 app/templates/data_source/list.html:36
@@ -1903,6 +1980,7 @@ msgstr "Clear filters"
 #: app/templates/adm1/list.html:40 app/templates/adm2/list.html:40
 #: app/templates/app/list.html:41 app/templates/climate_measure/list.html:41
 #: app/templates/country/list.html:41
+#: app/templates/country_climate_measure/list.html:41
 #: app/templates/country_indicator/list.html:41
 #: app/templates/crop/crop_list.html:39 app/templates/crop/list.html:41
 #: app/templates/cultivar/list.html:41 app/templates/data_source/list.html:41
@@ -1922,6 +2000,7 @@ msgstr "Loading filters..."
 #: app/templates/adm1/list.html:49 app/templates/adm2/list.html:49
 #: app/templates/app/list.html:49 app/templates/climate_measure/list.html:49
 #: app/templates/country/list.html:50
+#: app/templates/country_climate_measure/list.html:49
 #: app/templates/country_indicator/list.html:49
 #: app/templates/crop/crop_list.html:47 app/templates/crop/list.html:49
 #: app/templates/cultivar/list.html:49 app/templates/data_source/list.html:50
@@ -1991,7 +2070,8 @@ msgstr "Status"
 #: app/templates/adm1/list.html:80 app/templates/adm2/list.html:74
 #: app/templates/app/list.html:76 app/templates/climate_measure/list.html:78
 #: app/templates/country/list.html:74
-#: app/templates/country_indicator/list.html:77
+#: app/templates/country_climate_measure/list.html:79
+#: app/templates/country_indicator/list.html:80
 #: app/templates/crop/crop_list.html:68 app/templates/crop/list.html:73
 #: app/templates/cultivar/list.html:77 app/templates/data_source/list.html:78
 #: app/templates/indicator/list.html:81
@@ -2051,7 +2131,8 @@ msgstr "Disabled"
 
 #: app/templates/adm1/list.html:105 app/templates/app/list.html:101
 #: app/templates/climate_measure/list.html:103
-#: app/templates/country_indicator/list.html:100
+#: app/templates/country_climate_measure/list.html:104
+#: app/templates/country_indicator/list.html:106
 #: app/templates/cultivar/list.html:105
 #: app/templates/indicator_category/list.html:99
 #: app/templates/indicator_features/list.html:97
@@ -2090,7 +2171,8 @@ msgstr "Recover"
 #: app/templates/adm1/list.html:140 app/templates/adm2/list.html:131
 #: app/templates/app/list.html:137 app/templates/climate_measure/list.html:139
 #: app/templates/country/list.html:124
-#: app/templates/country_indicator/list.html:126
+#: app/templates/country_climate_measure/list.html:130
+#: app/templates/country_indicator/list.html:132
 #: app/templates/crop/crop_list.html:113 app/templates/crop/list.html:127
 #: app/templates/cultivar/list.html:139 app/templates/data_source/list.html:136
 #: app/templates/indicator/list.html:148
@@ -2133,6 +2215,7 @@ msgid "Editar división administrativa - Nivel 2"
 msgstr "Edit Administrative Division - Level 2"
 
 #: app/templates/adm2/edit.html:15 app/templates/app/edit.html:16
+#: app/templates/country_climate_measure/edit.html:9
 #: app/templates/country_indicator/edit.html:9
 #: app/templates/indicator_features/edit.html:9
 #: app/templates/phenological_stage/edit.html:9
@@ -2165,7 +2248,8 @@ msgid "Editar Aplicación"
 msgstr "Edit Application"
 
 #: app/templates/app/list.html:137 app/templates/climate_measure/list.html:139
-#: app/templates/country_indicator/list.html:126
+#: app/templates/country_climate_measure/list.html:130
+#: app/templates/country_indicator/list.html:132
 #: app/templates/crop/crop_list.html:113 app/templates/crop/list.html:127
 #: app/templates/indicator/list.html:148
 #: app/templates/indicator_category/list.html:135
@@ -2257,6 +2341,65 @@ msgstr "Add country"
 msgid "Código ISO 2"
 msgstr "ISO 2 code"
 
+#: app/templates/country_climate_measure/edit.html:2
+msgid "Editar Relación País-Variable Climática"
+msgstr "Edit Country-Climate Measure Relationship"
+
+#: app/templates/country_climate_measure/edit.html:7
+msgid "Editar relación país-variable climática"
+msgstr "Edit country-climate measure relationship"
+
+#: app/templates/country_climate_measure/list.html:2
+#: app/templates/country_climate_measure/list.html:6
+msgid "Relaciones País-Variable Climática"
+msgstr "Country-Climate Measure Relationships"
+
+#: app/templates/country_climate_measure/list.html:59
+#: app/templates/country_indicator/list.html:59
+#: app/templates/indicator_features/list.html:59
+msgid "Eliminar seleccionadas"
+msgstr "Delete selected"
+
+#: app/templates/country_climate_measure/list.html:91
+#: app/templates/country_climate_measure/list.html:92
+#: app/templates/country_climate_measure/list.html:93
+#: app/templates/country_climate_measure/list.html:94
+#: app/templates/country_indicator/list.html:92
+#: app/templates/country_indicator/list.html:93
+#: app/templates/country_indicator/list.html:94
+#: app/templates/country_indicator/list.html:95
+#: app/templates/cultivar/list.html:87 app/templates/cultivar/list.html:95
+msgid "Sí"
+msgstr "Yes"
+
+#: app/templates/country_climate_measure/list.html:91
+#: app/templates/country_climate_measure/list.html:92
+#: app/templates/country_climate_measure/list.html:93
+#: app/templates/country_climate_measure/list.html:94
+#: app/templates/country_indicator/list.html:92
+#: app/templates/country_indicator/list.html:93
+#: app/templates/country_indicator/list.html:94
+#: app/templates/country_indicator/list.html:95
+#: app/templates/cultivar/list.html:87 app/templates/cultivar/list.html:95
+#: app/templates/cultivar/list.html:255
+msgid "No"
+msgstr "No"
+
+#: app/templates/country_climate_measure/list.html:113
+#: app/templates/country_indicator/list.html:115
+#: app/templates/indicator_features/list.html:106
+#: app/templates/setup/edit.html:76 app/templates/user/permissions.html:132
+msgid "Eliminar"
+msgstr "Delete"
+
+#: app/templates/country_climate_measure/list.html:134
+msgid "No hay relaciones país-variable climática registradas."
+msgstr "No country-climate measure relationships registered."
+
+#: app/templates/country_climate_measure/list.html:184
+msgid "Agregar relación país-variable climática"
+msgstr "Add country-climate measure relationship"
+
 #: app/templates/country_indicator/edit.html:2
 msgid "Editar Relación País-Indicador"
 msgstr "Edit Country-Indicator Relationship"
@@ -2270,44 +2413,16 @@ msgstr "Edit Country-Indicator Relationship"
 msgid "Relaciones País-Indicador"
 msgstr "Country-Indicator Relationships"
 
-#: app/templates/country_indicator/list.html:59
-#: app/templates/indicator_features/list.html:59
-msgid "Eliminar seleccionadas"
-msgstr "Delete selected"
-
 #: app/templates/country_indicator/list.html:75
-#: app/templates/country_indicator/list.html:294
+#: app/templates/country_indicator/list.html:321
 msgid "Criterios"
 msgstr "Criteria"
 
-#: app/templates/country_indicator/list.html:89
-#: app/templates/country_indicator/list.html:90
-#: app/templates/country_indicator/list.html:91
-#: app/templates/country_indicator/list.html:92
-#: app/templates/cultivar/list.html:87 app/templates/cultivar/list.html:95
-msgid "Sí"
-msgstr "Yes"
-
-#: app/templates/country_indicator/list.html:89
-#: app/templates/country_indicator/list.html:90
-#: app/templates/country_indicator/list.html:91
-#: app/templates/country_indicator/list.html:92
-#: app/templates/cultivar/list.html:87 app/templates/cultivar/list.html:95
-#: app/templates/cultivar/list.html:255
-msgid "No"
-msgstr "No"
-
-#: app/templates/country_indicator/list.html:109
-#: app/templates/indicator_features/list.html:106
-#: app/templates/setup/edit.html:76 app/templates/user/permissions.html:132
-msgid "Eliminar"
-msgstr "Delete"
-
-#: app/templates/country_indicator/list.html:130
+#: app/templates/country_indicator/list.html:136
 msgid "No hay relaciones país-indicador registradas."
 msgstr "No country-indicator relationships registered."
 
-#: app/templates/country_indicator/list.html:180
+#: app/templates/country_indicator/list.html:186
 msgid "Agregar relación país-indicador"
 msgstr "Add country-indicator relationship"
 
