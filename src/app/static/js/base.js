@@ -113,6 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
       app:"configurationSection",
       data_source: "configurationSection",
       source: "configurationSection",
+      country_climate_measure: "configurationSection",
     };
 
     for (const [route, section] of Object.entries(routeSectionMap)) {
