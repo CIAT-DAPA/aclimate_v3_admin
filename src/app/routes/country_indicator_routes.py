@@ -55,7 +55,7 @@ def list_country_indicator():
                 criteria=criteria_data,
                 description=form.description.data or None,
                 store=form.store.data or None,
-                workspace=form.workspace.data or None
+                workspace=form.workspace.data or None,
             )
             country_indicator_service.create(new_ci)
             flash(_('Relación país-indicador agregada correctamente.'), 'success')
@@ -86,6 +86,8 @@ def edit_country_indicator(id):
     if request.method == 'GET':
         form.country_id.data = str(ci.country_id)
         form.indicator_id.data = ci.indicator_id
+        if ci.criteria:
+            form.criteria.data = json.dumps(ci.criteria, ensure_ascii=False)
 
     if form.validate_on_submit():
         # Validar y convertir el campo criteria si existe
@@ -102,8 +104,6 @@ def edit_country_indicator(id):
         
         try:
             update_data = CountryIndicatorUpdate(
-                country_id=int(form.country_id.data),
-                indicator_id=form.indicator_id.data,
                 spatial_forecast=form.spatial_forecast.data,
                 spatial_climate=form.spatial_climate.data,
                 location_forecast=form.location_forecast.data,
@@ -111,7 +111,7 @@ def edit_country_indicator(id):
                 criteria=criteria_data,
                 description=form.description.data or None,
                 store=form.store.data or None,
-                workspace=form.workspace.data or None
+                workspace=form.workspace.data or None,
             )
             country_indicator_service.update(id=id, obj_in=update_data)
             flash(_('Relación país-indicador actualizada.'), 'success')

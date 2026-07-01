@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_babel import lazy_gettext as _l
 from wtforms import SelectField, BooleanField, SubmitField, TextAreaField, StringField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import DataRequired, Optional, Length
 import json
 from wtforms import ValidationError
 
@@ -49,12 +49,12 @@ class CountryIndicatorForm(FlaskForm):
 
     store = StringField(
         _l('Store'),
-        validators=[Optional()]
+        validators=[Optional(), Length(max=255)]
     )
 
     workspace = StringField(
         _l('Workspace'),
-        validators=[Optional()]
+        validators=[Optional(), Length(max=255)]
     )
 
     submit = SubmitField(_l('Guardar'))
