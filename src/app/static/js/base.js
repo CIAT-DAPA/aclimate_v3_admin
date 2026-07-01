@@ -80,9 +80,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Mapeo de rutas a secciones del sidebar
     // IMPORTANTE: Rutas más específicas primero (ej: country_indicator antes de country)
+    // IMPORTANTE: rutas más específicas siempre antes que sus prefijos
     const routeSectionMap = {
+      // Indicadores (antes de Geográfico para que country_indicator no matchee con 'country')
+      country_indicator: "indicatorsSection",
+      indicator_features: "indicatorsSection",
+      indicator_category: "indicatorsSection",
+      indicator: "indicatorsSection",
       // Geográfico
-      country_indicator: "configurationSection",  // Debe ir ANTES de country
       country: "geograficoSection",
       adm1: "geograficoSection",
       adm2: "geograficoSection",
@@ -90,8 +95,9 @@ document.addEventListener("DOMContentLoaded", function () {
       // Clima
       weather: "climaSection",
       climate: "climaSection",
-      // Cultivos
-      phenological_stage: "cultivosSection",  // Debe ir antes que otros para evitar matches parciales
+      // Cultivos (phenological_stage antes de stress para evitar match parcial con phenological_stage_stress)
+      phenological_stage_stress: "cultivosSection",
+      phenological_stage: "cultivosSection",
       crop: "cultivosSection",
       stress: "cultivosSection",
       cultivar: "cultivosSection",
@@ -100,13 +106,11 @@ document.addEventListener("DOMContentLoaded", function () {
       setup: "cultivosSection",
       simulation: "cultivosSection",
       parameter: "cultivosSection",
-      // Indicadores
-      indicator_category: "indicatorsSection",  // Debe ir ANTES de indicator
-      indicator: "indicatorsSection",
       // Usuarios
       user: "usuariosSection",
       role: "usuariosSection",
       // Configuración
+      app:"configurationSection",
       data_source: "configurationSection",
       source: "configurationSection",
     };

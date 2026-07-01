@@ -72,7 +72,7 @@ def edit_country(id):
             iso2=form.iso2.data.upper(),
             enable=form.enable.data
         )
-
+        country_service.update(id=id, obj_in=update)
         flash(_('País actualizado correctamente.'), 'success')
         return redirect(url_for('country.list_country'))
 
