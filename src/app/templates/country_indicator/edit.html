@@ -56,26 +56,33 @@
 
     <div class="mb-3">
       {{ form.description.label(class="form-label") }}
+      <small class="text-muted ms-1">— {{ _('Si se deja vacío, se usa la descripción del indicador') }}</small>
+      {% if country_indicator.indicator and country_indicator.indicator.description %}
+      <div class="form-text text-muted mb-1">
+        <strong>{{ _('Descripción del indicador:') }}</strong> {{ country_indicator.indicator.description }}
+      </div>
+      {% endif %}
       {{ form.description(class="form-control") }}
       {% for error in form.description.errors %}
         <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
 
-    <div class="mb-3">
-      {{ form.store.label(class="form-label") }}
-      {{ form.store(class="form-control") }}
-      {% for error in form.store.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
-    </div>
-
-    <div class="mb-3">
-      {{ form.workspace.label(class="form-label") }}
-      {{ form.workspace(class="form-control") }}
-      {% for error in form.workspace.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        {{ form.store.label(class="form-label") }}
+        {{ form.store(class="form-control") }}
+        {% for error in form.store.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="col-md-6 mb-3">
+        {{ form.workspace.label(class="form-label") }}
+        {{ form.workspace(class="form-control") }}
+        {% for error in form.workspace.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
     </div>
 
     {{ form.submit(class="btn btn-success") }}

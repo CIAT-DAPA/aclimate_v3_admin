@@ -51,7 +51,7 @@
 
   {% if country_indicators %}
   <div id="countryIndicatorTableContainer" class="table-responsive">
-    {% if current_user.has_module_access('configuration', 'delete') %}
+    {% if current_user.has_module_access('INDICATORS_DATA', 'delete') %}
     <form id="bulk-action-form" method="POST" action="{{ url_for('country_indicator.bulk_action') }}">
       <div class="mb-2">
         <input type="hidden" name="action" id="bulk-action-hidden" value="" />
@@ -63,7 +63,7 @@
       <table class="table table-hover align-middle table-sm">
         <thead class="table-light">
           <tr>
-            {% if current_user.has_module_access('configuration', 'delete') %}
+            {% if current_user.has_module_access('INDICATORS_DATA', 'delete') %}
             <th style="width: 40px; min-width: 40px;"><input type="checkbox" id="select-all" /></th>
             {% endif %}
             <th style="width: 10%; min-width: 100px;">{{ _('País') }}</th>
@@ -73,10 +73,10 @@
             <th style="width: 12%; min-width: 120px; text-align: center;">{{ _('Pronóstico por ubicación') }}</th>
             <th style="width: 12%; min-width: 120px; text-align: center;">{{ _('Clima por ubicación') }}</th>
             <th style="width: 14%; min-width: 100px;">{{ _('Criterios') }}</th>
-            <th style="width: 14%; min-width: 100px;">{{ _('Descripción') }}</th>
-            <th style="width: 8%; min-width: 80px;">{{ _('Store') }}</th>
-            <th style="width: 8%; min-width: 80px;">{{ _('Workspace') }}</th>
-            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
+            <th style="width: 16%; min-width: 120px;">{{ _('Descripción') }}</th>
+            <th style="width: 10%; min-width: 90px;">{{ _('Store') }}</th>
+            <th style="width: 10%; min-width: 90px;">{{ _('Workspace') }}</th>
+            {% if current_user.has_module_access('INDICATORS_DATA', 'update') or current_user.has_module_access('INDICATORS_DATA', 'delete') %}
             <th class="text-end" style="width: 12%; min-width: 100px;">{{ _('Acciones') }}</th>
             {% endif %}
           </tr>
@@ -84,7 +84,7 @@
         <tbody id="countryIndicatorTableBody">
           {% for ci in country_indicators %}
           <tr>
-            {% if current_user.has_module_access('configuration', 'delete') %}
+            {% if current_user.has_module_access('INDICATORS_DATA', 'delete') %}
             <td><input type="checkbox" name="selected_ids" value="{{ ci.id }}" class="select-row" /></td>
             {% endif %}
             <td class="searchable country">{{ ci.country.name if ci.country else '' }}</td>
@@ -94,12 +94,17 @@
             <td class="searchable location_forecast text-center">{{ _('Sí') if ci.location_forecast else _('No') }}</td>
             <td class="searchable location_climate text-center">{{ _('Sí') if ci.location_climate else _('No') }}</td>
             <td class="searchable criteria">{{ ci.criteria or '' }}</td>
-            <td class="searchable description">{{ ci.description or '' }}</td>
+            <td class="searchable description" style="max-width: 180px;">
+              {% set desc = ci.description or (ci.indicator.description if ci.indicator else '') %}
+              {% if desc %}
+              <span title="{{ desc }}" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ desc }}</span>
+              {% endif %}
+            </td>
             <td class="searchable store">{{ ci.store or '' }}</td>
             <td class="searchable workspace">{{ ci.workspace or '' }}</td>
-            {% if current_user.has_module_access('configuration', 'update') or current_user.has_module_access('configuration', 'delete') %}
+            {% if current_user.has_module_access('INDICATORS_DATA', 'update') or current_user.has_module_access('INDICATORS_DATA', 'delete') %}
             <td class="text-end">
-              {% if current_user.has_module_access('configuration', 'update') %}
+              {% if current_user.has_module_access('INDICATORS_DATA', 'update') %}
               <a
                 href="{{ url_for('country_indicator.edit_country_indicator', id=ci.id) }}"
                 class="btn btn-warning btn-sm me-2"
@@ -108,7 +113,7 @@
                 <i class="fas fa-pen"></i>
               </a>
               {% endif %}
-              {% if current_user.has_module_access('configuration', 'delete') %}
+              {% if current_user.has_module_access('INDICATORS_DATA', 'delete') %}
               <a
                 href="{{ url_for('country_indicator.delete_country_indicator', id=ci.id) }}"
                 class="btn btn-danger btn-sm"
@@ -123,7 +128,7 @@
           {% endfor %}
         </tbody>
       </table>
-    {% if current_user.has_module_access('configuration', 'delete') %}
+    {% if current_user.has_module_access('INDICATORS_DATA', 'delete') %}
     </form>
     {% endif %}
   </div>
@@ -232,24 +237,27 @@
         </div>
         <div class="mb-3">
           {{ form.description.label(class="form-label") }}
+          <small class="text-muted ms-1">— {{ _('Deja vacío para usar la descripción del indicador') }}</small>
           {{ form.description(class="form-control") }}
           {% for error in form.description.errors %}
           <div class="text-danger">{{ error }}</div>
           {% endfor %}
         </div>
-        <div class="mb-3">
-          {{ form.store.label(class="form-label") }}
-          {{ form.store(class="form-control") }}
-          {% for error in form.store.errors %}
-          <div class="text-danger">{{ error }}</div>
-          {% endfor %}
-        </div>
-        <div class="mb-3">
-          {{ form.workspace.label(class="form-label") }}
-          {{ form.workspace(class="form-control") }}
-          {% for error in form.workspace.errors %}
-          <div class="text-danger">{{ error }}</div>
-          {% endfor %}
+        <div class="row">
+          <div class="col-6 mb-3">
+            {{ form.store.label(class="form-label") }}
+            {{ form.store(class="form-control") }}
+            {% for error in form.store.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-6 mb-3">
+            {{ form.workspace.label(class="form-label") }}
+            {{ form.workspace(class="form-control") }}
+            {% for error in form.workspace.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
         </div>
       </div>
       <div class="modal-footer">
