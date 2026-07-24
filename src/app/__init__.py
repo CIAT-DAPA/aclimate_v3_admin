@@ -166,4 +166,8 @@ def create_app():
     app.register_blueprint(app_bp)
     app.register_blueprint(indicator_features_bp)
 
+    # Health check endpoints (not exposed in Swagger/ReDoc)
+    from app.routes.health import bp as health_bp
+    app.register_blueprint(health_bp)
+
     return app
