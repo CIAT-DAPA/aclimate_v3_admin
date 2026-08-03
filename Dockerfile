@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# ACLIMATE v3 — Admin Dockerfile
+# ACLIMATE v3 - Admin Dockerfile
 # =============================================================================
 # Stack: Flask + Gunicorn + PostgreSQL + Babel i18n
 # Port: 3003 (configurable via PORT env var)
@@ -41,7 +41,11 @@ RUN apt-get remove -y git gcc python3-dev && \
 
 # Layer 2: Copy application source code
 COPY src/ ./src/
-COPY conf_files/ ./conf_files/
+
+# Create runtime directory
+# NOTE: conf_files/ is NOT tracked in git (see .gitignore). It is populated
+# at runtime by the application with uploads, logs and generated files.
+RUN mkdir -p /app/conf_files
 
 # Compile translations (.po -> .mo)
 RUN cd src && pybabel compile -d app/translations
