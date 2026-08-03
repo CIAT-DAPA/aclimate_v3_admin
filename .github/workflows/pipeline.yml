@@ -89,6 +89,8 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions: write-all
+    outputs:
+      release_tag: ${{ steps.tag_version.outputs.new_tag }}
     
     steps:
       - name: Checkout code
@@ -127,7 +129,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
-          DRY_RUN: true
+          DRY_RUN: false
           DEFAULT_BUMP: patch
           RELEASE_BRANCHES: main
           INITIAL_VERSION: 3.0.0
@@ -170,3 +172,45 @@ jobs:
           asset_content_type: application/zip
 
 # ------- END RELEASE -------- #
+
+# ------- START DOCKER PUBLISH TO GHCR -------- #
+
+  PublishDocker:
+    needs: create-release
+    name: Build & Push Docker Image to GHCR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker tags
+        id: meta
+        run: |
+          TAG="${{ needs.create-release.outputs.release_tag }}"
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "tags=ghcr.io/${REPO}:latest,ghcr.io/${REPO}:${TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+# ------- END DOCKER PUBLISH TO GHCR -------- #
