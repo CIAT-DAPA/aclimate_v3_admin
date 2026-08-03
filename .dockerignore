@@ -9,13 +9,17 @@ __pycache__/
 *.egg
 *.so
 .env
+.env.*
+!.env.example
 .venv/
 venv/
 env/
 *.log
+logs/
 tests/
 docs/
 *.md
+Jenkinsfile
 update_translations.sh
 update_translations_dev.ps1
 .gitkeep

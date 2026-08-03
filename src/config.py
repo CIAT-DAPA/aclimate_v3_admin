@@ -55,3 +55,6 @@ class Config:
 
     # Configurar carpeta para subidas
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'conf_files')
+
+    # Health check token (optional) — protects /health and /ready endpoints
+    HEALTH_TOKEN = os.environ.get('HEALTH_TOKEN', '')
