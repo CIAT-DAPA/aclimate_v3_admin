@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from flask_babel import _
 from aclimate_v3_orm.services import MngCountryClimateMeasureService, MngCountryService, MngClimateMeasureService
 from aclimate_v3_orm.schemas import CountryClimateMeasureCreate, CountryClimateMeasureUpdate
+from aclimate_v3_orm.enums import Period
 from app.forms.country_climate_measure_form import CountryClimateMeasureForm
 from app.decorators.permissions import require_module_access
 from app.config.permissions import Module
@@ -24,6 +25,7 @@ def list_country_climate_measure():
     measures = measure_service.get_all()
     form.country_id.choices = [(c.id, c.name) for c in countries]
     form.measure_id.choices = [(m.id, f"{m.name} ({m.short_name})") for m in measures]
+    form.temporality.choices = [(p.value, _(p.value)) for p in Period]
 
     if form.validate_on_submit():
         if not can_create:
@@ -38,6 +40,7 @@ def list_country_climate_measure():
                 spatial_climate=form.spatial_climate.data,
                 location_forecast=form.location_forecast.data,
                 location_climate=form.location_climate.data,
+                temporality=form.temporality.data or [],
                 description=form.description.data or None,
                 store=form.store.data or None,
                 workspace=form.workspace.data or None
@@ -68,10 +71,12 @@ def edit_country_climate_measure(id):
     measures = measure_service.get_all()
     form.country_id.choices = [(c.id, c.name) for c in countries]
     form.measure_id.choices = [(m.id, f"{m.name} ({m.short_name})") for m in measures]
+    form.temporality.choices = [(p.value, _(p.value)) for p in Period]
 
     if request.method == 'GET':
         form.country_id.data = str(cm.country_id)
         form.measure_id.data = cm.measure_id
+        form.temporality.data = [p.value if hasattr(p, 'value') else p for p in (cm.temporality or [])]
 
     if form.validate_on_submit():
         try:
@@ -82,6 +87,7 @@ def edit_country_climate_measure(id):
                 spatial_climate=form.spatial_climate.data,
                 location_forecast=form.location_forecast.data,
                 location_climate=form.location_climate.data,
+                temporality=form.temporality.data or [],
                 description=form.description.data or None,
                 store=form.store.data or None,
                 workspace=form.workspace.data or None

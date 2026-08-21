@@ -72,6 +72,7 @@
             <th style="width: 11%; min-width: 110px; text-align: center;">{{ _('Clima espacial') }}</th>
             <th style="width: 12%; min-width: 120px; text-align: center;">{{ _('Pronóstico por ubicación') }}</th>
             <th style="width: 12%; min-width: 120px; text-align: center;">{{ _('Clima por ubicación') }}</th>
+            <th style="width: 14%; min-width: 140px;">{{ _('Temporalidad') }}</th>
             <th style="width: 14%; min-width: 100px;">{{ _('Descripción') }}</th>
             <th style="width: 8%; min-width: 80px;">{{ _('Store') }}</th>
             <th style="width: 8%; min-width: 80px;">{{ _('Workspace') }}</th>
@@ -92,6 +93,12 @@
             <td class="searchable spatial_climate text-center">{{ _('Sí') if cm.spatial_climate else _('No') }}</td>
             <td class="searchable location_forecast text-center">{{ _('Sí') if cm.location_forecast else _('No') }}</td>
             <td class="searchable location_climate text-center">{{ _('Sí') if cm.location_climate else _('No') }}</td>
+            <td class="searchable temporality">
+              {% for t in (cm.temporality or []) %}
+              {% set t_value = t.value if t.value is defined else t %}
+              <span class="badge bg-info text-dark me-1">{{ _(t_value) }}</span>
+              {% endfor %}
+            </td>
             <td class="searchable description">{{ cm.description or '' }}</td>
             <td class="searchable store">{{ cm.store or '' }}</td>
             <td class="searchable workspace">{{ cm.workspace or '' }}</td>
@@ -220,6 +227,29 @@
         <div class="form-check mb-2">
           {{ form.location_climate(class="form-check-input") }}
           {{ form.location_climate.label(class="form-check-label") }}
+        </div>
+        <div class="mb-3">
+          {{ form.temporality.label(class="form-label") }}
+          <div class="border rounded p-3 d-flex flex-wrap gap-3" style="max-height: 160px; overflow-y: auto;">
+            {% for value, label in form.temporality.choices %}
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="temporality_{{ value }}"
+                name="temporality"
+                value="{{ value }}"
+                {% if value in form.temporality.data %}checked{% endif %}
+              >
+              <label class="form-check-label" for="temporality_{{ value }}">
+                {{ label }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+          {% for error in form.temporality.errors %}
+          <div class="text-danger">{{ error }}</div>
+          {% endfor %}
         </div>
         <div class="mb-3">
           {{ form.description.label(class="form-label") }}
