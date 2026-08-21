@@ -47,6 +47,30 @@
     </div>
 
     <div class="mb-3">
+      {{ form.temporality.label(class="form-label") }}
+      <div class="border rounded p-3 d-flex flex-wrap gap-3" style="max-height: 160px; overflow-y: auto;">
+        {% for value, label in form.temporality.choices %}
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="temporality_{{ value }}"
+            name="temporality"
+            value="{{ value }}"
+            {% if value in form.temporality.data %}checked{% endif %}
+          >
+          <label class="form-check-label" for="temporality_{{ value }}">
+            {{ label }}
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+      {% for error in form.temporality.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
       {{ form.description.label(class="form-label") }}
       {{ form.description(class="form-control") }}
       {% for error in form.description.errors %}
