@@ -33,7 +33,8 @@ class CountryClimateMeasureForm(FlaskForm):
     temporality = MultiCheckboxField(
         _l('Temporalidad'),
         choices=[],  # Llena dinámicamente en la vista con [(valor, etiqueta), ...]
-        coerce=str
+        coerce=str,
+        default=list
     )
 
     description = TextAreaField(
