@@ -46,28 +46,51 @@
       {{ form.location_climate.label(class="form-check-label") }}
     </div>
 
-    <div class="mb-3">
-      {{ form.temporality.label(class="form-label") }}
+    <div class="mb-3" id="location_climate_conf_section">
+      {{ form.location_climate_conf.label(class="form-label") }}
       <div class="border rounded p-3 d-flex flex-wrap gap-3" style="max-height: 160px; overflow-y: auto;">
-        {% for value, label in form.temporality.choices %}
+        {% for value, label in form.location_climate_conf.choices %}
         <div class="form-check">
           <input
             class="form-check-input"
             type="checkbox"
-            id="temporality_{{ value }}"
-            name="temporality"
+            id="location_climate_conf_{{ value }}"
+            name="location_climate_conf"
             value="{{ value }}"
-            {% if value in form.temporality.data %}checked{% endif %}
+            {% if value in form.location_climate_conf.data %}checked{% endif %}
           >
-          <label class="form-check-label" for="temporality_{{ value }}">
+          <label class="form-check-label" for="location_climate_conf_{{ value }}">
             {{ label }}
           </label>
         </div>
         {% endfor %}
       </div>
-      {% for error in form.temporality.errors %}
+      {% for error in form.location_climate_conf.errors %}
         <div class="text-danger">{{ error }}</div>
       {% endfor %}
+    </div>
+
+    <div class="mb-3" id="spatial_climate_conf_section">
+      <label class="form-label">{{ _('Configuración clima espacial') }}</label>
+      <div class="border rounded p-3">
+        <div class="row g-2 mb-2 text-muted small">
+          <div class="col-3">{{ _('Temporalidad') }}</div>
+          <div class="col-4">{{ _('Store') }}</div>
+          <div class="col-5">{{ _('Workspace') }}</div>
+        </div>
+        {% for p in periods %}
+        <div class="row g-2 mb-2">
+          <div class="col-3 d-flex align-items-center">{{ _(p.value) }}</div>
+          <div class="col-4">
+            <input type="text" class="form-control form-control-sm" name="spatial_conf_store_{{ p.value }}" value="{{ spatial_conf_by_temporality.get(p.value, {}).get('store', '') }}" placeholder="{{ _('Store') }}">
+          </div>
+          <div class="col-5">
+            <input type="text" class="form-control form-control-sm" name="spatial_conf_workspace_{{ p.value }}" value="{{ spatial_conf_by_temporality.get(p.value, {}).get('workspace', '') }}" placeholder="{{ _('Workspace') }}">
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <small class="text-muted">{{ _('Solo se guardan las temporalidades con Store o Workspace diligenciados.') }}</small>
     </div>
 
     <div class="mb-3">
@@ -78,24 +101,35 @@
       {% endfor %}
     </div>
 
-    <div class="mb-3">
-      {{ form.store.label(class="form-label") }}
-      {{ form.store(class="form-control") }}
-      {% for error in form.store.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
-    </div>
-
-    <div class="mb-3">
-      {{ form.workspace.label(class="form-label") }}
-      {{ form.workspace(class="form-control") }}
-      {% for error in form.workspace.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
-    </div>
-
     {{ form.submit(class="btn btn-success") }}
     <a href="{{ url_for('country_climate_measure.list_country_climate_measure') }}" class="btn btn-outline-secondary">{{ _('Cancelar') }}</a>
   </form>
 </div>
+
+<!-- Mostrar/ocultar configs según el flag correspondiente -->
+<script>
+  function toggleClimateConfSections() {
+    var spatial = document.getElementById('spatial_climate');
+    var location = document.getElementById('location_climate');
+    var spatialSection = document.getElementById('spatial_climate_conf_section');
+    var locationSection = document.getElementById('location_climate_conf_section');
+    if (spatial && spatialSection) {
+      spatialSection.classList.toggle('d-none', !spatial.checked);
+    }
+    if (location && locationSection) {
+      locationSection.classList.toggle('d-none', !location.checked);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var spatial = document.getElementById('spatial_climate');
+    var location = document.getElementById('location_climate');
+    if (spatial) {
+      spatial.addEventListener('change', toggleClimateConfSections);
+    }
+    if (location) {
+      location.addEventListener('change', toggleClimateConfSections);
+    }
+    toggleClimateConfSections();
+  });
+</script>
 {% endblock %}
