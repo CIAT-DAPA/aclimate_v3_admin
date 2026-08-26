@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_babel import lazy_gettext as _l
-from wtforms import SelectField, BooleanField, SubmitField, TextAreaField, StringField, SelectMultipleField
+from wtforms import SelectField, BooleanField, SubmitField, TextAreaField, SelectMultipleField
 from wtforms.validators import DataRequired, Optional
 from wtforms.widgets import ListWidget, CheckboxInput
 
@@ -30,8 +30,8 @@ class CountryClimateMeasureForm(FlaskForm):
     location_forecast = BooleanField(_l('Pronóstico por ubicación'), default=False)
     location_climate = BooleanField(_l('Clima por ubicación'), default=False)
 
-    temporality = MultiCheckboxField(
-        _l('Temporalidad'),
+    location_climate_conf = MultiCheckboxField(
+        _l('Temporalidades clima por ubicación'),
         choices=[],  # Llena dinámicamente en la vista con [(valor, etiqueta), ...]
         coerce=str,
         default=list
@@ -39,16 +39,6 @@ class CountryClimateMeasureForm(FlaskForm):
 
     description = TextAreaField(
         _l('Descripción'),
-        validators=[Optional()]
-    )
-
-    store = StringField(
-        _l('Store'),
-        validators=[Optional()]
-    )
-
-    workspace = StringField(
-        _l('Workspace'),
         validators=[Optional()]
     )
 
